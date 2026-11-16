@@ -402,6 +402,23 @@
                             <div id="detail-sachverhalt" class="sachverhalt-box"></div>
                             <p class="mt-10"><strong>Beweismittel &amp; Anlagen:</strong></p>
                             <div id="detail-beweismittel" class="sachverhalt-box">Keine</div>
+                            <div id="bwm-preview-box" class="sachverhalt-box mt-10 hidden"></div>
+
+                            <p class="mt-10"><strong>Ermittlungsnachträge &amp; Aussagen (Chronologie):</strong></p>
+                            <div id="detail-nachtraege" class="sachverhalt-box">Keine Nachträge vorhanden.</div>
+
+                            <form id="form-add-nachtrag" class="official-form mt-10" style="padding: 12px;">
+                                <h4 class="doc-gen-title">Nachtrag / Aussage / Beweismittel hinzufügen</h4>
+                                <div class="form-row">
+                                    <label for="nachtrag-text">Aussage / Ermittlungsvermerk</label>
+                                    <textarea id="nachtrag-text" rows="2" placeholder="z. B. Zeugenvernehmung Müller, neue Erkenntnisse..."></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <label for="nachtrag-files">Weitere Beweismittel anhängen (optional)</label>
+                                    <input type="file" id="nachtrag-files" multiple accept=".pdf,image/*,video/*,audio/*">
+                                </div>
+                                <button type="submit" class="btn-secondary btn-small">Mit Zeitstempel zur Akte hinzufügen</button>
+                            </form>
                         </div>
                         <div>
                             <div class="form-row">

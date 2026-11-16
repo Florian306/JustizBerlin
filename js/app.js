@@ -267,19 +267,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    beweismittelInput.addEventListener('change', () => {
-        const files = Array.from(beweismittelInput.files || []);
-        files.forEach(file => {
+    function getTimestampDE() {
+        return new Date().toLocaleString('de-DE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }) + ' Uhr';
+    }
+
+    function readFileAsEvidence(file) {
+        return new Promise((resolve) => {
             const num = Math.floor(100 + Math.random() * 899);
             const kennung = `BWM-26-${num}`;
             const sizeKb = Math.max(1, Math.round(file.size / 1024));
-            currentBeweismittel.push({
+            const base = {
                 kennung,
                 name: file.name,
-                type: file.type || 'Datei',
-                size: `${sizeKb} KB`
-            });
+                type: file.type || 'application/octet-stream',
+                size: `${sizeKb} KB`,
+                addedAt: getTimestampDE(),
+                dataUrl: null
+            };
+            if (file.size <= 1500000) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    base.dataUrl = reader.result;
+                    resolve(base);
+                };
+                reader.onerror = () => resolve(base);
+                reader.readAsDataURL(file);
+            } else {
+                resolve(base);
+            }
         });
+    }
+
+    beweismittelInput.addEventListener('change', async () => {
+        const files = Array.from(beweismittelInput.files || []);
+        for (const file of files) {
+            const bwm = await readFileAsEvidence(file);
+            currentBeweismittel.push(bwm);
+        }
         beweismittelInput.value = '';
         renderBeweismittelList();
     });
@@ -498,11 +528,72 @@ document.addEventListener('DOMContentLoaded', () => {
             bwmList = [];
         }
         const bwmEl = document.getElementById('detail-beweismittel');
+        const previewBox = document.getElementById('bwm-preview-box');
+        previewBox.classList.add('hidden');
+        previewBox.innerHTML = '';
+
         if (bwmList.length === 0) {
             bwmEl.textContent = 'Keine Beweismittel beigefügt.';
         } else {
-            bwmEl.innerHTML = bwmList.map(b =>
-                `<div><span class="mono-bold">${escapeHtml(b.kennung)}</span> – ${escapeHtml(b.name)} (${escapeHtml(b.size || '')})</div>`
+            bwmEl.innerHTML = '';
+            bwmList.forEach((b, idx) => {
+                const row = document.createElement('div');
+                row.className = 'detail-header-row';
+                row.style.padding = '4px 0';
+                row.style.borderBottom = '1px solid #E5E5E5';
+                const timeInfo = b.addedAt ? ` · <small>${escapeHtml(b.addedAt)}</small>` : '';
+                row.innerHTML = `
+                    <span><span class="mono-bold">${escapeHtml(b.kennung)}</span> – ${escapeHtml(b.name)} (${escapeHtml(b.size || '')})${timeInfo}</span>
+                    <button type="button" class="btn-secondary btn-small btn-view-bwm" data-idx="${idx}">Ansehen</button>
+                `;
+                bwmEl.appendChild(row);
+            });
+
+            bwmEl.querySelectorAll('.btn-view-bwm').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const b = bwmList[Number(btn.dataset.idx)];
+                    if (!b) return;
+                    previewBox.classList.remove('hidden');
+                    if (!b.dataUrl) {
+                        previewBox.innerHTML = `<p><strong>${escapeHtml(b.kennung)} (${escapeHtml(b.name)}):</strong> Für Dateien über 1,5 MB ist keine direkte Browser-Vorschau gespeichert.</p>`;
+                        return;
+                    }
+                    const header = `<div class="detail-header-row" style="margin-bottom:8px;"><strong>Vorschau: ${escapeHtml(b.kennung)} – ${escapeHtml(b.name)}</strong><button type="button" id="btn-close-preview" class="btn-secondary btn-small">Schließen</button></div>`;
+                    let media = '';
+                    if ((b.type || '').startsWith('image/')) {
+                        media = `<img src="${b.dataUrl}" alt="${escapeHtml(b.name)}" style="max-width:100%; max-height:400px; border:1px solid #CCC;">`;
+                    } else if (b.type === 'application/pdf' || b.name.toLowerCase().endsWith('.pdf')) {
+                        media = `<iframe src="${b.dataUrl}" style="width:100%; height:420px; border:1px solid #CCC;"></iframe>`;
+                    } else if ((b.type || '').startsWith('video/')) {
+                        media = `<video src="${b.dataUrl}" controls style="max-width:100%; max-height:360px;"></video>`;
+                    } else if ((b.type || '').startsWith('audio/')) {
+                        media = `<audio src="${b.dataUrl}" controls style="width:100%;"></audio>`;
+                    } else {
+                        media = `<a href="${b.dataUrl}" download="${escapeHtml(b.name)}" class="btn-secondary btn-small">Datei herunterladen</a>`;
+                    }
+                    previewBox.innerHTML = header + media;
+                    document.getElementById('btn-close-preview').addEventListener('click', () => {
+                        previewBox.classList.add('hidden');
+                        previewBox.innerHTML = '';
+                    });
+                });
+            });
+        }
+
+        let nachtraegeList = [];
+        try {
+            nachtraegeList = typeof akte.nachtraege === 'string'
+                ? JSON.parse(akte.nachtraege)
+                : (akte.nachtraege || []);
+        } catch {
+            nachtraegeList = [];
+        }
+        const nachtraegeEl = document.getElementById('detail-nachtraege');
+        if (nachtraegeList.length === 0) {
+            nachtraegeEl.textContent = 'Keine Nachträge vorhanden.';
+        } else {
+            nachtraegeEl.innerHTML = nachtraegeList.map(n =>
+                `<div style="padding: 6px 0; border-bottom: 1px solid #E5E5E5;"><strong>${escapeHtml(n.timestamp)}</strong> (${escapeHtml(n.author)}):<br>${escapeHtml(n.text)}</div>`
             ).join('');
         }
         document.getElementById('detail-status-select').value = akte.status;
@@ -522,6 +613,61 @@ document.addEventListener('DOMContentLoaded', () => {
         await AktenAPI.update(currentSelectedAz, { status, vermerk });
         document.getElementById('save-feedback').classList.remove('hidden');
         renderInternTable();
+    });
+
+    document.getElementById('form-add-nachtrag').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentSelectedAz) return;
+
+        const text = document.getElementById('nachtrag-text').value.trim();
+        const files = Array.from(document.getElementById('nachtrag-files').files || []);
+        if (!text && files.length === 0) return;
+
+        const akten = await AktenAPI.getAll();
+        const akte = akten.find(a => a.az === currentSelectedAz);
+        if (!akte) return;
+
+        let bwmList = [];
+        try {
+            bwmList = typeof akte.beweismittel === 'string'
+                ? JSON.parse(akte.beweismittel)
+                : (akte.beweismittel || []);
+        } catch { bwmList = []; }
+
+        let nachtraegeList = [];
+        try {
+            nachtraegeList = typeof akte.nachtraege === 'string'
+                ? JSON.parse(akte.nachtraege)
+                : (akte.nachtraege || []);
+        } catch { nachtraegeList = []; }
+
+        const newBwms = [];
+        for (const file of files) {
+            const bwm = await readFileAsEvidence(file);
+            bwmList.push(bwm);
+            newBwms.push(bwm.kennung);
+        }
+
+        const timestamp = getTimestampDE();
+        const author = document.getElementById('logged-user-display').textContent || 'Dienststelle';
+        let entryText = text;
+        if (newBwms.length > 0) {
+            entryText = (entryText ? entryText + ' ' : '') + `[Beweismittel hinzugefügt: ${newBwms.join(', ')}]`;
+        }
+
+        nachtraegeList.push({
+            timestamp,
+            author,
+            text: entryText
+        });
+
+        await AktenAPI.update(currentSelectedAz, {
+            beweismittel: bwmList,
+            nachtraege: nachtraegeList
+        });
+
+        e.target.reset();
+        openAkteDetail(currentSelectedAz);
     });
 
     // --- Amtlicher Dokumenten-Generator (PDF / Print) ---

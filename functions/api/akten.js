@@ -11,11 +11,13 @@ async function ensureAktenTable(db) {
             sachverhalt TEXT NOT NULL,
             status TEXT NOT NULL DEFAULT 'Eingegangen',
             vermerk TEXT,
-            beweismittel TEXT
+            beweismittel TEXT,
+            nachtraege TEXT
         )
     `).run();
 
     try { await db.prepare('ALTER TABLE akten ADD COLUMN beweismittel TEXT').run(); } catch {}
+    try { await db.prepare('ALTER TABLE akten ADD COLUMN nachtraege TEXT').run(); } catch {}
 }
 
 export async function onRequestGet(context) {
