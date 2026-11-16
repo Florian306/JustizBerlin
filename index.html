@@ -423,19 +423,37 @@
 
                 <!-- Detail- & Dokumenten-Editor -->
                 <div id="intern-detail-panel" class="detail-panel hidden">
-                    <div class="detail-header-row" style="margin-bottom: 14px;">
+                    <div class="detail-header-row" style="margin-bottom: 16px;">
                         <h3 class="section-heading" style="margin: 0;">Aktenbearbeitung: <span id="detail-az" class="mono-bold"></span></h3>
                         <button type="button" id="btn-close-detail" class="btn-secondary btn-small">Schließen</button>
                     </div>
-                    <div class="grid-two-col">
-                        <div>
-                            <p><strong>Antragsteller/in:</strong> <span id="detail-name"></span></p>
-                            <p><strong>Dienststelle / Anschrift:</strong> <span id="detail-behoerde"></span></p>
-                            <p><strong>Betroffene Person:</strong> <span id="detail-beteiligter"></span></p>
-                            <p><strong>Sachverhalt:</strong></p>
-                            <div id="detail-sachverhalt" class="sachverhalt-box"></div>
+
+                    <!-- Kompakte 3-Spalten-Stammdaten -->
+                    <div class="meta-grid-3">
+                        <div class="meta-item">
+                            <span class="meta-label">Antragsteller/in</span>
+                            <strong id="detail-name"></strong>
                         </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Dienststelle / Anschrift</span>
+                            <strong id="detail-behoerde"></strong>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Betroffene Person</span>
+                            <strong id="detail-beteiligter"></strong>
+                        </div>
+                    </div>
+
+                    <div class="grid-equal-2 mt-20">
                         <div>
+                            <p style="margin-top: 0;"><strong>Sachverhalt:</strong></p>
+                            <div id="detail-sachverhalt" class="sachverhalt-box" style="min-height: 120px;"></div>
+
+                            <p class="mt-20"><strong>Beweismittel &amp; Anlagen:</strong></p>
+                            <div id="detail-beweismittel" class="sachverhalt-box">Keine</div>
+                            <div id="bwm-preview-box" class="sachverhalt-box mt-10 hidden"></div>
+                        </div>
+                        <div class="control-box">
                             <div class="form-row">
                                 <label for="detail-status-select">Bearbeitungsstatus ändern:</label>
                                 <select id="detail-status-select">
@@ -475,17 +493,13 @@
 
                     <hr class="divider">
 
-                    <p><strong>Beweismittel &amp; Anlagen:</strong></p>
-                    <div id="detail-beweismittel" class="sachverhalt-box">Keine</div>
-                    <div id="bwm-preview-box" class="sachverhalt-box mt-10 hidden"></div>
-
-                    <div class="grid-two-col mt-20">
+                    <div class="grid-equal-2">
                         <div>
                             <p style="margin-top: 0;"><strong>Ermittlungsnachträge &amp; Aussagen (Chronologie):</strong></p>
                             <div id="detail-nachtraege" class="sachverhalt-box">Keine Nachträge vorhanden.</div>
                         </div>
                         <div>
-                            <form id="form-add-nachtrag" class="official-form" style="padding: 14px;">
+                            <form id="form-add-nachtrag" class="official-form" style="padding: 16px;">
                                 <h4 class="doc-gen-title">Nachtrag / Aussage / Beweismittel hinzufügen</h4>
                                 <div class="form-row">
                                     <label for="nachtrag-text">Aussage / Ermittlungsvermerk</label>
