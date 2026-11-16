@@ -428,9 +428,8 @@
 
                 <!-- Gesetzessammlung verwalten -->
                 <div id="subtab-gesetze-admin" class="subtab-panel">
-                <div class="detail-panel">
-                    <h3 class="section-heading">Gesetzessammlung verwalten (Automatische Nummerierung)</h3>
-                    <div class="grid-two-col">
+                    <h3 class="section-heading">Gesetzessammlung verwalten</h3>
+                    <div class="grid-admin-gesetze">
                         <div>
                             <form id="form-add-book" class="official-form">
                                 <h4 class="box-title">1. Neues Gesetzbuch anlegen</h4>
@@ -453,13 +452,15 @@
                         <div>
                             <form id="form-add-law" class="official-form">
                                 <h4 class="box-title">2. Neues Gesetz / Paragraph hinzufügen</h4>
-                                <div class="form-row">
-                                    <label for="law-book-select">Gesetzbuch <span class="req">*</span></label>
-                                    <select id="law-book-select" required></select>
-                                </div>
-                                <div class="form-row">
-                                    <label for="law-paragraph">Paragraph (optional)</label>
-                                    <input type="text" id="law-paragraph" placeholder="Leer = automatisch, oder z. B. § 2a">
+                                <div class="form-grid-2">
+                                    <div class="form-row">
+                                        <label for="law-book-select">Gesetzbuch <span class="req">*</span></label>
+                                        <select id="law-book-select" required></select>
+                                    </div>
+                                    <div class="form-row">
+                                        <label for="law-paragraph">Paragraph (optional)</label>
+                                        <input type="text" id="law-paragraph" placeholder="Leer = auto, z. B. § 2a">
+                                    </div>
                                 </div>
                                 <div class="form-row">
                                     <label for="law-title">Titel der Vorschrift <span class="req">*</span></label>
@@ -467,9 +468,9 @@
                                 </div>
                                 <div class="form-row">
                                     <label for="law-text">Gesetzestext <span class="req">*</span></label>
-                                    <textarea id="law-text" rows="3" required placeholder="Wortlaut der Vorschrift..."></textarea>
+                                    <textarea id="law-text" rows="4" required placeholder="Wortlaut der Vorschrift..."></textarea>
                                 </div>
-                                <button type="submit" class="btn-primary">Paragraph mit nächster §-Nummer speichern</button>
+                                <button type="submit" class="btn-primary">Paragraph speichern</button>
                                 <span id="law-save-msg" class="save-msg hidden">Hinzugefügt.</span>
                             </form>
                         </div>
@@ -524,7 +525,6 @@
                             <tbody id="intern-laws-tbody"></tbody>
                         </table>
                     </div>
-                </div>
                 </div>
             </div>
         </section>

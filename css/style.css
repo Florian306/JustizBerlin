@@ -412,8 +412,16 @@ a:hover {
     gap: 28px;
 }
 
+.grid-admin-gesetze {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 24px;
+    align-items: start;
+}
+
 @media (max-width: 800px) {
-    .grid-two-col {
+    .grid-two-col,
+    .grid-admin-gesetze {
         grid-template-columns: 1fr;
     }
 }
