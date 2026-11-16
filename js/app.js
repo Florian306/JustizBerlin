@@ -396,8 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     gesetzeFilterSearch.addEventListener('input', renderGesetzePublic);
 
-    function renderGesetzePublic() {
-        const data = GesetzeAPI.getAll();
+    async function renderGesetzePublic() {
+        const data = await GesetzeAPI.getAll();
         const search = gesetzeFilterSearch.value.trim().toLowerCase();
 
         // Dropdown aktualisieren
@@ -513,8 +513,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderGesetzeIntern() {
-        const data = GesetzeAPI.getAll();
+    async function renderGesetzeIntern() {
+        const data = await GesetzeAPI.getAll();
         const bookSelect = document.getElementById('law-book-select');
         const currentVal = bookSelect.value;
 
@@ -548,35 +548,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.btn-del-law').forEach(btn => {
-            btn.addEventListener('click', () => {
-                GesetzeAPI.deleteLaw(Number(btn.dataset.id));
+            btn.addEventListener('click', async () => {
+                await GesetzeAPI.deleteLaw(Number(btn.dataset.id));
                 renderGesetzeIntern();
                 renderGesetzePublic();
             });
         });
     }
 
-    document.getElementById('form-add-book').addEventListener('submit', (e) => {
+    document.getElementById('form-add-book').addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = document.getElementById('book-title').value.trim();
         const short = document.getElementById('book-short').value.trim();
         if (!title || !short) return;
 
-        GesetzeAPI.addBook(title, short);
+        await GesetzeAPI.addBook(title, short);
         e.target.reset();
         document.getElementById('book-save-msg').classList.remove('hidden');
         renderGesetzeIntern();
         renderGesetzePublic();
     });
 
-    document.getElementById('form-add-law').addEventListener('submit', (e) => {
+    document.getElementById('form-add-law').addEventListener('submit', async (e) => {
         e.preventDefault();
         const bookId = document.getElementById('law-book-select').value;
         const title = document.getElementById('law-title').value.trim();
         const text = document.getElementById('law-text').value.trim();
         if (!bookId || !title || !text) return;
 
-        GesetzeAPI.addLaw(bookId, title, text);
+        await GesetzeAPI.addLaw(bookId, title, text);
         document.getElementById('law-title').value = '';
         document.getElementById('law-text').value = '';
         document.getElementById('law-save-msg').classList.remove('hidden');

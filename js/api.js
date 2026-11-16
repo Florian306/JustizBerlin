@@ -4,7 +4,7 @@
 const AktenAPI = (() => {
     const STORAGE_KEY = 'justiz_berlin_akten_v1';
     const API_BASE = '/api/akten';
-    const USE_REMOTE_API = false; // Bei Produktivbetrieb mit Cloudflare D1 auf true setzen
+    const USE_REMOTE_API = true;
 
     const DEFAULT_AKTEN = [
         {
@@ -143,6 +143,8 @@ const AktenAPI = (() => {
  */
 const GesetzeAPI = (() => {
     const STORAGE_KEY = 'justiz_berlin_gesetze_v1';
+    const API_BASE = '/api/gesetze';
+    const USE_REMOTE_API = true;
 
     const DEFAULT_DATA = {
         books: [
@@ -203,11 +205,31 @@ const GesetzeAPI = (() => {
         }
     }
 
-    function getAll() {
+    async function getAll() {
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(API_BASE);
+                if (res.ok) return await res.json();
+            } catch {
+                // Fallback auf localStorage
+            }
+        }
         return load();
     }
 
-    function addBook(title, short) {
+    async function addBook(title, short) {
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'addBook', title, short })
+                });
+                if (res.ok) return await res.json();
+            } catch {
+                // Fallback auf localStorage
+            }
+        }
         const data = load();
         const id = short.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString().slice(-4);
         const book = { id, title, short };
@@ -216,7 +238,19 @@ const GesetzeAPI = (() => {
         return book;
     }
 
-    function addLaw(bookId, title, text) {
+    async function addLaw(bookId, title, text) {
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'addLaw', bookId, title, text })
+                });
+                if (res.ok) return await res.json();
+            } catch {
+                // Fallback auf localStorage
+            }
+        }
         const data = load();
         const existingInBook = data.laws.filter(l => l.bookId === bookId);
         const nextNum = existingInBook.length + 1;
@@ -232,7 +266,17 @@ const GesetzeAPI = (() => {
         return law;
     }
 
-    function deleteLaw(id) {
+    async function deleteLaw(id) {
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(`${API_BASE}?id=${encodeURIComponent(id)}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) return;
+            } catch {
+                // Fallback auf localStorage
+            }
+        }
         const data = load();
         data.laws = data.laws.filter(l => l.id !== id);
         save(data);
