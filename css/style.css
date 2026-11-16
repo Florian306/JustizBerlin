@@ -625,6 +625,14 @@ a:hover {
     gap: 10px;
 }
 
+.footer-disclaimer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-gray);
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
 /* ==========================================================================
    Druck-Stylesheet (@media print) für amtliche Beschlüsse
    ========================================================================== */
