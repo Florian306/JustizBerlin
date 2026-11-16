@@ -10,9 +10,12 @@ async function ensureAktenTable(db) {
             beteiligter TEXT,
             sachverhalt TEXT NOT NULL,
             status TEXT NOT NULL DEFAULT 'Eingegangen',
-            vermerk TEXT
+            vermerk TEXT,
+            beweismittel TEXT
         )
     `).run();
+
+    try { await db.prepare('ALTER TABLE akten ADD COLUMN beweismittel TEXT').run(); } catch {}
 }
 
 export async function onRequestGet(context) {
@@ -26,9 +29,13 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
     await ensureAktenTable(context.env.DB);
     const body = await context.request.json();
+    const bwmJson = typeof body.beweismittel === 'string'
+        ? body.beweismittel
+        : JSON.stringify(body.beweismittel || []);
+
     await context.env.DB.prepare(
-        `INSERT INTO akten (az, datum, typ, vorname, nachname, behoerde, beteiligter, sachverhalt, status, vermerk)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO akten (az, datum, typ, vorname, nachname, behoerde, beteiligter, sachverhalt, status, vermerk, beweismittel)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
         body.az,
         body.datum,
@@ -39,7 +46,8 @@ export async function onRequestPost(context) {
         body.beteiligter || '',
         body.sachverhalt,
         body.status || 'Eingegangen',
-        body.vermerk || ''
+        body.vermerk || '',
+        bwmJson
     ).run();
 
     return Response.json(body, { status: 201 });

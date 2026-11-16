@@ -154,18 +154,156 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- TAB 2: Online-Antrag einreichen ---
+    // --- TAB 2: Online-Antrag einreichen (Intelligentes Formular & Beweismittel) ---
     const antragForm = document.getElementById('antrag-form');
+    const antragTypSelect = document.getElementById('antrag-typ');
+    const extraFieldsContainer = document.getElementById('extra-fields-container');
+    const beweismittelInput = document.getElementById('beweismittel-input');
+    const beweismittelListEl = document.getElementById('beweismittel-list');
     const confBox = document.getElementById('antrag-bestaetigung');
+
+    let currentBeweismittel = [];
+
+    function updateDynamicFormFields() {
+        const typ = antragTypSelect.value;
+        const lblBehoerde = document.getElementById('lbl-behoerde');
+        const lblBeteiligter = document.getElementById('lbl-beteiligter');
+        const rowBeteiligter = document.getElementById('row-beteiligter');
+        const lblSachverhalt = document.getElementById('lbl-sachverhalt');
+
+        extraFieldsContainer.innerHTML = '';
+        extraFieldsContainer.classList.add('hidden');
+        rowBeteiligter.classList.remove('hidden');
+
+        if (typ.includes('Strafanzeige')) {
+            lblBehoerde.textContent = 'Dienststelle / Anschrift';
+            lblBeteiligter.textContent = 'Tatverdächtige/r / Beschuldigte/r';
+            lblSachverhalt.innerHTML = 'Tathergang / Ermittlungsergebnis <span class="req">*</span>';
+            extraFieldsContainer.innerHTML = `
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="extra-tatort">Tatort</label>
+                        <input type="text" id="extra-tatort" placeholder="z. B. Kurfürstendamm 45">
+                    </div>
+                    <div class="form-row">
+                        <label for="extra-tatzeit">Tatzeit</label>
+                        <input type="text" id="extra-tatzeit" placeholder="z. B. 16.11.2026, ca. 02:30 Uhr">
+                    </div>
+                </div>
+            `;
+            extraFieldsContainer.classList.remove('hidden');
+        } else if (typ.includes('Haftbefehl')) {
+            lblBehoerde.textContent = 'Antragstellende Dienststelle / StA';
+            lblBeteiligter.textContent = 'Zielperson / Beschuldigte/r';
+            lblSachverhalt.innerHTML = 'Dringender Tatverdacht &amp; Begründung <span class="req">*</span>';
+            extraFieldsContainer.innerHTML = `
+                <div class="form-row">
+                    <label for="extra-haftgrund">Haftgrund / Dringlichkeit</label>
+                    <input type="text" id="extra-haftgrund" placeholder="z. B. Fluchtgefahr (§ 112 StPO) / Eilantrag">
+                </div>
+            `;
+            extraFieldsContainer.classList.remove('hidden');
+        } else if (typ.includes('Schlichtung')) {
+            lblBehoerde.textContent = 'Wohnanschrift';
+            lblBeteiligter.textContent = 'Antragsgegner / Unternehmen';
+            lblSachverhalt.innerHTML = 'Streitgegenstand / Beschwerde <span class="req">*</span>';
+            extraFieldsContainer.innerHTML = `
+                <div class="form-row">
+                    <label for="extra-streitwert">Streitwert / Forderung (in EUR)</label>
+                    <input type="text" id="extra-streitwert" placeholder="z. B. 2.500 EUR">
+                </div>
+            `;
+            extraFieldsContainer.classList.remove('hidden');
+        } else if (typ.includes('Schöffe')) {
+            lblBehoerde.textContent = 'Meldeanschrift in Berlin';
+            rowBeteiligter.classList.add('hidden');
+            lblSachverhalt.innerHTML = 'Motivation &amp; Eignung <span class="req">*</span>';
+            extraFieldsContainer.innerHTML = `
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="extra-geburtsdatum">Geburtsdatum</label>
+                        <input type="text" id="extra-geburtsdatum" placeholder="z. B. 12.04.1992">
+                    </div>
+                    <div class="form-row">
+                        <label for="extra-beruf">Beruf / Tätigkeit</label>
+                        <input type="text" id="extra-beruf" placeholder="z. B. Kaufmann / Angestellte">
+                    </div>
+                </div>
+            `;
+            extraFieldsContainer.classList.remove('hidden');
+        }
+    }
+
+    antragTypSelect.addEventListener('change', updateDynamicFormFields);
+
+    function renderBeweismittelList() {
+        if (currentBeweismittel.length === 0) {
+            beweismittelListEl.innerHTML = '';
+            return;
+        }
+        const table = document.createElement('table');
+        table.className = 'compact-table';
+        table.innerHTML = '<tbody></tbody>';
+        const tbody = table.querySelector('tbody');
+
+        currentBeweismittel.forEach((bwm, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="mono-bold" style="width: 120px;">${escapeHtml(bwm.kennung)}</td>
+                <td>${escapeHtml(bwm.name)} <small>(${escapeHtml(bwm.size)})</small></td>
+                <td style="width: 80px; text-align: right;"><button type="button" class="btn-secondary btn-small btn-rem-bwm" data-idx="${idx}">Entfernen</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        beweismittelListEl.innerHTML = '';
+        beweismittelListEl.appendChild(table);
+
+        beweismittelListEl.querySelectorAll('.btn-rem-bwm').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentBeweismittel.splice(Number(btn.dataset.idx), 1);
+                renderBeweismittelList();
+            });
+        });
+    }
+
+    beweismittelInput.addEventListener('change', () => {
+        const files = Array.from(beweismittelInput.files || []);
+        files.forEach(file => {
+            const num = Math.floor(100 + Math.random() * 899);
+            const kennung = `BWM-26-${num}`;
+            const sizeKb = Math.max(1, Math.round(file.size / 1024));
+            currentBeweismittel.push({
+                kennung,
+                name: file.name,
+                type: file.type || 'Datei',
+                size: `${sizeKb} KB`
+            });
+        });
+        beweismittelInput.value = '';
+        renderBeweismittelList();
+    });
 
     antragForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const typ = document.getElementById('antrag-typ').value;
+        const typ = antragTypSelect.value;
         const vorname = document.getElementById('antrag-vorname').value.trim();
         const nachname = document.getElementById('antrag-nachname').value.trim();
         const behoerde = document.getElementById('antrag-behoerde').value.trim() || 'Keine Angabe';
         const beteiligter = document.getElementById('antrag-beteiligter').value.trim() || 'Keine Angabe';
-        const sachverhalt = document.getElementById('antrag-sachverhalt').value.trim();
+        let sachverhalt = document.getElementById('antrag-sachverhalt').value.trim();
+
+        // Zusatzfelder an Sachverhalt anhängen
+        const extras = [];
+        extraFieldsContainer.querySelectorAll('input').forEach(inp => {
+            if (inp.value.trim()) {
+                const label = extraFieldsContainer.querySelector(`label[for="${inp.id}"]`)?.textContent || inp.id;
+                extras.push(`${label}: ${inp.value.trim()}`);
+            }
+        });
+        if (extras.length > 0) {
+            sachverhalt = `${extras.join(' | ')}\n\n${sachverhalt}`;
+        }
 
         const az = AktenAPI.generateAktenzeichen(typ);
         const heute = new Date().toLocaleDateString('de-DE', {
@@ -184,7 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
             beteiligter,
             sachverhalt,
             status: 'Eingegangen',
-            vermerk: 'Elektronisch über Bürger-/Polizei-Service eingereicht.'
+            vermerk: 'Elektronisch über Bürger-/Polizei-Service eingereicht.',
+            beweismittel: [...currentBeweismittel]
         };
 
         await AktenAPI.create(neueAkte);
@@ -193,9 +332,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('conf-name').textContent = `${vorname} ${nachname}`;
         document.getElementById('conf-typ').textContent = typ;
         document.getElementById('conf-datum').textContent = heute;
+        document.getElementById('conf-beweismittel').textContent = currentBeweismittel.length > 0
+            ? currentBeweismittel.map(b => `${b.kennung} (${b.name})`).join(', ')
+            : 'Keine';
 
         confBox.classList.remove('hidden');
         antragForm.reset();
+        currentBeweismittel = [];
+        renderBeweismittelList();
+        updateDynamicFormFields();
+        updateStats();
         confBox.scrollIntoView({ behavior: 'smooth' });
     });
 
@@ -342,6 +488,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('detail-behoerde').textContent = akte.behoerde;
         document.getElementById('detail-beteiligter').textContent = akte.beteiligter;
         document.getElementById('detail-sachverhalt').textContent = akte.sachverhalt;
+
+        let bwmList = [];
+        try {
+            bwmList = typeof akte.beweismittel === 'string'
+                ? JSON.parse(akte.beweismittel)
+                : (akte.beweismittel || []);
+        } catch {
+            bwmList = [];
+        }
+        const bwmEl = document.getElementById('detail-beweismittel');
+        if (bwmList.length === 0) {
+            bwmEl.textContent = 'Keine Beweismittel beigefügt.';
+        } else {
+            bwmEl.innerHTML = bwmList.map(b =>
+                `<div><span class="mono-bold">${escapeHtml(b.kennung)}</span> – ${escapeHtml(b.name)} (${escapeHtml(b.size || '')})</div>`
+            ).join('');
+        }
         document.getElementById('detail-status-select').value = akte.status;
         document.getElementById('detail-vermerk').value = akte.vermerk || '';
         document.getElementById('save-feedback').classList.add('hidden');

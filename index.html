@@ -216,18 +216,28 @@
 
                 <div class="form-grid-2">
                     <div class="form-row">
-                        <label for="antrag-behoerde">Dienststelle / Anschrift</label>
+                        <label for="antrag-behoerde" id="lbl-behoerde">Dienststelle / Anschrift</label>
                         <input type="text" id="antrag-behoerde" placeholder="z. B. Polizei Berlin LKA 41 oder Wohnanschrift">
                     </div>
-                    <div class="form-row">
-                        <label for="antrag-beteiligter">Betroffene Person / Beschuldigte/r</label>
+                    <div class="form-row" id="row-beteiligter">
+                        <label for="antrag-beteiligter" id="lbl-beteiligter">Betroffene Person / Beschuldigte/r</label>
                         <input type="text" id="antrag-beteiligter" placeholder="Name des Beschuldigten / Gegners (falls bekannt)">
                     </div>
                 </div>
 
+                <!-- Kontextabhängige Zusatzfelder je nach Vorgangsart -->
+                <div id="extra-fields-container" class="hidden"></div>
+
                 <div class="form-row">
-                    <label for="antrag-sachverhalt">Sachverhalt / Begründung <span class="req">*</span></label>
+                    <label for="antrag-sachverhalt" id="lbl-sachverhalt">Sachverhalt / Begründung <span class="req">*</span></label>
                     <textarea id="antrag-sachverhalt" rows="5" required placeholder="Schildern Sie den Sachverhalt sachlich und vollständig (Ort, Zeit, Tatvorwurf bzw. Antragsgrund)..."></textarea>
+                </div>
+
+                <!-- Beweismittel & Anlagen -->
+                <div class="form-row">
+                    <label for="beweismittel-input">Beweismittel &amp; Anlagen (PDF, Bilder, Videos, Audio)</label>
+                    <input type="file" id="beweismittel-input" multiple accept=".pdf,image/*,video/*,audio/*">
+                    <div id="beweismittel-list" class="mt-10"></div>
                 </div>
 
                 <div class="form-actions">
@@ -246,6 +256,7 @@
                         <tr><th>Antragsteller/in:</th><td id="conf-name"></td></tr>
                         <tr><th>Vorgangsart:</th><td id="conf-typ"></td></tr>
                         <tr><th>Eingangsdatum:</th><td id="conf-datum"></td></tr>
+                        <tr><th>Beweismittel:</th><td id="conf-beweismittel">Keine</td></tr>
                         <tr><th>Aktueller Status:</th><td>Eingegangen</td></tr>
                     </tbody>
                 </table>
@@ -389,6 +400,8 @@
                             <p><strong>Betroffene Person:</strong> <span id="detail-beteiligter"></span></p>
                             <p><strong>Sachverhalt:</strong></p>
                             <div id="detail-sachverhalt" class="sachverhalt-box"></div>
+                            <p class="mt-10"><strong>Beweismittel &amp; Anlagen:</strong></p>
+                            <div id="detail-beweismittel" class="sachverhalt-box">Keine</div>
                         </div>
                         <div>
                             <div class="form-row">
