@@ -628,8 +628,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)}<br><small>${escapeHtml(akte.behoerde)}</small></td>
                 <td>${escapeHtml(akte.typ)}</td>
                 <td>${getStatusBadgeHtml(akte.status)}</td>
-                <td><button type="button" class="btn-secondary btn-small btn-open-akte" data-az="${escapeHtml(akte.az)}">Bearbeiten</button></td>
+                <td><button type="button" class="btn-secondary btn-small btn-open-akte" data-az="${escapeHtml(akte.az)}">Öffnen</button></td>
             `;
+            tr.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-open-akte')) return;
+                openAkteDetail(akte.az);
+            });
             tbody.appendChild(tr);
         });
 
