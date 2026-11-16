@@ -5,29 +5,31 @@
 
 :root {
     --bg-white: #FFFFFF;
-    --bg-light: #F2F2F2;
-    --bg-medium: #E5E5E5;
+    --bg-light: #F8F9FA;
+    --bg-medium: #E9ECEF;
     --text-main: #1A1A1A;
-    --text-muted: #555555;
+    --text-muted: #5A626A;
     --accent-red: #CC0000;
     --link-blue: #003366;
-    --border-gray: #CCCCCC;
-    --border-dark: #999999;
+    --border-gray: #DEE2E6;
+    --border-dark: #CED4DA;
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
+    --radius: 6px;
 }
 
 * {
     box-sizing: border-box;
-    border-radius: 0px;
 }
 
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.55;
     color: var(--text-main);
-    background-color: var(--bg-white);
+    background-color: #FCFCFD;
 }
 
 a {
@@ -228,11 +230,13 @@ a:hover {
     justify-content: space-between;
     align-items: center;
     gap: 20px;
-    background-color: var(--bg-light);
+    background-color: var(--bg-white);
     border: 1px solid var(--border-gray);
-    border-top: 3px solid var(--accent-red);
-    padding: 16px 20px;
-    margin-bottom: 18px;
+    border-top: 4px solid var(--accent-red);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 20px 24px;
+    margin-bottom: 20px;
 }
 
 .hero-kicker {
@@ -274,9 +278,11 @@ a:hover {
 }
 
 .stat-item {
-    background-color: var(--bg-light);
+    background-color: var(--bg-white);
     border: 1px solid var(--border-gray);
-    padding: 12px 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 14px 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -333,10 +339,18 @@ a:hover {
     background-color: var(--bg-white);
     border: 1px solid var(--border-gray);
     border-top: 3px solid var(--link-blue);
-    padding: 16px 18px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 18px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .service-card h4 {
@@ -369,17 +383,21 @@ a:hover {
 
 /* Hinweis- & Info-Kästen */
 .notice-box {
-    background-color: var(--bg-light);
+    background-color: var(--bg-white);
     border: 1px solid var(--border-gray);
     border-left: 4px solid var(--accent-red);
-    padding: 12px 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 14px 18px;
     margin-bottom: 24px;
 }
 
 .info-box {
-    background-color: var(--bg-light);
+    background-color: var(--bg-white);
     border: 1px solid var(--border-gray);
-    padding: 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 18px;
 }
 
 .box-title {
@@ -514,6 +532,7 @@ a:hover {
     font-family: inherit;
     font-size: 14px;
     background-color: var(--bg-white);
+    border-radius: 4px;
     transition: border-color 0.15s ease;
 }
 
@@ -563,6 +582,7 @@ a:hover {
     font-weight: bold;
     cursor: pointer;
     font-family: inherit;
+    border-radius: 4px;
     transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
