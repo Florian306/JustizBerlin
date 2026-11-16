@@ -30,6 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
+    // Sub-Navigation im Internen Dienstportal
+    document.querySelectorAll('.sub-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.subtab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`subtab-${btn.dataset.subtab}`).classList.add('active');
+        });
+    });
+
     // Schnellzugriff-Kacheln auf der Startseite
     document.querySelectorAll('.quick-tab-link').forEach(link => {
         link.addEventListener('click', (e) => {

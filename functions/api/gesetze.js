@@ -1,4 +1,35 @@
+async function ensureGesetzeTables(db) {
+    await db.prepare(`
+        CREATE TABLE IF NOT EXISTS books (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            short TEXT NOT NULL
+        )
+    `).run();
+
+    await db.prepare(`
+        CREATE TABLE IF NOT EXISTS laws (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bookId TEXT NOT NULL,
+            paragraph TEXT NOT NULL,
+            title TEXT NOT NULL,
+            text TEXT NOT NULL
+        )
+    `).run();
+
+    const existing = await db.prepare('SELECT COUNT(*) as cnt FROM books').first();
+    if (!existing || existing.cnt === 0) {
+        await db.prepare(`
+            INSERT OR IGNORE INTO books (id, title, short) VALUES
+                ('stgb', 'Strafgesetzbuch (StGB)', 'StGB'),
+                ('stpo', 'Strafprozessordnung (StPO)', 'StPO'),
+                ('berljg', 'Berliner Justizgesetz (BerlJG)', 'BerlJG')
+        `).run();
+    }
+}
+
 export async function onRequestGet(context) {
+    await ensureGesetzeTables(context.env.DB);
     const booksRes = await context.env.DB.prepare('SELECT * FROM books ORDER BY rowid ASC').all();
     const lawsRes = await context.env.DB.prepare('SELECT * FROM laws ORDER BY id ASC').all();
     return Response.json({
@@ -8,6 +39,7 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPost(context) {
+    await ensureGesetzeTables(context.env.DB);
     const body = await context.request.json();
 
     if (body.action === 'addBook') {
@@ -42,6 +74,7 @@ export async function onRequestPost(context) {
 }
 
 export async function onRequestDelete(context) {
+    await ensureGesetzeTables(context.env.DB);
     const url = new URL(context.request.url);
     const id = url.searchParams.get('id');
     if (!id) return Response.json({ error: 'Missing id' }, { status: 400 });

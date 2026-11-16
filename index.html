@@ -330,6 +330,14 @@
                     <button type="button" id="btn-logout" class="btn-secondary">Abmelden</button>
                 </div>
 
+                <!-- Sub-Navigation im Dienstportal -->
+                <div class="sub-nav" role="tablist">
+                    <button type="button" class="sub-tab active" data-subtab="akten">Aktenverwaltung</button>
+                    <button type="button" class="sub-tab" data-subtab="gesetze-admin">Gesetzessammlung verwalten</button>
+                </div>
+
+                <div id="subtab-akten" class="subtab-panel active">
+
                 <!-- Filterleiste -->
                 <div class="filter-bar">
                     <div class="filter-group">
@@ -413,9 +421,11 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
                 <!-- Gesetzessammlung verwalten -->
-                <div class="detail-panel mt-20">
+                <div id="subtab-gesetze-admin" class="subtab-panel">
+                <div class="detail-panel">
                     <h3 class="section-heading">Gesetzessammlung verwalten (Automatische Nummerierung)</h3>
                     <div class="grid-two-col">
                         <div>
@@ -468,6 +478,7 @@
                             <tbody id="intern-laws-tbody"></tbody>
                         </table>
                     </div>
+                </div>
                 </div>
             </div>
         </section>
