@@ -62,7 +62,14 @@
                 <div class="hero-content">
                     <span class="hero-kicker">Land Berlin · Rechtspflege &amp; Verbraucherschutz</span>
                     <h3 class="hero-heading">Willkommen beim digitalen Justizportal Berlin</h3>
-                    <p class="hero-text">Die Senatsverwaltung für Justiz und Verbraucherschutz gewährleistet die Funktionsfähigkeit der Berliner Gerichte, Staatsanwaltschaften und Justizvollzugsanstalten. Über dieses Portal können Anträge elektronisch eingereicht und laufende Vorgänge eingesehen werden.</p>
+                    <p class="hero-text">Die Senatsverwaltung für Justiz und Verbraucherschutz gewährleistet die Funktionsfähigkeit der Berliner Gerichte, Staatsanwaltschaften und Justizvollzugsanstalten.</p>
+                    <div class="hero-stats" aria-label="Aktuelle Verfahrenskennzahlen">
+                        <span>Registrierte Vorgänge: <strong id="stat-total">0</strong></span>
+                        <span class="sep">|</span>
+                        <span>In Prüfung / Offen: <strong id="stat-open">0</strong></span>
+                        <span class="sep">|</span>
+                        <span>Erlassene Beschlüsse: <strong id="stat-beschluss">0</strong></span>
+                    </div>
                 </div>
                 <div class="hero-seal">
                     <img src="assets/logo.jpg" alt="Amtliches Siegel Land Berlin" class="hero-seal-img">
@@ -71,22 +78,6 @@
 
             <!-- Dynamischer Hinweis bei neu veröffentlichtem Gesetzbuch -->
             <div id="new-book-notice" class="notice-box hidden"></div>
-
-            <!-- Dynamische Kennzahlen-Leiste -->
-            <div class="stats-bar" aria-label="Aktuelle Verfahrenskennzahlen">
-                <div class="stat-item">
-                    <span class="stat-label">Registrierte Vorgänge</span>
-                    <strong class="stat-value" id="stat-total">0</strong>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">In Prüfung / Offen</span>
-                    <strong class="stat-value" id="stat-open">0</strong>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Erlassene Beschlüsse</span>
-                    <strong class="stat-value" id="stat-beschluss">0</strong>
-                </div>
-            </div>
 
             <div class="service-cards-grid">
                 <div class="service-card">
@@ -625,7 +616,7 @@
     </section>
 
     <!-- Cookie-Hinweis (nur technisch notwendiges Session-Cookie) -->
-    <div id="cookie-banner" class="cookie-banner no-print hidden" role="dialog" aria-label="Cookie-Hinweis">
+    <div id="cookie-banner" class="cookie-banner no-print" role="dialog" aria-label="Cookie-Hinweis">
         <div class="container cookie-banner-inner">
             <div>
                 <strong>Hinweis zu Cookies:</strong> Dieses Portal verwendet ausschließlich ein technisch notwendiges Session-Cookie für die Anmeldung im internen Dienstportal. Es findet kein Tracking statt.

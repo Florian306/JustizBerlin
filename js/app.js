@@ -631,8 +631,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cookie-Hinweis-Banner
     const cookieBanner = document.getElementById('cookie-banner');
-    if (!localStorage.getItem('justiz_cookie_ok')) {
-        cookieBanner.classList.remove('hidden');
+    if (localStorage.getItem('justiz_cookie_ok') === '1') {
+        cookieBanner.classList.add('hidden');
     }
     document.getElementById('btn-accept-cookies').addEventListener('click', () => {
         localStorage.setItem('justiz_cookie_ok', '1');

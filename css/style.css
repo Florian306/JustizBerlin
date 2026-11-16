@@ -270,6 +270,26 @@ a:hover {
     display: block;
 }
 
+.hero-stats {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-gray);
+    font-size: 13.5px;
+    color: var(--text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.hero-stats strong {
+    color: var(--text-main);
+    font-family: Consolas, "Courier New", monospace;
+}
+
+.hero-stats .sep {
+    color: var(--border-dark);
+}
+
 /* Kennzahlen-Leiste */
 .stats-bar {
     display: grid;
