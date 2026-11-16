@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.subtab-panel').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(`subtab-${btn.dataset.subtab}`).classList.add('active');
+            if (btn.dataset.subtab === 'gesetze-admin') {
+                renderGesetzeIntern();
+            }
         });
     });
 
@@ -568,6 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dashboardView.classList.remove('hidden');
             document.getElementById('logged-user-display').textContent = user;
             renderInternTable();
+            renderGesetzeIntern();
         } else {
             loginError.classList.remove('hidden');
         }
