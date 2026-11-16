@@ -68,6 +68,22 @@
                 </div>
             </div>
 
+            <!-- Dynamische Kennzahlen-Leiste -->
+            <div class="stats-bar" aria-label="Aktuelle Verfahrenskennzahlen">
+                <div class="stat-item">
+                    <span class="stat-label">Registrierte Vorgänge</span>
+                    <strong class="stat-value" id="stat-total">0</strong>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">In Prüfung / Offen</span>
+                    <strong class="stat-value" id="stat-open">0</strong>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Erlassene Beschlüsse</span>
+                    <strong class="stat-value" id="stat-beschluss">0</strong>
+                </div>
+            </div>
+
             <div class="service-cards-grid">
                 <div class="service-card">
                     <h4>Online-Anträge &amp; Anzeigen</h4>
@@ -76,8 +92,11 @@
                 </div>
                 <div class="service-card">
                     <h4>Vorgangs- &amp; Aktenauskunft</h4>
-                    <p>Aktuellen Bearbeitungsstand anhand von Aktenzeichen und Nachname direkt abrufen.</p>
-                    <a href="#auskunft" class="btn-secondary btn-small quick-tab-link" data-tab="auskunft">Status abfragen</a>
+                    <p>Aktuellen Bearbeitungsstand anhand von Aktenzeichen direkt abrufen.</p>
+                    <form id="card-quick-search" class="card-quick-form">
+                        <input type="text" id="card-quick-az" placeholder="z. B. 204/26 StA" required>
+                        <button type="submit" class="btn-secondary btn-small">Prüfen</button>
+                    </form>
                 </div>
                 <div class="service-card">
                     <h4>Internes Dienstportal</h4>
@@ -89,7 +108,7 @@
             <div class="grid-two-col">
                 <div>
                     <h3 class="section-heading">Aktuelle Amtliche Bekanntmachungen</h3>
-                    <table class="official-table">
+                    <table class="official-table clickable-table" id="bekanntmachungen-table">
                         <thead>
                             <tr>
                                 <th>Datum</th>
@@ -98,28 +117,35 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr data-bekanntmachung="justizreform">
                                 <td>14.11.2026</td>
                                 <td><strong>Justizreform Berlin:</strong> Anpassung der Zuständigkeiten bei Wirtschaftsstrafsachen am Landgericht Berlin I.</td>
                                 <td>JustV I A 1</td>
                             </tr>
-                            <tr>
+                            <tr data-bekanntmachung="schoeffen">
                                 <td>09.11.2026</td>
                                 <td><strong>Schöffenwahl 2026/2027:</strong> Öffentliche Auslegung der Vorschlagslisten und Bewerbungsfrist für ehrenamtliche Richterinnen und Richter.</td>
                                 <td>JustV II B 4</td>
                             </tr>
-                            <tr>
+                            <tr data-bekanntmachung="verbraucherschutz">
                                 <td>02.11.2026</td>
                                 <td><strong>Verbraucherschutz-Warnung:</strong> Hinweise zu unzulässigen Inkassoforderungen im Raum Berlin-Mitte.</td>
                                 <td>VS III C 2</td>
                             </tr>
-                            <tr>
+                            <tr data-bekanntmachung="gebuehren">
                                 <td>25.10.2026</td>
                                 <td><strong>Verordnung über die Gerichtsvollzieherkosten:</strong> Neufassung der Gebührentabelle ab dem 01.12.2026.</td>
                                 <td>GVBl. S. 412</td>
                             </tr>
                         </tbody>
                     </table>
+                    <div id="bekanntmachung-detail" class="info-box hidden">
+                        <div class="detail-header-row">
+                            <strong id="bekanntmachung-detail-title"></strong>
+                            <button type="button" id="close-bekanntmachung" class="btn-secondary btn-small">Schließen</button>
+                        </div>
+                        <p id="bekanntmachung-detail-text" class="mt-10"></p>
+                    </div>
                 </div>
 
                 <aside>
@@ -135,6 +161,13 @@
                             </tbody>
                         </table>
                         <p class="mt-10"><strong>Telefonvermittlung:</strong><br>(030) 9014-0</p>
+                    </div>
+
+                    <div class="info-box mt-20">
+                        <h3 class="box-title">Bereitschaftsdienst (Eilanträge)</h3>
+                        <p>Für unaufschiebbare Anträge der Polizei Berlin (Haftbefehle, Durchsuchungen bei Gefahr im Verzug):</p>
+                        <p><strong>StA-Bereitschaft:</strong> (030) 9014-9999<br>
+                        <strong>Dienstzeit:</strong> Täglich 00:00 – 24:00 Uhr</p>
                     </div>
 
                     <div class="info-box mt-20">

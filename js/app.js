@@ -51,6 +51,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Startseite: Kennzahlen, Schnellabfrage & Bekanntmachungen ---
+    async function updateStats() {
+        const akten = await AktenAPI.getAll();
+        const total = akten.length;
+        const open = akten.filter(a => a.status === 'Eingegangen' || a.status === 'In staatsanwaltschaftlicher Prüfung').length;
+        const beschluss = akten.filter(a => a.status === 'Beschluss erlassen' || a.status === 'Anklage erhoben').length;
+
+        document.getElementById('stat-total').textContent = total;
+        document.getElementById('stat-open').textContent = open;
+        document.getElementById('stat-beschluss').textContent = beschluss;
+    }
+
+    updateStats();
+
+    document.getElementById('card-quick-search').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const az = document.getElementById('card-quick-az').value.trim();
+        if (az) {
+            document.getElementById('auskunft-az').value = az;
+            switchTab('auskunft');
+            document.getElementById('auskunft-nachname').focus();
+        }
+    });
+
+    const BEKANNTMACHUNGEN = {
+        justizreform: {
+            title: 'Justizreform Berlin (Az. JustV I A 1)',
+            text: 'Mit Wirkung zum 01.12.2026 werden sämtliche Ermittlungsverfahren wegen komplexer Wirtschaftskriminalität im Bezirk Tiergarten sowie Mitte zentral bei der Schwerpunktstaatsanwaltschaft am Landgericht Berlin I gebündelt.'
+        },
+        schoeffen: {
+            title: 'Schöffenwahl 2026/2027 (Az. JustV II B 4)',
+            text: 'Bürgerinnen und Bürger mit Hauptwohnsitz in Berlin können sich ab sofort über das Online-Antragsportal für das Ehrenamt als Schöffin oder Schöffe am Amtsgericht Tiergarten bewerben.'
+        },
+        verbraucherschutz: {
+            title: 'Verbraucherschutz-Warnung (Az. VS III C 2)',
+            text: 'Derzeit kursieren gefälschte Zahlungsaufforderungen angeblicher Inkassobüros. Prüfen Sie Forderungen sorgfältig und melden Sie unberechtigte Mahnungen über die Schlichtungsstelle.'
+        },
+        gebuehren: {
+            title: 'Verordnung über die Gerichtsvollzieherkosten (GVBl. S. 412)',
+            text: 'Die aktualisierte Gebührentabelle für Zustellungen und Zwangsvollstreckungen tritt zum 01.12.2026 in Kraft und ist in den Rechtsantragstellen einsehbar.'
+        }
+    };
+
+    document.querySelectorAll('#bekanntmachungen-table tbody tr').forEach(row => {
+        row.addEventListener('click', () => {
+            const key = row.dataset.bekanntmachung;
+            const info = BEKANNTMACHUNGEN[key];
+            if (!info) return;
+            document.getElementById('bekanntmachung-detail-title').textContent = info.title;
+            document.getElementById('bekanntmachung-detail-text').textContent = info.text;
+            document.getElementById('bekanntmachung-detail').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('close-bekanntmachung').addEventListener('click', () => {
+        document.getElementById('bekanntmachung-detail').classList.add('hidden');
+    });
+
     // Header-Suchleiste -> springt zur Aktenauskunft
     document.getElementById('header-search-form').addEventListener('submit', (e) => {
         e.preventDefault();
