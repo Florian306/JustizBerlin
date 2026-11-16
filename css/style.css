@@ -714,9 +714,103 @@ a:hover {
     color: var(--bg-white);
 }
 
-.official-table tbody tr.law-highlight {
+.official-table tbody tr.law-highlight,
+.law-article.law-highlight {
     background-color: #FFF8DC !important;
     transition: background-color 0.5s ease;
+}
+
+/* gesetze-im-internet.de Look: Inhaltsverzeichnis + Lesebereich */
+.law-reader-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 850px) {
+    .law-reader-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.law-toc {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-gray);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 16px;
+    position: sticky;
+    top: 20px;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.law-toc-title {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+    border-bottom: 2px solid var(--accent-red);
+    padding-bottom: 6px;
+}
+
+.law-toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.law-toc-list li {
+    border-bottom: 1px solid var(--bg-medium);
+}
+
+.law-toc-list a {
+    display: block;
+    padding: 7px 4px;
+    font-size: 13.5px;
+    text-decoration: none;
+    color: var(--text-main);
+}
+
+.law-toc-list a:hover {
+    color: var(--link-blue);
+    background-color: var(--bg-light);
+}
+
+.law-content-area {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-gray);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 24px 28px;
+}
+
+.law-article {
+    padding: 18px 12px;
+    border-bottom: 1px solid var(--border-gray);
+}
+
+.law-article:last-child {
+    border-bottom: none;
+}
+
+.law-article-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.law-article-title {
+    margin: 0;
+    font-size: 17px;
+    color: var(--link-blue);
+}
+
+.law-article-meta {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
 }
 
 /* Bestätigung & Ergebnisse */

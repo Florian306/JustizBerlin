@@ -971,35 +971,56 @@ document.addEventListener('DOMContentLoaded', () => {
             section.className = 'mb-20';
             section.innerHTML = `<h3 class="section-heading">${escapeHtml(book.title)}</h3>`;
 
-            const table = document.createElement('table');
-            table.className = 'official-table';
-            table.innerHTML = `
-                <thead>
-                    <tr>
-                        <th style="width: 90px;">Paragraph</th>
-                        <th style="width: 220px;">Titel</th>
-                        <th>Wortlaut</th>
-                        <th style="width: 120px;">Stand</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            `;
+            const layout = document.createElement('div');
+            layout.className = 'law-reader-layout';
 
-            const tbody = table.querySelector('tbody');
+            // Linke Spalte: Inhaltsverzeichnis
+            const toc = document.createElement('aside');
+            toc.className = 'law-toc';
+            toc.innerHTML = `<h4 class="law-toc-title">Inhaltsverzeichnis (${escapeHtml(book.short)})</h4><ul class="law-toc-list"></ul>`;
+            const tocList = toc.querySelector('.law-toc-list');
+
+            // Rechte Spalte: Lesebereich
+            const contentArea = document.createElement('div');
+            contentArea.className = 'law-content-area';
+
             laws.forEach(law => {
-                const tr = document.createElement('tr');
-                tr.dataset.lawRef = `${book.short} ${law.paragraph}`;
-                tr.innerHTML = `
-                    <td class="mono-bold">${escapeHtml(law.paragraph)}</td>
-                    <td><strong>${escapeHtml(law.title)}</strong></td>
-                    <td class="law-text-formatted">${formatLawTextHtml(law.text)}</td>
-                    <td>${escapeHtml(law.updatedAt || 'Initial')}</td>
+                const refKey = `${book.short} ${law.paragraph}`;
+
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#law-${law.id}" class="toc-jump" data-ref="${escapeHtml(refKey)}"><strong>${escapeHtml(law.paragraph)}</strong> ${escapeHtml(law.title)}</a>`;
+                tocList.appendChild(li);
+
+                const article = document.createElement('article');
+                article.className = 'law-article';
+                article.dataset.lawRef = refKey;
+                article.innerHTML = `
+                    <div class="law-article-header">
+                        <h4 class="law-article-title">${escapeHtml(law.paragraph)} ${escapeHtml(law.title)}</h4>
+                        <span class="law-article-meta">Stand: ${escapeHtml(law.updatedAt || 'Initial')}</span>
+                    </div>
+                    <div class="law-text-formatted">${formatLawTextHtml(law.text)}</div>
                 `;
-                tbody.appendChild(tr);
+                contentArea.appendChild(article);
             });
 
-            section.appendChild(table);
+            layout.appendChild(toc);
+            layout.appendChild(contentArea);
+            section.appendChild(layout);
             container.appendChild(section);
+        });
+
+        container.querySelectorAll('.toc-jump').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const ref = link.dataset.ref;
+                const target = container.querySelector(`.law-article[data-law-ref="${CSS.escape(ref)}"]`);
+                if (target) {
+                    target.classList.add('law-highlight');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => target.classList.remove('law-highlight'), 2000);
+                }
+            });
         });
 
         container.querySelectorAll('.law-ref-link').forEach(link => {
@@ -1012,11 +1033,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectedPublicBookId = targetBook.id;
                     gesetzeFilterSearch.value = '';
                     await renderGesetzePublic();
-                    const row = document.querySelector(`tr[data-law-ref="${CSS.escape(ref)}"]`);
-                    if (row) {
-                        row.classList.add('law-highlight');
-                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        setTimeout(() => row.classList.remove('law-highlight'), 2000);
+                    const article = document.querySelector(`.law-article[data-law-ref="${CSS.escape(ref)}"]`);
+                    if (article) {
+                        article.classList.add('law-highlight');
+                        article.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => article.classList.remove('law-highlight'), 2000);
                     }
                 }
             });
