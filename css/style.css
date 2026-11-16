@@ -227,12 +227,12 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
     background-color: var(--bg-light);
     border: 1px solid var(--border-gray);
     border-top: 3px solid var(--accent-red);
-    padding: 22px 24px;
-    margin-bottom: 24px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
 }
 
 .hero-kicker {
