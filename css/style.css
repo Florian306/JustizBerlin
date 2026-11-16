@@ -669,6 +669,56 @@ a:hover {
     outline-offset: -2px;
 }
 
+/* Gesetzestext-Formatierung & Querverweise */
+.law-text-formatted {
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.ref-autocomplete {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    box-shadow: var(--shadow-md);
+    max-height: 180px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.ref-autocomplete-item {
+    padding: 7px 12px;
+    font-size: 13.5px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bg-medium);
+}
+
+.ref-autocomplete-item:hover {
+    background-color: var(--bg-light);
+    color: var(--link-blue);
+}
+
+.law-ref-link {
+    display: inline-block;
+    background-color: #E8EEF5;
+    color: var(--link-blue);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    border: 1px solid #C5D5E8;
+}
+
+.law-ref-link:hover {
+    background-color: var(--link-blue);
+    color: var(--bg-white);
+}
+
+.official-table tbody tr.law-highlight {
+    background-color: #FFF8DC !important;
+    transition: background-color 0.5s ease;
+}
+
 /* Bestätigung & Ergebnisse */
 .confirmation-box,
 .result-box {

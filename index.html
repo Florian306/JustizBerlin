@@ -499,7 +499,9 @@
                                 </div>
                                 <div class="form-row">
                                     <label for="law-text">Gesetzestext <span class="req">*</span></label>
-                                    <textarea id="law-text" rows="4" required placeholder="Wortlaut der Vorschrift..."></textarea>
+                                    <textarea id="law-text" rows="4" required placeholder="Wortlaut der Vorschrift... (Tipp: @ für Querverweis)"></textarea>
+                                    <div id="law-ref-autocomplete" class="ref-autocomplete hidden"></div>
+                                    <small class="demo-hint" style="display:block; margin-top:4px;">Tipp: Tippe <strong>@</strong>, um einen klickbaren Querverweis zu einem anderen Gesetz einzufügen. Zeilenumbrüche bleiben erhalten.</small>
                                 </div>
                                 <button type="submit" class="btn-primary">Paragraph speichern</button>
                                 <span id="law-save-msg" class="save-msg hidden">Hinzugefügt.</span>

@@ -988,10 +988,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const tbody = table.querySelector('tbody');
             laws.forEach(law => {
                 const tr = document.createElement('tr');
+                tr.dataset.lawRef = `${book.short} ${law.paragraph}`;
                 tr.innerHTML = `
                     <td class="mono-bold">${escapeHtml(law.paragraph)}</td>
                     <td><strong>${escapeHtml(law.title)}</strong></td>
-                    <td>${escapeHtml(law.text)}</td>
+                    <td class="law-text-formatted">${formatLawTextHtml(law.text)}</td>
                     <td>${escapeHtml(law.updatedAt || 'Initial')}</td>
                 `;
                 tbody.appendChild(tr);
@@ -999,6 +1000,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             section.appendChild(table);
             container.appendChild(section);
+        });
+
+        container.querySelectorAll('.law-ref-link').forEach(link => {
+            link.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const ref = link.dataset.ref;
+                const d = await GesetzeAPI.getAll();
+                const targetBook = d.books.find(b => ref.startsWith(b.short + ' '));
+                if (targetBook) {
+                    selectedPublicBookId = targetBook.id;
+                    gesetzeFilterSearch.value = '';
+                    await renderGesetzePublic();
+                    const row = document.querySelector(`tr[data-law-ref="${CSS.escape(ref)}"]`);
+                    if (row) {
+                        row.classList.add('law-highlight');
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => row.classList.remove('law-highlight'), 2000);
+                    }
+                }
+            });
         });
 
         if (!anyShown) {
@@ -1172,6 +1193,65 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('law-save-msg').classList.remove('hidden');
         renderGesetzeIntern();
         renderGesetzePublic();
+    });
+
+    function formatLawTextHtml(rawText) {
+        const escaped = escapeHtml(rawText || '');
+        return escaped.replace(/\[\[([^\]]+)\]\]/g, (match, ref) => {
+            return `<a href="#gesetze" class="law-ref-link" data-ref="${ref}">${ref}</a>`;
+        });
+    }
+
+    // @-Autocomplete für Querverweise im Gesetzestext
+    const lawTextInput = document.getElementById('law-text');
+    const lawRefAutocomplete = document.getElementById('law-ref-autocomplete');
+
+    lawTextInput.addEventListener('input', async () => {
+        const val = lawTextInput.value;
+        const cursorPos = lawTextInput.selectionStart;
+        const textBeforeCursor = val.slice(0, cursorPos);
+        const atMatch = textBeforeCursor.match(/@([^\s@\[\]]*)$/);
+
+        if (!atMatch) {
+            lawRefAutocomplete.classList.add('hidden');
+            return;
+        }
+
+        const query = atMatch[1].toLowerCase();
+        const data = await GesetzeAPI.getAll();
+        const items = data.laws.map(l => {
+            const book = data.books.find(b => b.id === l.bookId);
+            const short = book ? book.short : l.bookId;
+            return {
+                ref: `${short} ${l.paragraph}`,
+                label: `${short} ${l.paragraph} – ${l.title}`
+            };
+        }).filter(item => item.label.toLowerCase().includes(query));
+
+        if (items.length === 0) {
+            lawRefAutocomplete.classList.add('hidden');
+            return;
+        }
+
+        lawRefAutocomplete.innerHTML = '';
+        items.slice(0, 10).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'ref-autocomplete-item';
+            div.textContent = item.label;
+            div.addEventListener('click', () => {
+                const startIdx = textBeforeCursor.lastIndexOf('@');
+                const before = val.slice(0, startIdx);
+                const after = val.slice(cursorPos);
+                const insert = `[[${item.ref}]] `;
+                lawTextInput.value = before + insert + after;
+                lawTextInput.focus();
+                const newPos = before.length + insert.length;
+                lawTextInput.setSelectionRange(newPos, newPos);
+                lawRefAutocomplete.classList.add('hidden');
+            });
+            lawRefAutocomplete.appendChild(div);
+        });
+        lawRefAutocomplete.classList.remove('hidden');
     });
 
     function escapeHtml(str) {
