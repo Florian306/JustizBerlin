@@ -388,31 +388,79 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Gesetzessammlung (Öffentlich & Intern) ---
     const gesetzeFilterBook = document.getElementById('gesetze-filter-book');
     const gesetzeFilterSearch = document.getElementById('gesetze-filter-search');
+    let selectedPublicBookId = null;
 
-    gesetzeFilterBook.addEventListener('change', renderGesetzePublic);
+    gesetzeFilterBook.addEventListener('change', () => {
+        selectedPublicBookId = gesetzeFilterBook.value === 'alle' ? null : gesetzeFilterBook.value;
+        renderGesetzePublic();
+    });
     gesetzeFilterSearch.addEventListener('input', renderGesetzePublic);
 
     function renderGesetzePublic() {
         const data = GesetzeAPI.getAll();
-        const currentBook = gesetzeFilterBook.value;
         const search = gesetzeFilterSearch.value.trim().toLowerCase();
 
         // Dropdown aktualisieren
-        gesetzeFilterBook.innerHTML = '<option value="alle">Alle Gesetzbücher</option>';
+        gesetzeFilterBook.innerHTML = '<option value="alle">Alle Gesetzbücher (Übersicht)</option>';
         data.books.forEach(b => {
             const opt = document.createElement('option');
             opt.value = b.id;
             opt.textContent = b.title;
-            if (b.id === currentBook) opt.selected = true;
+            if (b.id === selectedPublicBookId) opt.selected = true;
             gesetzeFilterBook.appendChild(opt);
         });
 
         const container = document.getElementById('gesetze-public-list');
         container.innerHTML = '';
 
-        const booksToShow = currentBook === 'alle'
-            ? data.books
-            : data.books.filter(b => b.id === currentBook);
+        // Ansicht 1: Bücher-Übersicht (wenn kein Buch ausgewählt und keine Suche aktiv)
+        if (!selectedPublicBookId && !search) {
+            const grid = document.createElement('div');
+            grid.className = 'service-cards-grid';
+
+            data.books.forEach(book => {
+                const count = data.laws.filter(l => l.bookId === book.id).length;
+                const card = document.createElement('div');
+                card.className = 'service-card book-card';
+                card.innerHTML = `
+                    <div>
+                        <span class="hero-kicker">${escapeHtml(book.short)}</span>
+                        <h4>${escapeHtml(book.title)}</h4>
+                        <p>${count} ${count === 1 ? 'Vorschrift' : 'Vorschriften'} hinterlegt</p>
+                    </div>
+                    <button type="button" class="btn-secondary btn-small btn-open-book" data-book-id="${escapeHtml(book.id)}">Gesetzbuch öffnen</button>
+                `;
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+
+            container.querySelectorAll('.btn-open-book').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedPublicBookId = btn.dataset.bookId;
+                    renderGesetzePublic();
+                });
+            });
+            return;
+        }
+
+        // Ansicht 2: Einzelnes Gesetzbuch oder Suchergebnisse
+        if (selectedPublicBookId) {
+            const backBar = document.createElement('div');
+            backBar.className = 'mb-20';
+            backBar.innerHTML = `<button type="button" id="btn-back-books" class="btn-secondary btn-small">&larr; Zurück zur Übersicht aller Gesetzbücher</button>`;
+            container.appendChild(backBar);
+
+            document.getElementById('btn-back-books').addEventListener('click', () => {
+                selectedPublicBookId = null;
+                gesetzeFilterSearch.value = '';
+                renderGesetzePublic();
+            });
+        }
+
+        const booksToShow = selectedPublicBookId
+            ? data.books.filter(b => b.id === selectedPublicBookId)
+            : data.books;
 
         let anyShown = false;
 
@@ -461,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!anyShown) {
-            container.innerHTML = '<div class="notice-box">Keine passenden Vorschriften gefunden.</div>';
+            container.innerHTML += '<div class="notice-box">Keine passenden Vorschriften in diesem Gesetzbuch gefunden.</div>';
         }
     }
 
