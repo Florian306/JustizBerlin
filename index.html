@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senatsverwaltung für Justiz und Verbraucherschutz – Land Berlin</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Obere Service-Leiste -->
+    <div class="service-bar no-print">
+        <div class="container service-bar-inner">
+            <span class="service-brand">Land Berlin</span>
+            <nav class="service-links" aria-label="Service-Navigation">
+                <a href="#start" data-nav="start">Service-Portal</a>
+                <span class="sep">|</span>
+                <a href="#barrierefreiheit" id="link-barrierefreiheit">Barrierefreiheit</a>
+                <span class="sep">|</span>
+                <a href="#leichte-sprache" id="link-leichte-sprache">Leichte Sprache</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Haupt-Header -->
+    <header class="main-header no-print">
+        <div class="container header-inner">
+            <div class="logo-area">
+                <div class="coat-of-arms" aria-hidden="true">
+                    <svg viewBox="0 0 40 48" width="40" height="48" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="38" height="46" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>
+                        <rect x="1" y="1" width="38" height="9" fill="#CC0000"/>
+                        <path d="M12 18 L28 18 L26 36 L20 42 L14 36 Z" fill="#1A1A1A"/>
+                        <circle cx="20" cy="24" r="3" fill="#FFFFFF"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-sub">Berlin.de – Offizielles Landesportal</span>
+                    <h1 class="logo-title">Senatsverwaltung für Justiz und Verbraucherschutz</h1>
+                </div>
+            </div>
+            <form class="header-search" id="header-search-form" role="search">
+                <label for="header-search-input" class="sr-only">Aktenzeichen oder Suchbegriff</label>
+                <input type="text" id="header-search-input" placeholder="Aktenzeichen (z. B. 204/26 StA)..." autocomplete="off">
+                <button type="submit" class="btn-secondary">Suchen</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Horizontale Hauptnavigation -->
+    <nav class="main-nav no-print" aria-label="Hauptnavigation">
+        <div class="container">
+            <ul class="nav-list">
+                <li><button type="button" class="nav-tab active" data-tab="start">Startseite &amp; Bekanntmachungen</button></li>
+                <li><button type="button" class="nav-tab" data-tab="service">Bürger- &amp; Polizei-Service</button></li>
+                <li><button type="button" class="nav-tab" data-tab="auskunft">Vorgangs- &amp; Aktenauskunft</button></li>
+                <li><button type="button" class="nav-tab" data-tab="intern">Internes Dienstportal</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hauptinhalt -->
+    <main class="container main-content no-print">
+        <!-- TAB 1: Startseite & Amtliche Bekanntmachungen -->
+        <section id="tab-start" class="tab-panel active" aria-labelledby="heading-start">
+            <h2 id="heading-start" class="page-title">Startseite &amp; Amtliche Bekanntmachungen</h2>
+            
+            <div class="notice-box">
+                <strong>Amtlicher Hinweis:</strong> Für sämtliche Eingaben im elektronischen Rechtsverkehr gelten die Vorschriften der Elektronischer-Rechtsverkehr-Verordnung (ERVV). Bei akuten Gefahrenlagen wenden Sie sich unmittelbar an den Polizeinotruf (110).
+            </div>
+
+            <div class="grid-two-col">
+                <div>
+                    <h3 class="section-heading">Aktuelle Amtliche Bekanntmachungen</h3>
+                    <table class="official-table">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Bekanntmachung / Betreff</th>
+                                <th>Aktenzeichen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>14.11.2026</td>
+                                <td><strong>Justizreform Berlin:</strong> Anpassung der Zuständigkeiten bei Wirtschaftsstrafsachen am Landgericht Berlin I.</td>
+                                <td>JustV I A 1</td>
+                            </tr>
+                            <tr>
+                                <td>09.11.2026</td>
+                                <td><strong>Schöffenwahl 2026/2027:</strong> Öffentliche Auslegung der Vorschlagslisten und Bewerbungsfrist für ehrenamtliche Richterinnen und Richter.</td>
+                                <td>JustV II B 4</td>
+                            </tr>
+                            <tr>
+                                <td>02.11.2026</td>
+                                <td><strong>Verbraucherschutz-Warnung:</strong> Hinweise zu unzulässigen Inkassoforderungen im Raum Berlin-Mitte.</td>
+                                <td>VS III C 2</td>
+                            </tr>
+                            <tr>
+                                <td>25.10.2026</td>
+                                <td><strong>Verordnung über die Gerichtsvollzieherkosten:</strong> Neufassung der Gebührentabelle ab dem 01.12.2026.</td>
+                                <td>GVBl. S. 412</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="section-heading">Direktzugriff Online-Anträge</h3>
+                    <div class="quick-links-box">
+                        <ul class="official-list">
+                            <li><a href="#service" class="quick-nav" data-target="service" data-preset="strafanzeige">Strafanzeige / Ermittlungsakte der Polizei einreichen</a></li>
+                            <li><a href="#service" class="quick-nav" data-target="service" data-preset="haftbefehl">Antrag auf Haftbefehl / Durchsuchungsbeschluss (nur Behörden)</a></li>
+                            <li><a href="#service" class="quick-nav" data-target="service" data-preset="schlichtung">Zivilrechtliche Schlichtung / Verbraucherschutz-Beschwerde</a></li>
+                            <li><a href="#service" class="quick-nav" data-target="service" data-preset="schoeffe">Bewerbung als ehrenamtliche/r Schöffe/in</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <aside>
+                    <div class="info-box">
+                        <h3 class="box-title">Amtsgericht Tiergarten</h3>
+                        <p><strong>Anschrift:</strong><br>Turmstraße 91<br>10559 Berlin</p>
+                        <p><strong>Öffnungszeiten (Rechtsantragstelle):</strong></p>
+                        <table class="compact-table">
+                            <tbody>
+                                <tr><td>Montag – Mittwoch</td><td>09:00 – 13:00 Uhr</td></tr>
+                                <tr><td>Donnerstag</td><td>09:00 – 18:00 Uhr</td></tr>
+                                <tr><td>Freitag</td><td>09:00 – 12:00 Uhr</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="mt-10"><strong>Telefonvermittlung:</strong><br>(030) 9014-0</p>
+                    </div>
+
+                    <div class="info-box mt-20">
+                        <h3 class="box-title">Geltende Verordnungen</h3>
+                        <ul class="official-list">
+                            <li>Berliner Justizgesetz (BerlJG)</li>
+                            <li>Verordnung über die Geschäftsverteilung (GVO)</li>
+                            <li>Richtlinien für das Strafverfahren (RiStBV)</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- TAB 2: Bürger- & Polizei-Service -->
+        <section id="tab-service" class="tab-panel" aria-labelledby="heading-service">
+            <h2 id="heading-service" class="page-title">Bürger- &amp; Polizei-Service (Online-Anträge)</h2>
+            <p class="intro-text">Über dieses Formular können Bürgerinnen und Bürger sowie Ermittlungsbehörden Vorgänge elektronisch bei der Senatsverwaltung bzw. den nachgeordneten Gerichten und Staatsanwaltschaften einreichen.</p>
+
+            <form id="antrag-form" class="official-form">
+                <div class="form-row">
+                    <label for="antrag-typ">Vorgangsart <span class="req">*</span></label>
+                    <select id="antrag-typ" required>
+                        <option value="">-- Bitte wählen --</option>
+                        <option value="Strafanzeige / Ermittlungsakte der Polizei">Strafanzeige / Ermittlungsakte der Polizei</option>
+                        <option value="Antrag auf Haftbefehl / Durchsuchungsbeschluss">Antrag auf Haftbefehl / Durchsuchungsbeschluss</option>
+                        <option value="Zivilrechtliche Schlichtung / Verbraucherschutz-Beschwerde">Zivilrechtliche Schlichtung / Verbraucherschutz-Beschwerde</option>
+                        <option value="Bewerbung als ehrenamtliche/r Schöffe/in">Bewerbung als ehrenamtliche/r Schöffe/in</option>
+                    </select>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="antrag-vorname">Vorname (Antragsteller / Sachbearbeiter) <span class="req">*</span></label>
+                        <input type="text" id="antrag-vorname" required placeholder="z. B. Max">
+                    </div>
+                    <div class="form-row">
+                        <label for="antrag-nachname">Nachname <span class="req">*</span></label>
+                        <input type="text" id="antrag-nachname" required placeholder="z. B. Mustermann">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="antrag-behoerde">Dienststelle / Anschrift</label>
+                        <input type="text" id="antrag-behoerde" placeholder="z. B. Polizei Berlin LKA 41 oder Wohnanschrift">
+                    </div>
+                    <div class="form-row">
+                        <label for="antrag-beteiligter">Betroffene Person / Beschuldigte/r</label>
+                        <input type="text" id="antrag-beteiligter" placeholder="Name des Beschuldigten / Gegners (falls bekannt)">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="antrag-sachverhalt">Sachverhalt / Begründung <span class="req">*</span></label>
+                    <textarea id="antrag-sachverhalt" rows="5" required placeholder="Schildern Sie den Sachverhalt sachlich und vollständig (Ort, Zeit, Tatvorwurf bzw. Antragsgrund)..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Vorgang verbindlich einreichen</button>
+                    <button type="reset" class="btn-secondary">Eingaben zurücksetzen</button>
+                </div>
+            </form>
+
+            <!-- Eingangsbestätigung -->
+            <div id="antrag-bestaetigung" class="confirmation-box hidden" role="status">
+                <h3>Amtliche Eingangsbestätigung</h3>
+                <p>Ihr Vorgang wurde elektronisch erfasst und an die zuständige Geschäftsstelle weitergeleitet.</p>
+                <table class="compact-table">
+                    <tbody>
+                        <tr><th>Aktenzeichen:</th><td id="conf-az" class="mono-bold"></td></tr>
+                        <tr><th>Antragsteller/in:</th><td id="conf-name"></td></tr>
+                        <tr><th>Vorgangsart:</th><td id="conf-typ"></td></tr>
+                        <tr><th>Eingangsdatum:</th><td id="conf-datum"></td></tr>
+                        <tr><th>Aktueller Status:</th><td>Eingegangen</td></tr>
+                    </tbody>
+                </table>
+                <p class="mt-10">Bitte bewahren Sie das Aktenzeichen für spätere Rückfragen unter „Vorgangs- &amp; Aktenauskunft“ auf.</p>
+            </div>
+        </section>
+
+        <!-- TAB 3: Vorgangs- & Aktenauskunft -->
+        <section id="tab-auskunft" class="tab-panel" aria-labelledby="heading-auskunft">
+            <h2 id="heading-auskunft" class="page-title">Vorgangs- &amp; Aktenauskunft (Statusabfrage)</h2>
+            <p class="intro-text">Bürgerinnen, Bürger und Verfahrensbeteiligte können hier den aktuellen Bearbeitungsstand eines eingereichten Vorgangs einsehen. Aus Datenschutzgründen ist die Angabe von Aktenzeichen und Nachname erforderlich.</p>
+
+            <form id="auskunft-form" class="official-form form-inline-box">
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="auskunft-az">Aktenzeichen <span class="req">*</span></label>
+                        <input type="text" id="auskunft-az" required placeholder="z. B. 204/26 StA">
+                    </div>
+                    <div class="form-row">
+                        <label for="auskunft-nachname">Nachname (Antragsteller/in) <span class="req">*</span></label>
+                        <input type="text" id="auskunft-nachname" required placeholder="z. B. Weber">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Status abfragen</button>
+                </div>
+            </form>
+
+            <div id="auskunft-ergebnis" class="result-box hidden"></div>
+        </section>
+
+        <!-- TAB 4: Internes Dienstportal -->
+        <section id="tab-intern" class="tab-panel" aria-labelledby="heading-intern">
+            <h2 id="heading-intern" class="page-title">Internes Dienstportal (Staatsanwaltschaft &amp; Gericht)</h2>
+
+            <!-- Login-Ansicht -->
+            <div id="intern-login-view">
+                <div class="notice-box">
+                    <strong>Zugangsbeschränkung:</strong> Dieser Bereich ist ausschließlich für Bedienstete der Berliner Justiz (Staatsanwaltschaft, Richterschaft, Geschäftsstellen) vorgesehen.
+                </div>
+                <form id="login-form" class="official-form login-box">
+                    <div class="form-row">
+                        <label for="login-user">Dienstkennung</label>
+                        <input type="text" id="login-user" required placeholder="justiz-berlin">
+                    </div>
+                    <div class="form-row">
+                        <label for="login-pass">Passwort</label>
+                        <input type="password" id="login-pass" required placeholder="Passwort eingeben">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Anmelden</button>
+                    </div>
+                    <p class="demo-hint">Demo-Zugang: <code>justiz-berlin</code> / <code>SenJust2026!</code></p>
+                    <p id="login-error" class="error-text hidden">Ungültige Dienstkennung oder falsches Passwort.</p>
+                </form>
+            </div>
+
+            <!-- Eingeloggte Ansicht -->
+            <div id="intern-dashboard-view" class="hidden">
+                <div class="dashboard-toolbar">
+                    <div>
+                        <strong>Angemeldet als:</strong> <span id="logged-user-display">justiz-berlin</span> (Dezernat IV / Bereitschaftsdienst)
+                    </div>
+                    <button type="button" id="btn-logout" class="btn-secondary">Abmelden</button>
+                </div>
+
+                <!-- Filterleiste -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label for="filter-status">Status-Filter:</label>
+                        <select id="filter-status">
+                            <option value="alle">Alle Vorgänge</option>
+                            <option value="Eingegangen">Eingegangen</option>
+                            <option value="In staatsanwaltschaftlicher Prüfung">In staatsanwaltschaftlicher Prüfung</option>
+                            <option value="Anklage erhoben">Anklage erhoben</option>
+                            <option value="Beschluss erlassen">Beschluss erlassen</option>
+                            <option value="Eingestellt">Eingestellt</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-search">Suche:</label>
+                        <input type="text" id="filter-search" placeholder="Aktenzeichen, Name, Betreff...">
+                    </div>
+                </div>
+
+                <!-- Akten-Tabelle -->
+                <div class="table-responsive">
+                    <table class="official-table" id="intern-akten-table">
+                        <thead>
+                            <tr>
+                                <th>Aktenzeichen</th>
+                                <th>Datum</th>
+                                <th>Antragsteller / Dienststelle</th>
+                                <th>Vorgangsart</th>
+                                <th>Status</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="intern-akten-tbody">
+                            <!-- Dynamisch befüllt -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Detail- & Dokumenten-Editor -->
+                <div id="intern-detail-panel" class="detail-panel hidden">
+                    <h3 class="section-heading">Aktenbearbeitung: <span id="detail-az" class="mono-bold"></span></h3>
+                    <div class="grid-two-col">
+                        <div>
+                            <p><strong>Antragsteller/in:</strong> <span id="detail-name"></span></p>
+                            <p><strong>Dienststelle / Anschrift:</strong> <span id="detail-behoerde"></span></p>
+                            <p><strong>Betroffene Person:</strong> <span id="detail-beteiligter"></span></p>
+                            <p><strong>Sachverhalt:</strong></p>
+                            <div id="detail-sachverhalt" class="sachverhalt-box"></div>
+                        </div>
+                        <div>
+                            <div class="form-row">
+                                <label for="detail-status-select">Bearbeitungsstatus ändern:</label>
+                                <select id="detail-status-select">
+                                    <option value="Eingegangen">Eingegangen</option>
+                                    <option value="In staatsanwaltschaftlicher Prüfung">In staatsanwaltschaftlicher Prüfung</option>
+                                    <option value="Anklage erhoben">Anklage erhoben</option>
+                                    <option value="Beschluss erlassen">Beschluss erlassen</option>
+                                    <option value="Eingestellt">Eingestellt</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="detail-vermerk">Interner Vermerk / Verfügung:</label>
+                                <textarea id="detail-vermerk" rows="4" placeholder="Interne Notiz oder Begründung für den Status..."></textarea>
+                            </div>
+                            <button type="button" id="btn-save-akte" class="btn-primary">Änderungen speichern</button>
+                            <span id="save-feedback" class="save-msg hidden">Gespeichert.</span>
+
+                            <hr class="divider">
+
+                            <h4 class="doc-gen-title">Amtlicher Dokumenten-Generator</h4>
+                            <div class="form-row">
+                                <label for="doc-type-select">Dokumentenart:</label>
+                                <select id="doc-type-select">
+                                    <option value="Haftbefehl">Haftbefehl (§ 112 StPO)</option>
+                                    <option value="Durchsuchungsbeschluss">Durchsuchungsbeschluss (§ 102 StPO)</option>
+                                    <option value="Strafbefehl">Strafbefehl (§ 407 StPO)</option>
+                                    <option value="Schöffen-Ladung">Ladung zum Schöffendienst (§ 45 GVG)</option>
+                                </select>
+                            </div>
+                            <button type="button" id="btn-print-doc" class="btn-secondary">Amtliches Dokument drucken / als PDF speichern</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer no-print">
+        <div class="container footer-inner">
+            <div>
+                <strong>Senatsverwaltung für Justiz und Verbraucherschutz</strong><br>
+                Salzburger Straße 21–25, 10825 Berlin
+            </div>
+            <div class="footer-links">
+                <a href="#impressum">Impressum</a> |
+                <a href="#datenschutz">Datenschutz</a> |
+                <a href="#kontakt">Kontakt</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Druckbereich für amtliche Beschlüsse (nur bei @media print sichtbar) -->
+    <section id="print-document" class="print-only" aria-hidden="true">
+        <div class="print-header">
+            <div class="print-header-left">
+                <strong>LAND BERLIN</strong><br>
+                Senatsverwaltung für Justiz und Verbraucherschutz<br>
+                Amtsgericht Tiergarten / Staatsanwaltschaft Berlin<br>
+                Turmstraße 91, 10559 Berlin
+            </div>
+            <div class="print-header-right">
+                <div class="print-seal-box">
+                    DIENSTSIEGEL<br>LAND BERLIN
+                </div>
+            </div>
+        </div>
+
+        <div class="print-meta">
+            <div><strong>Geschäftszeichen:</strong> <span id="print-az"></span></div>
+            <div><strong>Datum:</strong> <span id="print-datum"></span></div>
+        </div>
+
+        <h1 class="print-title" id="print-doc-title">BESCHLUSS</h1>
+
+        <div class="print-body" id="print-doc-body">
+            <!-- Dynamisch befüllt -->
+        </div>
+
+        <div class="print-signature">
+            <div class="sig-line">
+                ________________________________________<br>
+                <span id="print-signer">Richter/in am Amtsgericht / Staatsanwalt/-anwältin</span><br>
+                <em>(Elektronisch ausgefertigt – gültig ohne Unterschrift gemäß § 37a VwVfG / § 32b StPO)</em>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

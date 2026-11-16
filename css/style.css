@@ -1,0 +1,615 @@
+/* ==========================================================================
+   Senatsverwaltung für Justiz und Verbraucherschutz – Land Berlin
+   Strikter Behörden-Stil: Keine Verläufe, keine runden Ecken, klare Struktur
+   ========================================================================== */
+
+:root {
+    --bg-white: #FFFFFF;
+    --bg-light: #F2F2F2;
+    --bg-medium: #E5E5E5;
+    --text-main: #1A1A1A;
+    --text-muted: #555555;
+    --accent-red: #CC0000;
+    --link-blue: #003366;
+    --border-gray: #CCCCCC;
+    --border-dark: #999999;
+}
+
+* {
+    box-sizing: border-box;
+    border-radius: 0px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-main);
+    background-color: var(--bg-white);
+}
+
+a {
+    color: var(--link-blue);
+    text-decoration: underline;
+}
+
+a:hover {
+    color: var(--accent-red);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Obere Service-Leiste */
+.service-bar {
+    background-color: var(--text-main);
+    color: var(--bg-white);
+    font-size: 13px;
+    padding: 6px 0;
+}
+
+.service-bar-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.service-brand {
+    font-weight: bold;
+    letter-spacing: 0.3px;
+}
+
+.service-links a {
+    color: var(--bg-white);
+    text-decoration: none;
+}
+
+.service-links a:hover {
+    text-decoration: underline;
+}
+
+.service-links .sep {
+    margin: 0 8px;
+    color: #888888;
+}
+
+/* Haupt-Header */
+.main-header {
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-gray);
+    padding: 18px 0;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo-sub {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.logo-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.header-search {
+    display: flex;
+    gap: 6px;
+}
+
+.header-search input {
+    padding: 7px 10px;
+    border: 1px solid var(--border-dark);
+    font-size: 14px;
+    width: 240px;
+}
+
+/* Hauptnavigation */
+.main-nav {
+    background-color: var(--bg-light);
+    border-bottom: 1px solid var(--border-gray);
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.nav-tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--text-main);
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.nav-tab:hover {
+    background-color: var(--bg-medium);
+}
+
+.nav-tab.active {
+    border-bottom: 3px solid var(--accent-red);
+    background-color: var(--bg-white);
+    color: var(--accent-red);
+}
+
+/* Hauptinhalt */
+.main-content {
+    padding: 30px 20px 50px 20px;
+    min-height: 65vh;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.page-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    border-bottom: 2px solid var(--text-main);
+    padding-bottom: 8px;
+}
+
+.section-heading {
+    font-size: 18px;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--accent-red);
+    padding-left: 10px;
+}
+
+.intro-text {
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+/* Hinweis- & Info-Kästen */
+.notice-box {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-gray);
+    border-left: 4px solid var(--accent-red);
+    padding: 12px 16px;
+    margin-bottom: 24px;
+}
+
+.info-box {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-gray);
+    padding: 16px;
+}
+
+.box-title {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    border-bottom: 1px solid var(--border-gray);
+    padding-bottom: 6px;
+}
+
+.quick-links-box {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-gray);
+    padding: 14px 18px;
+}
+
+.official-list {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.official-list li {
+    margin-bottom: 6px;
+}
+
+/* Grid */
+.grid-two-col {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 28px;
+}
+
+@media (max-width: 800px) {
+    .grid-two-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tabellen */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.official-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.official-table th,
+.official-table td {
+    border: 1px solid var(--border-gray);
+    padding: 9px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.official-table thead th {
+    background-color: var(--bg-medium);
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.official-table tbody tr:nth-child(even) {
+    background-color: #FAFAFA;
+}
+
+.compact-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.compact-table th,
+.compact-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border-gray);
+    text-align: left;
+}
+
+/* Formulare & Buttons */
+.official-form {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-gray);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 650px) {
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-row {
+    margin-bottom: 14px;
+}
+
+.form-row label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.req {
+    color: var(--accent-red);
+}
+
+.form-row input[type="text"],
+.form-row input[type="password"],
+.form-row select,
+.form-row textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border-dark);
+    font-family: inherit;
+    font-size: 14px;
+    background-color: var(--bg-white);
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+    outline: 2px solid var(--link-blue);
+    outline-offset: -1px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.btn-primary {
+    background-color: var(--link-blue);
+    color: var(--bg-white);
+    border: 1px solid var(--link-blue);
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-primary:hover {
+    background-color: #002244;
+}
+
+.btn-secondary {
+    background-color: var(--bg-white);
+    color: var(--text-main);
+    border: 1px solid var(--border-dark);
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-medium);
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 13px;
+}
+
+/* Bestätigung & Ergebnisse */
+.confirmation-box,
+.result-box {
+    background-color: var(--bg-white);
+    border: 2px solid var(--text-main);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.confirmation-box h3,
+.result-box h3 {
+    margin-top: 0;
+    color: var(--accent-red);
+}
+
+.mono-bold {
+    font-family: Consolas, "Courier New", monospace;
+    font-weight: bold;
+}
+
+.error-text {
+    color: var(--accent-red);
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Internes Dienstportal */
+.login-box {
+    max-width: 420px;
+}
+
+.demo-hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+.dashboard-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-gray);
+    padding: 10px 16px;
+    margin-bottom: 16px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-gray);
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.filter-group select,
+.filter-group input {
+    padding: 6px 8px;
+    border: 1px solid var(--border-dark);
+    font-size: 14px;
+}
+
+.detail-panel {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-dark);
+    padding: 20px;
+    margin-top: 24px;
+}
+
+.sachverhalt-box {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-gray);
+    padding: 10px;
+    font-size: 14px;
+    white-space: pre-wrap;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px solid var(--border-gray);
+    margin: 20px 0;
+}
+
+.doc-gen-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.save-msg {
+    margin-left: 10px;
+    color: #006600;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Footer */
+.main-footer {
+    background-color: var(--bg-light);
+    border-top: 1px solid var(--border-gray);
+    padding: 20px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   Druck-Stylesheet (@media print) für amtliche Beschlüsse
+   ========================================================================== */
+.print-only {
+    display: none;
+}
+
+@media print {
+    @page {
+        size: A4;
+        margin: 0;
+    }
+
+    body {
+        margin: 20mm 20mm 20mm 25mm;
+        background-color: #FFFFFF;
+        color: #000000;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 12px;
+        margin-bottom: 20px;
+    }
+
+    .print-header-left {
+        font-size: 10.5pt;
+        line-height: 1.4;
+    }
+
+    .print-seal-box {
+        border: 2px solid #000000;
+        padding: 10px 14px;
+        text-align: center;
+        font-size: 9pt;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+
+    .print-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        font-size: 11pt;
+    }
+
+    .print-title {
+        font-size: 16pt;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 25px;
+        text-decoration: underline;
+    }
+
+    .print-body {
+        margin-bottom: 50px;
+        text-align: justify;
+    }
+
+    .print-signature {
+        margin-top: 60px;
+        page-break-inside: avoid;
+    }
+
+    .sig-line {
+        font-size: 10.5pt;
+    }
+}
