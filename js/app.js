@@ -1084,6 +1084,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 bookSelect.appendChild(opt);
             });
         }
+        updateNextParagraphPlaceholder(data);
 
         // Filter-Dropdown über Verwaltungstabelle aktualisieren
         const currentFilter = adminLawsFilter.value;
@@ -1233,9 +1234,65 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // @-Autocomplete für Querverweise im Gesetzestext
+    // @-Autocomplete & Editor-Toolbar für Gesetzestext
     const lawTextInput = document.getElementById('law-text');
     const lawRefAutocomplete = document.getElementById('law-ref-autocomplete');
+    const lawBookSelect = document.getElementById('law-book-select');
+    const lawParagraphInput = document.getElementById('law-paragraph');
+    const lawLivePreview = document.getElementById('law-live-preview');
+
+    function updateNextParagraphPlaceholder(data) {
+        const bookId = lawBookSelect.value;
+        if (!bookId) {
+            lawParagraphInput.placeholder = 'Leer = automatisch, z. B. § 2a';
+            return;
+        }
+        const count = data.laws.filter(l => l.bookId === bookId).length;
+        lawParagraphInput.placeholder = `Automatisch: § ${count + 1} (oder z. B. § 2a)`;
+    }
+
+    lawBookSelect.addEventListener('change', async () => {
+        const data = await GesetzeAPI.getAll();
+        updateNextParagraphPlaceholder(data);
+    });
+
+    function insertAtCursor(textarea, textToInsert) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const val = textarea.value;
+        textarea.value = val.slice(0, start) + textToInsert + val.slice(end);
+        textarea.focus();
+        const pos = start + textToInsert.length;
+        textarea.setSelectionRange(pos, pos);
+    }
+
+    document.getElementById('btn-insert-absatz').addEventListener('click', () => {
+        const matches = lawTextInput.value.match(/\(\d+\)/g);
+        const nextAbs = (matches ? matches.length : 0) + 1;
+        const prefix = lawTextInput.value && !lawTextInput.value.endsWith('\n') ? '\n' : '';
+        insertAtCursor(lawTextInput, `${prefix}(${nextAbs}) `);
+    });
+
+    document.getElementById('btn-insert-bullet').addEventListener('click', () => {
+        const prefix = lawTextInput.value && !lawTextInput.value.endsWith('\n') ? '\n' : '';
+        insertAtCursor(lawTextInput, `${prefix}• `);
+    });
+
+    document.getElementById('btn-insert-ref').addEventListener('click', () => {
+        insertAtCursor(lawTextInput, '@');
+        lawTextInput.dispatchEvent(new Event('input'));
+    });
+
+    document.getElementById('btn-toggle-law-preview').addEventListener('click', () => {
+        if (lawLivePreview.classList.contains('hidden')) {
+            lawLivePreview.innerHTML = lawTextInput.value.trim()
+                ? formatLawTextHtml(lawTextInput.value)
+                : '<em>Noch kein Text eingegeben.</em>';
+            lawLivePreview.classList.remove('hidden');
+        } else {
+            lawLivePreview.classList.add('hidden');
+        }
+    });
 
     lawTextInput.addEventListener('input', async () => {
         const val = lawTextInput.value;
