@@ -880,9 +880,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const gesetzeFilterBook = document.getElementById('gesetze-filter-book');
     const gesetzeFilterSearch = document.getElementById('gesetze-filter-search');
     let selectedPublicBookId = null;
+    let selectedPublicLawId = null;
 
     gesetzeFilterBook.addEventListener('change', () => {
         selectedPublicBookId = gesetzeFilterBook.value === 'alle' ? null : gesetzeFilterBook.value;
+        selectedPublicLawId = null;
         renderGesetzePublic();
     });
     gesetzeFilterSearch.addEventListener('input', renderGesetzePublic);
@@ -980,29 +982,42 @@ document.addEventListener('DOMContentLoaded', () => {
             toc.innerHTML = `<h4 class="law-toc-title">Inhaltsverzeichnis (${escapeHtml(book.short)})</h4><ul class="law-toc-list"></ul>`;
             const tocList = toc.querySelector('.law-toc-list');
 
-            // Rechte Spalte: Lesebereich
+            // Aktiven Paragraphen bestimmen (Standard: erster Paragraph)
+            let activeIdx = laws.findIndex(l => l.id === selectedPublicLawId);
+            if (activeIdx === -1) {
+                activeIdx = 0;
+                selectedPublicLawId = laws[0].id;
+            }
+            const activeLaw = laws[activeIdx];
+
+            laws.forEach(law => {
+                const isActive = law.id === activeLaw.id;
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#law-${law.id}" class="toc-jump${isActive ? ' active' : ''}" data-law-id="${law.id}"><strong>${escapeHtml(law.paragraph)}</strong> ${escapeHtml(law.title)}</a>`;
+                tocList.appendChild(li);
+            });
+
+            // Rechte Spalte: Einzelne Gesetzes-Seite
             const contentArea = document.createElement('div');
             contentArea.className = 'law-content-area';
 
-            laws.forEach(law => {
-                const refKey = `${book.short} ${law.paragraph}`;
+            const prevLaw = activeIdx > 0 ? laws[activeIdx - 1] : null;
+            const nextLaw = activeIdx < laws.length - 1 ? laws[activeIdx + 1] : null;
 
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#law-${law.id}" class="toc-jump" data-ref="${escapeHtml(refKey)}"><strong>${escapeHtml(law.paragraph)}</strong> ${escapeHtml(law.title)}</a>`;
-                tocList.appendChild(li);
-
-                const article = document.createElement('article');
-                article.className = 'law-article';
-                article.dataset.lawRef = refKey;
-                article.innerHTML = `
+            contentArea.innerHTML = `
+                <article class="law-article" style="border-bottom: none; padding: 0;">
                     <div class="law-article-header">
-                        <h4 class="law-article-title">${escapeHtml(law.paragraph)} ${escapeHtml(law.title)}</h4>
-                        <span class="law-article-meta">Stand: ${escapeHtml(law.updatedAt || 'Initial')}</span>
+                        <h4 class="law-article-title" style="font-size: 20px;">${escapeHtml(activeLaw.paragraph)} ${escapeHtml(activeLaw.title)}</h4>
+                        <span class="law-article-meta">Stand: ${escapeHtml(activeLaw.updatedAt || 'Initial')}</span>
                     </div>
-                    <div class="law-text-formatted">${formatLawTextHtml(law.text)}</div>
-                `;
-                contentArea.appendChild(article);
-            });
+                    <div class="law-text-formatted" style="margin-top: 14px;">${formatLawTextHtml(activeLaw.text)}</div>
+                </article>
+                <div class="law-pagination">
+                    <div>${prevLaw ? `<button type="button" class="btn-secondary btn-small btn-law-nav" data-law-id="${prevLaw.id}">&larr; ${escapeHtml(prevLaw.paragraph)}</button>` : ''}</div>
+                    <span class="demo-hint" style="margin: 0;">Paragraph ${activeIdx + 1} von ${laws.length}</span>
+                    <div>${nextLaw ? `<button type="button" class="btn-secondary btn-small btn-law-nav" data-law-id="${nextLaw.id}">${escapeHtml(nextLaw.paragraph)} &rarr;</button>` : ''}</div>
+                </div>
+            `;
 
             layout.appendChild(toc);
             layout.appendChild(contentArea);
@@ -1010,16 +1025,11 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(section);
         });
 
-        container.querySelectorAll('.toc-jump').forEach(link => {
-            link.addEventListener('click', (e) => {
+        container.querySelectorAll('.toc-jump, .btn-law-nav').forEach(el => {
+            el.addEventListener('click', (e) => {
                 e.preventDefault();
-                const ref = link.dataset.ref;
-                const target = container.querySelector(`.law-article[data-law-ref="${CSS.escape(ref)}"]`);
-                if (target) {
-                    target.classList.add('law-highlight');
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    setTimeout(() => target.classList.remove('law-highlight'), 2000);
-                }
+                selectedPublicLawId = Number(el.dataset.lawId);
+                renderGesetzePublic();
             });
         });
 
@@ -1030,15 +1040,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const d = await GesetzeAPI.getAll();
                 const targetBook = d.books.find(b => ref.startsWith(b.short + ' '));
                 if (targetBook) {
+                    const targetLaw = d.laws.find(l => l.bookId === targetBook.id && `${targetBook.short} ${l.paragraph}` === ref);
                     selectedPublicBookId = targetBook.id;
+                    selectedPublicLawId = targetLaw ? targetLaw.id : null;
                     gesetzeFilterSearch.value = '';
                     await renderGesetzePublic();
-                    const article = document.querySelector(`.law-article[data-law-ref="${CSS.escape(ref)}"]`);
-                    if (article) {
-                        article.classList.add('law-highlight');
-                        article.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        setTimeout(() => article.classList.remove('law-highlight'), 2000);
-                    }
                 }
             });
         });

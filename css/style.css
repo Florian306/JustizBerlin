@@ -60,7 +60,8 @@ a:hover {
 .mt-20 { margin-top: 20px; }
 
 .container {
-    max-width: 1140px;
+    width: 96%;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -774,6 +775,23 @@ a:hover {
 .law-toc-list a:hover {
     color: var(--link-blue);
     background-color: var(--bg-light);
+}
+
+.law-toc-list a.active {
+    color: var(--link-blue);
+    background-color: #E8EEF5;
+    font-weight: bold;
+    border-left: 3px solid var(--accent-red);
+    padding-left: 8px;
+}
+
+.law-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-gray);
 }
 
 .law-content-area {
