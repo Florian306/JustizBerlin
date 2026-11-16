@@ -122,35 +122,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const BEKANNTMACHUNGEN = {
-        justizreform: {
-            title: 'Justizreform Berlin (Az. JustV I A 1)',
-            text: 'Mit Wirkung zum 01.12.2026 werden sämtliche Ermittlungsverfahren wegen komplexer Wirtschaftskriminalität im Bezirk Tiergarten sowie Mitte zentral bei der Schwerpunktstaatsanwaltschaft am Landgericht Berlin I gebündelt.'
-        },
-        schoeffen: {
-            title: 'Schöffenwahl 2026/2027 (Az. JustV II B 4)',
-            text: 'Bürgerinnen und Bürger mit Hauptwohnsitz in Berlin können sich ab sofort über das Online-Antragsportal für das Ehrenamt als Schöffin oder Schöffe am Amtsgericht Tiergarten bewerben.'
-        },
-        verbraucherschutz: {
-            title: 'Verbraucherschutz-Warnung (Az. VS III C 2)',
-            text: 'Derzeit kursieren gefälschte Zahlungsaufforderungen angeblicher Inkassobüros. Prüfen Sie Forderungen sorgfältig und melden Sie unberechtigte Mahnungen über die Schlichtungsstelle.'
-        },
-        gebuehren: {
-            title: 'Verordnung über die Gerichtsvollzieherkosten (GVBl. S. 412)',
-            text: 'Die aktualisierte Gebührentabelle für Zustellungen und Zwangsvollstreckungen tritt zum 01.12.2026 in Kraft und ist in den Rechtsantragstellen einsehbar.'
-        }
-    };
+    async function renderBekanntmachungen() {
+        const tbody = document.getElementById('bekanntmachungen-tbody');
+        const [akten, gesetze] = await Promise.all([AktenAPI.getAll(), GesetzeAPI.getAll()]);
 
-    document.querySelectorAll('#bekanntmachungen-table tbody tr').forEach(row => {
-        row.addEventListener('click', () => {
-            const key = row.dataset.bekanntmachung;
-            const info = BEKANNTMACHUNGEN[key];
-            if (!info) return;
-            document.getElementById('bekanntmachung-detail-title').textContent = info.title;
-            document.getElementById('bekanntmachung-detail-text').textContent = info.text;
-            document.getElementById('bekanntmachung-detail').classList.remove('hidden');
+        const items = [];
+
+        // Echte veröffentlichte Gesetzbücher
+        gesetze.books.filter(b => b.createdAt).forEach(b => {
+            items.push({
+                datum: b.createdAt,
+                betreff: `<strong>Gesetzbuch veröffentlicht:</strong> ${escapeHtml(b.title)}`,
+                az: b.short,
+                detailTitle: `Veröffentlichung: ${b.title} (${b.short})`,
+                detailText: `Das Gesetzbuch "${b.title}" wurde am ${b.createdAt} in die Berliner Gesetzessammlung aufgenommen.`
+            });
         });
-    });
+
+        // Echte erlassene Beschlüsse & Anklagen
+        akten.filter(a => a.status === 'Beschluss erlassen' || a.status === 'Anklage erhoben').forEach(a => {
+            items.push({
+                datum: a.datum,
+                betreff: `<strong>${escapeHtml(a.status)}:</strong> ${escapeHtml(a.typ)}`,
+                az: a.az,
+                detailTitle: `${a.status} – Az. ${a.az}`,
+                detailText: `Im Verfahren ${a.az} (${a.typ}) wurde der Status "${a.status}" vermerkt.`
+            });
+        });
+
+        tbody.innerHTML = '';
+        if (items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3">Aktuell liegen keine amtlichen Bekanntmachungen vor.</td></tr>';
+            return;
+        }
+
+        items.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${escapeHtml(item.datum)}</td>
+                <td>${item.betreff}</td>
+                <td class="mono-bold">${escapeHtml(item.az)}</td>
+            `;
+            tr.addEventListener('click', () => {
+                document.getElementById('bekanntmachung-detail-title').textContent = item.detailTitle;
+                document.getElementById('bekanntmachung-detail-text').textContent = item.detailText;
+                document.getElementById('bekanntmachung-detail').classList.remove('hidden');
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    renderBekanntmachungen();
 
     document.getElementById('close-bekanntmachung').addEventListener('click', () => {
         document.getElementById('bekanntmachung-detail').classList.add('hidden');
