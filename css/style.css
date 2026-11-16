@@ -626,11 +626,14 @@ a:hover {
 }
 
 .footer-disclaimer {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border-gray);
-    font-size: 12px;
-    color: var(--text-muted);
+    margin-top: 16px;
+    padding: 12px 16px;
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-dark);
+    border-left: 4px solid var(--accent-red);
+    font-size: 13.5px;
+    font-weight: bold;
+    color: var(--text-main);
 }
 
 /* ==========================================================================
