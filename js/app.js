@@ -920,75 +920,83 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch { nachtraegeList = []; }
 
             const bwmRows = bwmList.length === 0
-                ? '<tr><td colspan="4">Keine Beweismittel hinterlegt.</td></tr>'
+                ? '<tr><td colspan="4" style="padding: 8px; border: 1px solid #999;">Keine Beweismittel hinterlegt.</td></tr>'
                 : bwmList.map(b => `
                     <tr>
-                        <td><strong>${escapeHtml(b.kennung)}</strong></td>
-                        <td>${escapeHtml(b.name)}</td>
-                        <td>${escapeHtml(b.size || '')}</td>
-                        <td>${escapeHtml(b.addedAt || akte.datum)}</td>
+                        <td style="border:1px solid #999; padding:6px 8px; white-space:nowrap; font-family:monospace; font-weight:bold;">${escapeHtml(b.kennung)}</td>
+                        <td style="border:1px solid #999; padding:6px 8px;">${escapeHtml(b.name)}</td>
+                        <td style="border:1px solid #999; padding:6px 8px; white-space:nowrap;">${escapeHtml(b.size || '')}</td>
+                        <td style="border:1px solid #999; padding:6px 8px; white-space:nowrap;">${escapeHtml(b.addedAt || akte.datum)}</td>
                     </tr>
                 `).join('');
 
             const bwmImages = bwmList
                 .filter(b => b.dataUrl && (b.type || '').startsWith('image/'))
                 .map(b => `
-                    <div style="margin-top: 16px; page-break-inside: avoid;">
-                        <p><strong>Anlage ${escapeHtml(b.kennung)} (${escapeHtml(b.name)}):</strong></p>
+                    <div style="margin-top: 16px; padding: 10px; border: 1px solid #999; page-break-inside: avoid;">
+                        <p style="margin: 0 0 8px 0;"><strong>Anlage ${escapeHtml(b.kennung)} (${escapeHtml(b.name)}):</strong></p>
                         <img src="${b.dataUrl}" style="max-width: 100%; max-height: 260px; border: 1px solid #000;">
                     </div>
                 `).join('');
 
             const nachtraegeHtml = nachtraegeList.length === 0
-                ? '<p>Keine weiteren Ermittlungsnachträge vorhanden.</p>'
+                ? '<p style="color:#555; font-style:italic;">Keine weiteren Ermittlungsnachträge vorhanden.</p>'
                 : nachtraegeList.map(n => `
-                    <p style="border-bottom: 1px solid #CCC; padding-bottom: 6px;">
-                        <strong>${escapeHtml(n.timestamp)}</strong> – <em>${escapeHtml(n.author)}</em>:<br>
-                        ${escapeHtml(n.text)}
-                    </p>
+                    <div style="border-left: 3px solid #000; padding: 6px 12px; margin-bottom: 10px; background: #F9F9F9;">
+                        <strong>${escapeHtml(n.timestamp)}</strong> – <em>${escapeHtml(n.author)}</em><br>
+                        <span>${escapeHtml(n.text)}</span>
+                    </div>
                 `).join('');
 
             bodyEl.innerHTML = `
-                <div style="page-break-after: always; padding-top: 20px;">
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
-                        <tr><th style="text-align:left; padding:6px; border-bottom:1px solid #000; width:35%;">Aktenzeichen:</th><td style="padding:6px; border-bottom:1px solid #000;"><strong>${escapeHtml(akte.az)}</strong></td></tr>
-                        <tr><th style="text-align:left; padding:6px; border-bottom:1px solid #000;">Vorgangsart:</th><td style="padding:6px; border-bottom:1px solid #000;">${escapeHtml(akte.typ)}</td></tr>
-                        <tr><th style="text-align:left; padding:6px; border-bottom:1px solid #000;">Eingangsdatum:</th><td style="padding:6px; border-bottom:1px solid #000;">${escapeHtml(akte.datum)}</td></tr>
-                        <tr><th style="text-align:left; padding:6px; border-bottom:1px solid #000;">Aktueller Status:</th><td style="padding:6px; border-bottom:1px solid #000;"><strong>${escapeHtml(akte.status)}</strong></td></tr>
-                        <tr><th style="text-align:left; padding:6px; border-bottom:1px solid #000;">Antragsteller / Dienststelle:</th><td style="padding:6px; border-bottom:1px solid #000;">${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)} (${escapeHtml(akte.behoerde)})</td></tr>
-                        <tr><th style="text-align:left; padding:6px; border-bottom:1px solid #000;">Betroffene Person:</th><td style="padding:6px; border-bottom:1px solid #000;">${escapeHtml(akte.beteiligter)}</td></tr>
+                <div style="page-break-after: always; border: 2px solid #000; padding: 28px; margin-top: 10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+                        <span style="border: 2px solid #CC0000; color: #CC0000; padding: 4px 10px; font-weight: bold; font-size: 10pt; letter-spacing: 1px;">AMTLICHE AKTE · NUR FÜR DEN DIENSTGEBRAUCH</span>
+                        <span style="font-family: monospace; font-size: 12pt; font-weight: bold;">AZ: ${escapeHtml(akte.az)}</span>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 11pt;">
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2; width:36%;">Aktenzeichen</th><td style="padding:8px; border:1px solid #999;"><strong>${escapeHtml(akte.az)}</strong></td></tr>
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Vorgangsart</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.typ)}</td></tr>
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Eingangsdatum</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.datum)}</td></tr>
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Aktueller Status</th><td style="padding:8px; border:1px solid #999;"><strong>${escapeHtml(akte.status)}</strong></td></tr>
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Antragsteller / Dienststelle</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)} (${escapeHtml(akte.behoerde)})</td></tr>
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Betroffene Person</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.beteiligter)}</td></tr>
                     </table>
-                    <p><strong>Akteninhalt:</strong></p>
-                    <ol>
-                        <li>Sachverhalt &amp; Tatvorwurf</li>
-                        <li>Beweismittel-Verzeichnis (${bwmList.length} Anlagen)</li>
-                        <li>Chronologie der Ermittlungsnachträge (${nachtraegeList.length} Einträge)</li>
-                        <li>Interner Vermerk / Verfügung</li>
-                    </ol>
+
+                    <div style="border-top: 2px solid #000; padding-top: 14px;">
+                        <p style="margin: 0 0 8px 0;"><strong>Aktenverzeichnis:</strong></p>
+                        <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                            <li>Sachverhalt &amp; Tatvorwurf</li>
+                            <li>Beweismittel-Verzeichnis (${bwmList.length} ${bwmList.length === 1 ? 'Anlage' : 'Anlagen'})</li>
+                            <li>Chronologie der Ermittlungsnachträge (${nachtraegeList.length} ${nachtraegeList.length === 1 ? 'Eintrag' : 'Einträge'})</li>
+                            <li>Interner Vermerk / Verfügung</li>
+                        </ol>
+                    </div>
                 </div>
 
-                <h3>1. Sachverhalt &amp; Tatvorwurf</h3>
-                <p style="white-space: pre-wrap;">${escapeHtml(akte.sachverhalt)}</p>
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px; margin-top: 0;">1. Sachverhalt &amp; Tatvorwurf</h3>
+                <div style="border: 1px solid #999; padding: 12px; background: #FAFAFA; white-space: pre-wrap; margin-bottom: 22px;">${escapeHtml(akte.sachverhalt)}</div>
 
-                <h3>2. Beweismittel-Verzeichnis</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt; margin-bottom: 12px;">
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px;">2. Beweismittel-Verzeichnis</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 22px;">
                     <thead>
-                        <tr style="background: #EEE;">
-                            <th style="border:1px solid #000; padding:5px; text-align:left;">Kennung</th>
-                            <th style="border:1px solid #000; padding:5px; text-align:left;">Bezeichnung / Datei</th>
-                            <th style="border:1px solid #000; padding:5px; text-align:left;">Größe</th>
-                            <th style="border:1px solid #000; padding:5px; text-align:left;">Erfasst am</th>
+                        <tr style="background: #E9ECEF;">
+                            <th style="border:1px solid #999; padding:6px 8px; text-align:left;">Kennung</th>
+                            <th style="border:1px solid #999; padding:6px 8px; text-align:left;">Bezeichnung / Datei</th>
+                            <th style="border:1px solid #999; padding:6px 8px; text-align:left;">Größe</th>
+                            <th style="border:1px solid #999; padding:6px 8px; text-align:left;">Erfasst am</th>
                         </tr>
                     </thead>
                     <tbody>${bwmRows}</tbody>
                 </table>
                 ${bwmImages}
 
-                <h3>3. Chronologie der Ermittlungsnachträge &amp; Aussagen</h3>
-                ${nachtraegeHtml}
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px;">3. Chronologie der Ermittlungsnachträge &amp; Aussagen</h3>
+                <div style="margin-bottom: 22px;">${nachtraegeHtml}</div>
 
-                <h3>4. Interner Vermerk / Verfügung</h3>
-                <p style="white-space: pre-wrap;">${escapeHtml(akte.vermerk || 'Kein Vermerk hinterlegt.')}</p>
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px;">4. Interner Vermerk / Verfügung</h3>
+                <div style="border: 1px solid #999; padding: 12px; background: #FAFAFA; white-space: pre-wrap;">${escapeHtml(akte.vermerk || 'Kein Vermerk hinterlegt.')}</div>
             `;
         } else if (docType === 'Haftbefehl') {
             signerEl.textContent = 'Richter/in am Amtsgericht Tiergarten';
