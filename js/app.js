@@ -376,6 +376,31 @@ document.addEventListener('DOMContentLoaded', () => {
         confBox.scrollIntoView({ behavior: 'smooth' });
     });
 
+    document.getElementById('btn-print-confirmation').addEventListener('click', () => {
+        const az = document.getElementById('conf-az').textContent;
+        const name = document.getElementById('conf-name').textContent;
+        const typ = document.getElementById('conf-typ').textContent;
+        const datum = document.getElementById('conf-datum').textContent;
+        const bwm = document.getElementById('conf-beweismittel').textContent;
+
+        document.getElementById('print-az').textContent = az;
+        document.getElementById('print-datum').textContent = datum;
+        document.getElementById('print-doc-title').textContent = 'AMTLICHE EINGANGSBESTÄTIGUNG';
+        document.getElementById('print-signer').textContent = 'Elektronische Poststelle – Senatsverwaltung für Justiz und Verbraucherschutz';
+        document.getElementById('print-doc-body').innerHTML = `
+            <p>Hiermit wird der elektronische Eingang Ihres Vorgangs bei der Senatsverwaltung für Justiz und Verbraucherschutz – Land Berlin bestätigt.</p>
+            <table style="width:100%; border-collapse:collapse; margin: 20px 0;">
+                <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2; width:35%;">Aktenzeichen:</th><td style="padding:8px; border:1px solid #999;"><strong>${escapeHtml(az)}</strong></td></tr>
+                <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Antragsteller/in:</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(name)}</td></tr>
+                <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Vorgangsart:</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(typ)}</td></tr>
+                <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Eingangsdatum:</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(datum)}</td></tr>
+                <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Beweismittel:</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(bwm)}</td></tr>
+            </table>
+            <p>Bitte bewahren Sie das Aktenzeichen <strong>${escapeHtml(az)}</strong> für Rückfragen unter „Vorgangs- &amp; Aktenauskunft“ auf.</p>
+        `;
+        window.print();
+    });
+
     // --- TAB 3: Vorgangs- & Aktenauskunft ---
     const auskunftForm = document.getElementById('auskunft-form');
     const auskunftErgebnis = document.getElementById('auskunft-ergebnis');
@@ -814,14 +839,86 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStats();
     });
 
+    document.getElementById('btn-toggle-new-akte').addEventListener('click', () => {
+        document.getElementById('intern-new-akte-panel').classList.toggle('hidden');
+    });
+
+    document.getElementById('btn-close-new-akte').addEventListener('click', () => {
+        document.getElementById('intern-new-akte-panel').classList.add('hidden');
+    });
+
+    document.getElementById('form-intern-new-akte').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const typ = document.getElementById('intern-new-typ').value;
+        const status = document.getElementById('intern-new-status').value;
+        const nameRaw = document.getElementById('intern-new-name').value.trim();
+        const beteiligter = document.getElementById('intern-new-beteiligter').value.trim();
+        const sachverhalt = document.getElementById('intern-new-sachverhalt').value.trim();
+
+        const parts = nameRaw.split(' ');
+        const vorname = parts.length > 1 ? parts.slice(0, -1).join(' ') : 'Dienststelle';
+        const nachname = parts[parts.length - 1];
+        const az = AktenAPI.generateAktenzeichen(typ);
+        const heute = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const author = document.getElementById('logged-user-display').textContent || 'Dienststelle';
+
+        await AktenAPI.create({
+            az,
+            datum: heute,
+            typ,
+            vorname,
+            nachname,
+            behoerde: 'Internes Dienstportal (SenJustV)',
+            beteiligter,
+            sachverhalt,
+            status,
+            vermerk: `Direkt eröffnet durch ${author}.`,
+            beweismittel: [],
+            nachtraege: [{
+                timestamp: getTimestampDE(),
+                author,
+                text: `Akte direkt im Dienstportal eröffnet (Status: ${status}).`
+            }]
+        });
+
+        e.target.reset();
+        document.getElementById('intern-new-akte-panel').classList.add('hidden');
+        renderInternTable();
+        updateStats();
+        openAkteDetail(az);
+    });
+
     document.getElementById('btn-save-akte').addEventListener('click', async () => {
         if (!currentSelectedAz) return;
         const status = document.getElementById('detail-status-select').value;
         const vermerk = document.getElementById('detail-vermerk').value;
 
-        await AktenAPI.update(currentSelectedAz, { status, vermerk });
+        const akten = await AktenAPI.getAll();
+        const akte = akten.find(a => a.az === currentSelectedAz);
+        const patch = { status, vermerk };
+
+        if (akte && akte.status !== status) {
+            let nachtraegeList = [];
+            try {
+                nachtraegeList = typeof akte.nachtraege === 'string'
+                    ? JSON.parse(akte.nachtraege)
+                    : (akte.nachtraege || []);
+            } catch { nachtraegeList = []; }
+
+            const author = document.getElementById('logged-user-display').textContent || 'Dienststelle';
+            nachtraegeList.push({
+                timestamp: getTimestampDE(),
+                author,
+                text: `[Status geändert: ${akte.status} → ${status}]`
+            });
+            patch.nachtraege = nachtraegeList;
+        }
+
+        await AktenAPI.update(currentSelectedAz, patch);
         document.getElementById('save-feedback').classList.remove('hidden');
         renderInternTable();
+        updateStats();
+        if (patch.nachtraege) openAkteDetail(currentSelectedAz);
     });
 
     document.getElementById('form-add-nachtrag').addEventListener('submit', async (e) => {

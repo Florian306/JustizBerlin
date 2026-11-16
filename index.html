@@ -217,6 +217,13 @@
                     <div id="beweismittel-list" class="mt-10"></div>
                 </div>
 
+                <div class="form-row">
+                    <label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
+                        <input type="checkbox" id="antrag-wahrheit" required style="width: auto; margin-top: 3px;">
+                        <span>Ich versichere, sämtliche Angaben nach bestem Wissen und Gewissen wahrheitsgemäß gemacht zu haben (Hinweis auf § 164 StGB – Falsche Verdächtigung). <span class="req">*</span></span>
+                    </label>
+                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn-primary">Vorgang verbindlich einreichen</button>
                     <button type="reset" class="btn-secondary">Eingaben zurücksetzen</button>
@@ -238,6 +245,7 @@
                     </tbody>
                 </table>
                 <p class="mt-10">Bitte bewahren Sie das Aktenzeichen für spätere Rückfragen unter „Vorgangs- &amp; Aktenauskunft“ auf.</p>
+                <button type="button" id="btn-print-confirmation" class="btn-secondary btn-small mt-10">Eingangsbestätigung als PDF drucken</button>
             </div>
         </section>
 
@@ -347,6 +355,51 @@
                         <input type="text" id="filter-search" placeholder="Aktenzeichen, Name, Betreff...">
                     </div>
                     <div id="intern-akten-count" class="demo-hint" style="margin: 0 0 0 auto;"></div>
+                    <button type="button" id="btn-toggle-new-akte" class="btn-primary btn-small">+ Neue Akte anlegen</button>
+                </div>
+
+                <!-- Neue Akte direkt im Dienstportal anlegen -->
+                <div id="intern-new-akte-panel" class="detail-panel hidden" style="margin-bottom: 18px; margin-top: 0;">
+                    <div class="detail-header-row" style="margin-bottom: 12px;">
+                        <h3 class="section-heading" style="margin: 0;">Neue Akte im Dienstportal eröffnen</h3>
+                        <button type="button" id="btn-close-new-akte" class="btn-secondary btn-small">Schließen</button>
+                    </div>
+                    <form id="form-intern-new-akte" class="official-form">
+                        <div class="form-grid-2">
+                            <div class="form-row">
+                                <label for="intern-new-typ">Vorgangsart <span class="req">*</span></label>
+                                <select id="intern-new-typ" required>
+                                    <option value="Strafanzeige / Ermittlungsakte der Polizei">Strafanzeige / Ermittlungsakte</option>
+                                    <option value="Antrag auf Haftbefehl / Durchsuchungsbeschluss">Haftbefehl / Durchsuchungsbeschluss</option>
+                                    <option value="Zivilrechtliche Schlichtung / Verbraucherschutz-Beschwerde">Zivilrecht / Verbraucherschutz</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="intern-new-status">Initialer Status <span class="req">*</span></label>
+                                <select id="intern-new-status" required>
+                                    <option value="In staatsanwaltschaftlicher Prüfung">In staatsanwaltschaftlicher Prüfung</option>
+                                    <option value="Eingegangen">Eingegangen</option>
+                                    <option value="Anklage erhoben">Anklage erhoben</option>
+                                    <option value="Beschluss erlassen">Beschluss erlassen</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="form-row">
+                                <label for="intern-new-name">Sachbearbeiter / Antragsteller <span class="req">*</span></label>
+                                <input type="text" id="intern-new-name" required placeholder="z. B. StA Müller">
+                            </div>
+                            <div class="form-row">
+                                <label for="intern-new-beteiligter">Betroffene Person / Beschuldigte/r <span class="req">*</span></label>
+                                <input type="text" id="intern-new-beteiligter" required placeholder="Name des Beschuldigten">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label for="intern-new-sachverhalt">Sachverhalt / Akteninhalt <span class="req">*</span></label>
+                            <textarea id="intern-new-sachverhalt" rows="3" required placeholder="Kurze Beschreibung des Verfahrens..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Akte eröffnen</button>
+                    </form>
                 </div>
 
                 <!-- Akten-Tabelle -->
