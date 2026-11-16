@@ -120,6 +120,21 @@ const AktenAPI = (() => {
         return null;
     }
 
+    async function remove(az) {
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(`${API_BASE}/${encodeURIComponent(az)}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) return;
+            } catch {
+                // Fallback auf localStorage
+            }
+        }
+        const akten = loadLocal().filter(a => a.az !== az);
+        saveLocal(akten);
+    }
+
     function generateAktenzeichen(typ) {
         const num = Math.floor(100 + Math.random() * 899);
         let suffix = 'JustV';
@@ -134,6 +149,7 @@ const AktenAPI = (() => {
         getAll,
         create,
         update,
+        remove,
         generateAktenzeichen
     };
 })();

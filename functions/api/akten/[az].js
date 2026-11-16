@@ -22,3 +22,9 @@ export async function onRequestPatch(context) {
 
     return Response.json({ az, status, vermerk, beweismittel, nachtraege });
 }
+
+export async function onRequestDelete(context) {
+    const az = decodeURIComponent(context.params.az);
+    await context.env.DB.prepare('DELETE FROM akten WHERE az = ?').bind(az).run();
+    return Response.json({ deleted: az });
+}

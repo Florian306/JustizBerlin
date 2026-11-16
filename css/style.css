@@ -593,6 +593,62 @@ a:hover {
     font-size: 13px;
 }
 
+.btn-danger-outline {
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+.btn-danger-outline:hover {
+    background-color: var(--accent-red);
+    color: var(--bg-white);
+    border-color: var(--accent-red);
+}
+
+/* Status-Badges & aktive Tabellenzeile */
+.status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid transparent;
+}
+
+.status-eingegangen {
+    background-color: #EFEFEF;
+    color: #333333;
+    border-color: #CCCCCC;
+}
+
+.status-pruefung {
+    background-color: #E8EEF5;
+    color: #003366;
+    border-color: #B8C9DF;
+}
+
+.status-anklage {
+    background-color: #FDF2F2;
+    color: #990000;
+    border-color: #E6B8B8;
+}
+
+.status-beschluss {
+    background-color: #EAF4EA;
+    color: #1B5E20;
+    border-color: #B7DAB7;
+}
+
+.status-eingestellt {
+    background-color: #F7F7F7;
+    color: #666666;
+    border-color: #DDDDDD;
+}
+
+.official-table tbody tr.active-row {
+    background-color: #EEF3F8 !important;
+    outline: 2px solid var(--link-blue);
+    outline-offset: -2px;
+}
+
 /* Bestätigung & Ergebnisse */
 .confirmation-box,
 .result-box {

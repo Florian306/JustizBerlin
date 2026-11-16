@@ -585,6 +585,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filter-status').addEventListener('change', renderInternTable);
     document.getElementById('filter-search').addEventListener('input', renderInternTable);
 
+    function getStatusBadgeHtml(status) {
+        let cls = 'status-eingegangen';
+        if (status === 'In staatsanwaltschaftlicher Prüfung') cls = 'status-pruefung';
+        else if (status === 'Anklage erhoben') cls = 'status-anklage';
+        else if (status === 'Beschluss erlassen') cls = 'status-beschluss';
+        else if (status === 'Eingestellt') cls = 'status-eingestellt';
+        return `<span class="status-badge ${cls}">${escapeHtml(status)}</span>`;
+    }
+
     async function renderInternTable() {
         const tbody = document.getElementById('intern-akten-tbody');
         const statusFilter = document.getElementById('filter-status').value;
@@ -601,6 +610,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchStatus && matchSearch;
         });
 
+        document.getElementById('intern-akten-count').textContent = `${gefiltert.length} von ${akten.length} Vorgängen`;
+
         tbody.innerHTML = '';
 
         if (gefiltert.length === 0) {
@@ -610,12 +621,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gefiltert.forEach(akte => {
             const tr = document.createElement('tr');
+            if (akte.az === currentSelectedAz) tr.classList.add('active-row');
             tr.innerHTML = `
                 <td class="mono-bold">${escapeHtml(akte.az)}</td>
                 <td>${escapeHtml(akte.datum)}</td>
                 <td>${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)}<br><small>${escapeHtml(akte.behoerde)}</small></td>
                 <td>${escapeHtml(akte.typ)}</td>
-                <td><strong>${escapeHtml(akte.status)}</strong></td>
+                <td>${getStatusBadgeHtml(akte.status)}</td>
                 <td><button type="button" class="btn-secondary btn-small btn-open-akte" data-az="${escapeHtml(akte.az)}">Bearbeiten</button></td>
             `;
             tbody.appendChild(tr);
@@ -721,8 +733,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const panel = document.getElementById('intern-detail-panel');
         panel.classList.remove('hidden');
+        renderInternTable();
         panel.scrollIntoView({ behavior: 'smooth' });
     }
+
+    document.getElementById('btn-close-detail').addEventListener('click', () => {
+        currentSelectedAz = null;
+        document.getElementById('intern-detail-panel').classList.add('hidden');
+        renderInternTable();
+    });
+
+    document.getElementById('btn-delete-akte').addEventListener('click', async () => {
+        if (!currentSelectedAz) return;
+        if (!confirm(`Vorgang ${currentSelectedAz} wirklich unwiderruflich löschen?`)) return;
+        await AktenAPI.remove(currentSelectedAz);
+        currentSelectedAz = null;
+        document.getElementById('intern-detail-panel').classList.add('hidden');
+        renderInternTable();
+        updateStats();
+    });
 
     document.getElementById('btn-save-akte').addEventListener('click', async () => {
         if (!currentSelectedAz) return;

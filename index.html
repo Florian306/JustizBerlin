@@ -369,6 +369,7 @@
                         <label for="filter-search">Suche:</label>
                         <input type="text" id="filter-search" placeholder="Aktenzeichen, Name, Betreff...">
                     </div>
+                    <div id="intern-akten-count" class="demo-hint" style="margin: 0 0 0 auto;"></div>
                 </div>
 
                 <!-- Akten-Tabelle -->
@@ -392,7 +393,10 @@
 
                 <!-- Detail- & Dokumenten-Editor -->
                 <div id="intern-detail-panel" class="detail-panel hidden">
-                    <h3 class="section-heading">Aktenbearbeitung: <span id="detail-az" class="mono-bold"></span></h3>
+                    <div class="detail-header-row" style="margin-bottom: 14px;">
+                        <h3 class="section-heading" style="margin: 0;">Aktenbearbeitung: <span id="detail-az" class="mono-bold"></span></h3>
+                        <button type="button" id="btn-close-detail" class="btn-secondary btn-small">Schließen</button>
+                    </div>
                     <div class="grid-two-col">
                         <div>
                             <p><strong>Antragsteller/in:</strong> <span id="detail-name"></span></p>
@@ -416,7 +420,10 @@
                                 <label for="detail-vermerk">Interner Vermerk / Verfügung:</label>
                                 <textarea id="detail-vermerk" rows="4" placeholder="Interne Notiz oder Begründung für den Status..."></textarea>
                             </div>
-                            <button type="button" id="btn-save-akte" class="btn-primary">Änderungen speichern</button>
+                            <div class="form-actions" style="margin-top: 10px;">
+                                <button type="button" id="btn-save-akte" class="btn-primary">Änderungen speichern</button>
+                                <button type="button" id="btn-delete-akte" class="btn-secondary btn-danger-outline">Akte löschen</button>
+                            </div>
                             <span id="save-feedback" class="save-msg hidden">Gespeichert.</span>
 
                             <hr class="divider">
