@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addedAt: getTimestampDE(),
                 dataUrl: null
             };
-            if (file.size <= 1500000) {
+            if (file.size <= 10 * 1024 * 1024) {
                 const reader = new FileReader();
                 reader.onload = () => {
                     base.dataUrl = reader.result;
@@ -400,6 +400,39 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        renderAuskunftDetail(treffer);
+    });
+
+    function renderAuskunftDetail(treffer) {
+        let bwmList = [];
+        try {
+            bwmList = typeof treffer.beweismittel === 'string'
+                ? JSON.parse(treffer.beweismittel)
+                : (treffer.beweismittel || []);
+        } catch { bwmList = []; }
+
+        let nachtraegeList = [];
+        try {
+            nachtraegeList = typeof treffer.nachtraege === 'string'
+                ? JSON.parse(treffer.nachtraege)
+                : (treffer.nachtraege || []);
+        } catch { nachtraegeList = []; }
+
+        const bwmHtml = bwmList.length === 0
+            ? 'Keine Beweismittel hinterlegt.'
+            : bwmList.map((b, idx) => `
+                <div class="detail-header-row" style="padding: 4px 0; border-bottom: 1px solid #E5E5E5;">
+                    <span><span class="mono-bold">${escapeHtml(b.kennung)}</span> – ${escapeHtml(b.name)} (${escapeHtml(b.size || '')})</span>
+                    <button type="button" class="btn-secondary btn-small btn-auskunft-view-bwm" data-idx="${idx}">Ansehen</button>
+                </div>
+            `).join('');
+
+        const nachtraegeHtml = nachtraegeList.length === 0
+            ? 'Keine Nachträge vorhanden.'
+            : nachtraegeList.map(n =>
+                `<div style="padding: 6px 0; border-bottom: 1px solid #E5E5E5;"><strong>${escapeHtml(n.timestamp)}</strong> (${escapeHtml(n.author)}):<br>${escapeHtml(n.text)}</div>`
+            ).join('');
+
         auskunftErgebnis.innerHTML = `
             <h3>Auskunft zum Vorgang ${escapeHtml(treffer.az)}</h3>
             <table class="compact-table">
@@ -411,8 +444,94 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tbody>
             </table>
             <p class="mt-10"><strong>Amtlicher Hinweis:</strong> ${getStatusHinweis(treffer.status)}</p>
+
+            <hr class="divider">
+            <p><strong>Eingereichte Beweismittel:</strong></p>
+            <div class="sachverhalt-box">${bwmHtml}</div>
+            <div id="auskunft-bwm-preview" class="sachverhalt-box mt-10 hidden"></div>
+
+            <p class="mt-10"><strong>Chronologie / Nachträge:</strong></p>
+            <div class="sachverhalt-box">${nachtraegeHtml}</div>
+
+            <form id="form-auskunft-nachtrag" class="official-form mt-20">
+                <h4 class="box-title">Weitere Aussage oder Beweismittel nachreichen</h4>
+                <div class="form-row">
+                    <label for="auskunft-nachtrag-text">Ergänzende Erklärung / Aussage</label>
+                    <textarea id="auskunft-nachtrag-text" rows="2" placeholder="Schildern Sie Ihre Ergänzung zum Vorgang..."></textarea>
+                </div>
+                <div class="form-row">
+                    <label for="auskunft-nachtrag-files">Weitere Beweismittel anhängen (PDF, Bilder, Videos, Audio)</label>
+                    <input type="file" id="auskunft-nachtrag-files" multiple accept=".pdf,image/*,video/*,audio/*">
+                </div>
+                <button type="submit" class="btn-primary">Mit Zeitstempel nachreichen</button>
+            </form>
         `;
-    });
+
+        auskunftErgebnis.querySelectorAll('.btn-auskunft-view-bwm').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const b = bwmList[Number(btn.dataset.idx)];
+                const previewBox = document.getElementById('auskunft-bwm-preview');
+                if (!b || !b.dataUrl) {
+                    previewBox.classList.remove('hidden');
+                    previewBox.textContent = 'Für diese Datei liegt keine direkte Browser-Vorschau vor.';
+                    return;
+                }
+                previewBox.classList.remove('hidden');
+                const header = `<div class="detail-header-row" style="margin-bottom:8px;"><strong>Vorschau: ${escapeHtml(b.kennung)} – ${escapeHtml(b.name)}</strong><button type="button" id="btn-close-auskunft-preview" class="btn-secondary btn-small">Schließen</button></div>`;
+                let media = '';
+                if ((b.type || '').startsWith('image/')) {
+                    media = `<img src="${b.dataUrl}" alt="${escapeHtml(b.name)}" style="max-width:100%; max-height:400px; border:1px solid #CCC;">`;
+                } else if (b.type === 'application/pdf' || b.name.toLowerCase().endsWith('.pdf')) {
+                    media = `<iframe src="${b.dataUrl}" style="width:100%; height:420px; border:1px solid #CCC;"></iframe>`;
+                } else if ((b.type || '').startsWith('video/')) {
+                    media = `<video src="${b.dataUrl}" controls style="max-width:100%; max-height:360px;"></video>`;
+                } else if ((b.type || '').startsWith('audio/')) {
+                    media = `<audio src="${b.dataUrl}" controls style="width:100%;"></audio>`;
+                } else {
+                    media = `<a href="${b.dataUrl}" download="${escapeHtml(b.name)}" class="btn-secondary btn-small">Datei herunterladen</a>`;
+                }
+                previewBox.innerHTML = header + media;
+                document.getElementById('btn-close-auskunft-preview').addEventListener('click', () => {
+                    previewBox.classList.add('hidden');
+                    previewBox.innerHTML = '';
+                });
+            });
+        });
+
+        document.getElementById('form-auskunft-nachtrag').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const text = document.getElementById('auskunft-nachtrag-text').value.trim();
+            const files = Array.from(document.getElementById('auskunft-nachtrag-files').files || []);
+            if (!text && files.length === 0) return;
+
+            const newBwms = [];
+            for (const file of files) {
+                const bwm = await readFileAsEvidence(file);
+                bwmList.push(bwm);
+                newBwms.push(bwm.kennung);
+            }
+
+            let entryText = text;
+            if (newBwms.length > 0) {
+                entryText = (entryText ? entryText + ' ' : '') + `[Beweismittel nachgereicht: ${newBwms.join(', ')}]`;
+            }
+
+            nachtraegeList.push({
+                timestamp: getTimestampDE(),
+                author: `${treffer.vorname} ${treffer.nachname} (Antragsteller/in)`,
+                text: entryText
+            });
+
+            await AktenAPI.update(treffer.az, {
+                beweismittel: bwmList,
+                nachtraege: nachtraegeList
+            });
+
+            treffer.beweismittel = bwmList;
+            treffer.nachtraege = nachtraegeList;
+            renderAuskunftDetail(treffer);
+        });
+    }
 
     function getStatusHinweis(status) {
         switch (status) {

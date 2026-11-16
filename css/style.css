@@ -679,9 +679,14 @@ a:hover {
     margin-top: 24px;
 }
 
-.detail-panel .official-form {
+.grid-admin-gesetze .official-form {
     background-color: var(--bg-white);
     height: 100%;
+    margin-bottom: 0;
+}
+
+.detail-panel .official-form {
+    background-color: var(--bg-white);
     margin-bottom: 0;
 }
 
