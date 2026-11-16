@@ -26,6 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
+    // Schnellzugriff-Kacheln auf der Startseite
+    document.querySelectorAll('.quick-tab-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab(link.dataset.tab);
+        });
+    });
+
     // Direktlinks von der Startseite zum Service-Formular
     document.querySelectorAll('.quick-nav').forEach(link => {
         link.addEventListener('click', (e) => {
