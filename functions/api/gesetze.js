@@ -56,11 +56,14 @@ export async function onRequestPost(context) {
     }
 
     if (body.action === 'addLaw') {
-        const countRes = await context.env.DB.prepare(
-            'SELECT COUNT(*) as cnt FROM laws WHERE bookId = ?'
-        ).bind(body.bookId).first();
-        const nextNum = (countRes?.cnt || 0) + 1;
-        const paragraph = `§ ${nextNum}`;
+        let paragraph = (body.paragraph || '').trim();
+        if (!paragraph) {
+            const countRes = await context.env.DB.prepare(
+                'SELECT COUNT(*) as cnt FROM laws WHERE bookId = ?'
+            ).bind(body.bookId).first();
+            const nextNum = (countRes?.cnt || 0) + 1;
+            paragraph = `§ ${nextNum}`;
+        }
 
         const res = await context.env.DB.prepare(
             'INSERT INTO laws (bookId, paragraph, title, text, updatedAt) VALUES (?, ?, ?, ?, ?)'

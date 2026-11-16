@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return l.paragraph.toLowerCase().includes(search) ||
                     l.title.toLowerCase().includes(search) ||
                     l.text.toLowerCase().includes(search);
-            });
+            }).sort((a, b) => a.paragraph.localeCompare(b.paragraph, 'de', { numeric: true }));
 
             if (laws.length === 0) return;
             anyShown = true;
@@ -615,9 +615,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = document.getElementById('intern-laws-tbody');
         tbody.innerHTML = '';
 
-        const filteredLaws = currentFilter === 'alle'
-            ? data.laws
-            : data.laws.filter(l => l.bookId === currentFilter);
+        const filteredLaws = (currentFilter === 'alle'
+            ? [...data.laws]
+            : data.laws.filter(l => l.bookId === currentFilter)
+        ).sort((a, b) => a.paragraph.localeCompare(b.paragraph, 'de', { numeric: true }));
 
         if (filteredLaws.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5">Noch keine Vorschriften vorhanden.</td></tr>';
@@ -698,11 +699,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('form-add-law').addEventListener('submit', async (e) => {
         e.preventDefault();
         const bookId = document.getElementById('law-book-select').value;
+        const customParagraph = document.getElementById('law-paragraph').value.trim();
         const title = document.getElementById('law-title').value.trim();
         const text = document.getElementById('law-text').value.trim();
         if (!bookId || !title || !text) return;
 
-        await GesetzeAPI.addLaw(bookId, title, text);
+        await GesetzeAPI.addLaw(bookId, title, text, customParagraph);
+        document.getElementById('law-paragraph').value = '';
         document.getElementById('law-title').value = '';
         document.getElementById('law-text').value = '';
         document.getElementById('law-save-msg').classList.remove('hidden');
