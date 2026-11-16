@@ -921,14 +921,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const bwmRows = bwmList.length === 0
                 ? '<tr><td colspan="4" style="padding: 8px; border: 1px solid #999;">Keine Beweismittel hinterlegt.</td></tr>'
-                : bwmList.map(b => `
+                : bwmList.map(b => {
+                    const viewUrl = `${window.location.origin}/api/beweismittel?az=${encodeURIComponent(akte.az)}&kennung=${encodeURIComponent(b.kennung)}`;
+                    const linkHtml = b.dataUrl
+                        ? `<a href="${viewUrl}" target="_blank" style="color:#003366; text-decoration:underline;">${escapeHtml(b.name)}</a>`
+                        : escapeHtml(b.name);
+                    return `
                     <tr>
                         <td style="border:1px solid #999; padding:6px 8px; white-space:nowrap; font-family:monospace; font-weight:bold;">${escapeHtml(b.kennung)}</td>
-                        <td style="border:1px solid #999; padding:6px 8px;">${escapeHtml(b.name)}</td>
+                        <td style="border:1px solid #999; padding:6px 8px;">${linkHtml}</td>
                         <td style="border:1px solid #999; padding:6px 8px; white-space:nowrap;">${escapeHtml(b.size || '')}</td>
                         <td style="border:1px solid #999; padding:6px 8px; white-space:nowrap;">${escapeHtml(b.addedAt || akte.datum)}</td>
                     </tr>
-                `).join('');
+                `;
+                }).join('');
 
             const bwmImages = bwmList
                 .filter(b => b.dataUrl && (b.type || '').startsWith('image/'))
