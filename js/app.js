@@ -78,6 +78,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateStats();
+    renderNewBookNotice();
+
+    async function renderNewBookNotice() {
+        const data = await GesetzeAPI.getAll();
+        const noticeEl = document.getElementById('new-book-notice');
+        const customBooks = data.books.filter(b => b.createdAt);
+        if (customBooks.length === 0) {
+            noticeEl.classList.add('hidden');
+            return;
+        }
+        const latest = customBooks[customBooks.length - 1];
+        noticeEl.innerHTML = `<strong>Neue Gesetzesveröffentlichung (${escapeHtml(latest.createdAt)}):</strong> Das Gesetzbuch <strong>${escapeHtml(latest.title)}</strong> wurde neu in die Berliner Gesetzessammlung aufgenommen. <a href="#gesetze" id="notice-goto-gesetze">Zur Gesetzessammlung</a>`;
+        noticeEl.classList.remove('hidden');
+
+        document.getElementById('notice-goto-gesetze').addEventListener('click', (e) => {
+            e.preventDefault();
+            selectedPublicBookId = latest.id;
+            switchTab('gesetze');
+        });
+    }
 
     document.getElementById('card-quick-search').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -496,8 +516,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <thead>
                     <tr>
                         <th style="width: 90px;">Paragraph</th>
-                        <th style="width: 240px;">Titel</th>
+                        <th style="width: 220px;">Titel</th>
                         <th>Wortlaut</th>
+                        <th style="width: 120px;">Stand</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -510,6 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="mono-bold">${escapeHtml(law.paragraph)}</td>
                     <td><strong>${escapeHtml(law.title)}</strong></td>
                     <td>${escapeHtml(law.text)}</td>
+                    <td>${escapeHtml(law.updatedAt || 'Initial')}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -541,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
 
         if (data.laws.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4">Noch keine Vorschriften vorhanden.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5">Noch keine Vorschriften vorhanden.</td></tr>';
             return;
         }
 
@@ -552,9 +574,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${escapeHtml(book ? book.short : law.bookId)}</td>
                 <td class="mono-bold">${escapeHtml(law.paragraph)}</td>
                 <td>${escapeHtml(law.title)}</td>
-                <td><button type="button" class="btn-secondary btn-small btn-del-law" data-id="${law.id}">Löschen</button></td>
+                <td>${escapeHtml(law.updatedAt || 'Initial')}</td>
+                <td>
+                    <button type="button" class="btn-secondary btn-small btn-edit-law" data-id="${law.id}">Bearbeiten</button>
+                    <button type="button" class="btn-secondary btn-small btn-del-law" data-id="${law.id}">Löschen</button>
+                </td>
             `;
             tbody.appendChild(tr);
+        });
+
+        document.querySelectorAll('.btn-edit-law').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const law = data.laws.find(l => l.id === Number(btn.dataset.id));
+                if (!law) return;
+                document.getElementById('edit-law-id').value = law.id;
+                document.getElementById('edit-law-paragraph').value = law.paragraph;
+                document.getElementById('edit-law-title').value = law.title;
+                document.getElementById('edit-law-text').value = law.text;
+                const panel = document.getElementById('edit-law-panel');
+                panel.classList.remove('hidden');
+                panel.scrollIntoView({ behavior: 'smooth' });
+            });
         });
 
         document.querySelectorAll('.btn-del-law').forEach(btn => {
@@ -565,6 +605,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    document.getElementById('btn-cancel-edit-law').addEventListener('click', () => {
+        document.getElementById('edit-law-panel').classList.add('hidden');
+    });
+
+    document.getElementById('form-edit-law').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = Number(document.getElementById('edit-law-id').value);
+        const paragraph = document.getElementById('edit-law-paragraph').value.trim();
+        const title = document.getElementById('edit-law-title').value.trim();
+        const text = document.getElementById('edit-law-text').value.trim();
+        if (!id || !paragraph || !title || !text) return;
+
+        await GesetzeAPI.updateLaw(id, { paragraph, title, text });
+        document.getElementById('edit-law-panel').classList.add('hidden');
+        renderGesetzeIntern();
+        renderGesetzePublic();
+    });
 
     document.getElementById('form-add-book').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -577,6 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('book-save-msg').classList.remove('hidden');
         renderGesetzeIntern();
         renderGesetzePublic();
+        renderNewBookNotice();
     });
 
     document.getElementById('form-add-law').addEventListener('submit', async (e) => {

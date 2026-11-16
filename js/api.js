@@ -217,7 +217,16 @@ const GesetzeAPI = (() => {
         return load();
     }
 
+    function getTodayDE() {
+        return new Date().toLocaleDateString('de-DE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+
     async function addBook(title, short) {
+        const createdAt = getTodayDE();
         if (USE_REMOTE_API) {
             try {
                 const res = await fetch(API_BASE, {
@@ -232,13 +241,14 @@ const GesetzeAPI = (() => {
         }
         const data = load();
         const id = short.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString().slice(-4);
-        const book = { id, title, short };
+        const book = { id, title, short, createdAt };
         data.books.push(book);
         save(data);
         return book;
     }
 
     async function addLaw(bookId, title, text) {
+        const updatedAt = getTodayDE();
         if (USE_REMOTE_API) {
             try {
                 const res = await fetch(API_BASE, {
@@ -259,11 +269,36 @@ const GesetzeAPI = (() => {
             bookId,
             paragraph: `§ ${nextNum}`,
             title,
-            text
+            text,
+            updatedAt
         };
         data.laws.push(law);
         save(data);
         return law;
+    }
+
+    async function updateLaw(id, patch) {
+        const updatedAt = getTodayDE();
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(API_BASE, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, ...patch })
+                });
+                if (res.ok) return await res.json();
+            } catch {
+                // Fallback auf localStorage
+            }
+        }
+        const data = load();
+        const idx = data.laws.findIndex(l => l.id === id);
+        if (idx !== -1) {
+            data.laws[idx] = { ...data.laws[idx], ...patch, updatedAt };
+            save(data);
+            return data.laws[idx];
+        }
+        return null;
     }
 
     async function deleteLaw(id) {
@@ -286,6 +321,7 @@ const GesetzeAPI = (() => {
         getAll,
         addBook,
         addLaw,
+        updateLaw,
         deleteLaw
     };
 })();

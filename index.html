@@ -69,6 +69,9 @@
                 </div>
             </div>
 
+            <!-- Dynamischer Hinweis bei neu veröffentlichtem Gesetzbuch -->
+            <div id="new-book-notice" class="notice-box hidden"></div>
+
             <!-- Dynamische Kennzahlen-Leiste -->
             <div class="stats-bar" aria-label="Aktuelle Verfahrenskennzahlen">
                 <div class="stat-item">
@@ -464,6 +467,32 @@
                         </div>
                     </div>
 
+                    <!-- Bearbeitungs-Panel für einen Paragraphen -->
+                    <div id="edit-law-panel" class="official-form mt-20 hidden">
+                        <h4 class="box-title">Vorschrift bearbeiten</h4>
+                        <form id="form-edit-law">
+                            <input type="hidden" id="edit-law-id">
+                            <div class="form-grid-2">
+                                <div class="form-row">
+                                    <label for="edit-law-paragraph">Paragraph <span class="req">*</span></label>
+                                    <input type="text" id="edit-law-paragraph" required>
+                                </div>
+                                <div class="form-row">
+                                    <label for="edit-law-title">Titel <span class="req">*</span></label>
+                                    <input type="text" id="edit-law-title" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <label for="edit-law-text">Gesetzestext <span class="req">*</span></label>
+                                <textarea id="edit-law-text" rows="3" required></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">Änderungen speichern</button>
+                                <button type="button" id="btn-cancel-edit-law" class="btn-secondary">Abbrechen</button>
+                            </div>
+                        </form>
+                    </div>
+
                     <h4 class="doc-gen-title mt-20">Aktuelle Vorschriften (Verwaltung)</h4>
                     <div class="table-responsive">
                         <table class="official-table" id="intern-laws-table">
@@ -472,7 +501,8 @@
                                     <th>Gesetzbuch</th>
                                     <th>Paragraph</th>
                                     <th>Titel</th>
-                                    <th>Aktion</th>
+                                    <th>Letzte Änderung</th>
+                                    <th>Aktionen</th>
                                 </tr>
                             </thead>
                             <tbody id="intern-laws-tbody"></tbody>
