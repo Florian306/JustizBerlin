@@ -541,7 +541,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!anyShown) {
-            container.innerHTML += '<div class="notice-box">Keine passenden Vorschriften in diesem Gesetzbuch gefunden.</div>';
+            const emptyBox = document.createElement('div');
+            emptyBox.className = 'notice-box mt-10';
+            emptyBox.textContent = 'Keine passenden Vorschriften in diesem Gesetzbuch gefunden.';
+            container.appendChild(emptyBox);
         }
     }
 

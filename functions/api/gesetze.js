@@ -22,16 +22,6 @@ async function ensureGesetzeTables(db) {
     // Migration für bestehende Tabellen
     try { await db.prepare('ALTER TABLE books ADD COLUMN createdAt TEXT').run(); } catch {}
     try { await db.prepare('ALTER TABLE laws ADD COLUMN updatedAt TEXT').run(); } catch {}
-
-    const existing = await db.prepare('SELECT COUNT(*) as cnt FROM books').first();
-    if (!existing || existing.cnt === 0) {
-        await db.prepare(`
-            INSERT OR IGNORE INTO books (id, title, short, createdAt) VALUES
-                ('stgb', 'Strafgesetzbuch (StGB)', 'StGB', NULL),
-                ('stpo', 'Strafprozessordnung (StPO)', 'StPO', NULL),
-                ('berljg', 'Berliner Justizgesetz (BerlJG)', 'BerlJG', NULL)
-        `).run();
-    }
 }
 
 function getTodayDE() {
@@ -111,6 +101,21 @@ export async function onRequestDelete(context) {
     await ensureGesetzeTables(context.env.DB);
     const url = new URL(context.request.url);
     const id = url.searchParams.get('id');
+    const bookId = url.searchParams.get('bookId');
+    const clearAll = url.searchParams.get('clearAll');
+
+    if (clearAll === '1') {
+        await context.env.DB.prepare('DELETE FROM laws').run();
+        await context.env.DB.prepare('DELETE FROM books').run();
+        return Response.json({ cleared: true });
+    }
+
+    if (bookId) {
+        await context.env.DB.prepare('DELETE FROM laws WHERE bookId = ?').bind(bookId).run();
+        await context.env.DB.prepare('DELETE FROM books WHERE id = ?').bind(bookId).run();
+        return Response.json({ deletedBook: bookId });
+    }
+
     if (!id) return Response.json({ error: 'Missing id' }, { status: 400 });
 
     await context.env.DB.prepare('DELETE FROM laws WHERE id = ?').bind(Number(id)).run();

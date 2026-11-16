@@ -147,41 +147,8 @@ const GesetzeAPI = (() => {
     const USE_REMOTE_API = true;
 
     const DEFAULT_DATA = {
-        books: [
-            { id: 'stgb', title: 'Strafgesetzbuch (StGB)', short: 'StGB' },
-            { id: 'stpo', title: 'Strafprozessordnung (StPO)', short: 'StPO' },
-            { id: 'berljg', title: 'Berliner Justizgesetz (BerlJG)', short: 'BerlJG' }
-        ],
-        laws: [
-            {
-                id: 1,
-                bookId: 'stgb',
-                paragraph: '§ 1',
-                title: 'Keine Strafe ohne Gesetz',
-                text: 'Eine Tat kann nur bestraft werden, wenn die Strafbarkeit gesetzlich bestimmt war, bevor die Tat begangen wurde.'
-            },
-            {
-                id: 2,
-                bookId: 'stgb',
-                paragraph: '§ 2',
-                title: 'Schwerer Diebstahl & Bandenkriminalität',
-                text: 'Wer fremde bewegliche Sachen in Bandenabsicht oder unter Verwendung von Waffen entwendet, wird mit Freiheitsstrafe oder Geldstrafe bestraft.'
-            },
-            {
-                id: 3,
-                bookId: 'stpo',
-                paragraph: '§ 1',
-                title: 'Untersuchungshaft',
-                text: 'Die Untersuchungshaft darf gegen den Beschuldigten angeordnet werden, wenn er der Tat dringend verdächtig ist und ein Haftgrund (Flucht- oder Verdunkelungsgefahr) besteht.'
-            },
-            {
-                id: 4,
-                bookId: 'berljg',
-                paragraph: '§ 1',
-                title: 'Zuständigkeit der Berliner Gerichte',
-                text: 'Die ordentliche Gerichtsbarkeit im Land Berlin wird durch das Amtsgericht Tiergarten, das Landgericht Berlin sowie das Kammergericht ausgeübt.'
-            }
-        ]
+        books: [],
+        laws: []
     };
 
     function load() {
