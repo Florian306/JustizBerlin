@@ -1,16 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Demo-Zugangsdaten für das interne Dienstportal
-    const DEMO_USER = 'justiz-berlin';
-    const DEMO_PASS = 'SenJust2026!';
-
     let currentSelectedAz = null;
     let isLoggedIn = false;
 
-    // --- Tab-Navigation ---
+    // --- Tab-Navigation (mit Zustandserhalt über Reload) ---
     const navTabs = document.querySelectorAll('.nav-tab');
     const tabPanels = document.querySelectorAll('.tab-panel');
 
     function switchTab(tabId) {
+        sessionStorage.setItem('justiz_active_tab', tabId);
         navTabs.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tabId);
         });
@@ -33,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sub-Navigation im Internen Dienstportal
     document.querySelectorAll('.sub-tab').forEach(btn => {
         btn.addEventListener('click', () => {
+            sessionStorage.setItem('justiz_active_subtab', btn.dataset.subtab);
             document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.subtab-panel').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
@@ -559,32 +557,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    loginForm.addEventListener('submit', (e) => {
+    function applyLoggedInUI(user) {
+        isLoggedIn = true;
+        loginError.classList.add('hidden');
+        loginView.classList.add('hidden');
+        dashboardView.classList.remove('hidden');
+        document.getElementById('logged-user-display').textContent = user;
+        renderInternTable();
+        renderGesetzeIntern();
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const user = document.getElementById('login-user').value.trim();
         const pass = document.getElementById('login-pass').value;
 
-        if (user === DEMO_USER && pass === DEMO_PASS) {
-            isLoggedIn = true;
-            loginError.classList.add('hidden');
-            loginView.classList.add('hidden');
-            dashboardView.classList.remove('hidden');
-            document.getElementById('logged-user-display').textContent = user;
-            renderInternTable();
-            renderGesetzeIntern();
-        } else {
+        try {
+            const res = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user, pass })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                sessionStorage.setItem('justiz_auth_user', data.user);
+                applyLoggedInUI(data.user);
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        } catch {
             loginError.classList.remove('hidden');
         }
     });
 
-    document.getElementById('btn-logout').addEventListener('click', () => {
+    document.getElementById('btn-logout').addEventListener('click', async () => {
         isLoggedIn = false;
         currentSelectedAz = null;
+        sessionStorage.removeItem('justiz_auth_user');
+        try { await fetch('/api/auth', { method: 'DELETE' }); } catch {}
         document.getElementById('intern-detail-panel').classList.add('hidden');
         dashboardView.classList.add('hidden');
         loginView.classList.remove('hidden');
         loginForm.reset();
     });
+
+    async function restoreSessionAndTab() {
+        try {
+            const res = await fetch('/api/auth');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.authenticated) {
+                    applyLoggedInUI(data.user);
+                }
+            }
+        } catch {
+            const localUser = sessionStorage.getItem('justiz_auth_user');
+            if (localUser) applyLoggedInUI(localUser);
+        }
+
+        const savedSubTab = sessionStorage.getItem('justiz_active_subtab');
+        if (savedSubTab) {
+            const subBtn = document.querySelector(`.sub-tab[data-subtab="${savedSubTab}"]`);
+            if (subBtn) subBtn.click();
+        }
+
+        const savedTab = sessionStorage.getItem('justiz_active_tab');
+        if (savedTab && document.getElementById(`tab-${savedTab}`)) {
+            switchTab(savedTab);
+        }
+    }
+
+    restoreSessionAndTab();
 
     document.getElementById('filter-status').addEventListener('change', renderInternTable);
     document.getElementById('filter-search').addEventListener('input', renderInternTable);
