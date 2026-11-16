@@ -432,8 +432,27 @@
                     <h3 class="section-heading">Gesetzessammlung verwalten (Automatische Nummerierung)</h3>
                     <div class="grid-two-col">
                         <div>
+                            <form id="form-add-book" class="official-form">
+                                <h4 class="box-title">1. Neues Gesetzbuch anlegen</h4>
+                                <div class="form-row">
+                                    <label for="book-title">Bezeichnung <span class="req">*</span></label>
+                                    <input type="text" id="book-title" required placeholder="z. B. Straßenverkehrsordnung (StVO)">
+                                </div>
+                                <div class="form-row">
+                                    <label for="book-short">Kürzel <span class="req">*</span></label>
+                                    <input type="text" id="book-short" required placeholder="z. B. StVO">
+                                </div>
+                                <button type="submit" class="btn-secondary">Gesetzbuch anlegen</button>
+                                <span id="book-save-msg" class="save-msg hidden">Angelegt.</span>
+
+                                <hr class="divider">
+                                <h4 class="doc-gen-title">Angelegte Gesetzbücher</h4>
+                                <div id="admin-books-list"></div>
+                            </form>
+                        </div>
+                        <div>
                             <form id="form-add-law" class="official-form">
-                                <h4 class="box-title">Neues Gesetz / Paragraph hinzufügen</h4>
+                                <h4 class="box-title">2. Neues Gesetz / Paragraph hinzufügen</h4>
                                 <div class="form-row">
                                     <label for="law-book-select">Gesetzbuch <span class="req">*</span></label>
                                     <select id="law-book-select" required></select>
@@ -448,21 +467,6 @@
                                 </div>
                                 <button type="submit" class="btn-primary">Paragraph mit nächster §-Nummer speichern</button>
                                 <span id="law-save-msg" class="save-msg hidden">Hinzugefügt.</span>
-                            </form>
-                        </div>
-                        <div>
-                            <form id="form-add-book" class="official-form">
-                                <h4 class="box-title">Neues Gesetzbuch anlegen</h4>
-                                <div class="form-row">
-                                    <label for="book-title">Bezeichnung <span class="req">*</span></label>
-                                    <input type="text" id="book-title" required placeholder="z. B. Straßenverkehrsordnung (StVO)">
-                                </div>
-                                <div class="form-row">
-                                    <label for="book-short">Kürzel <span class="req">*</span></label>
-                                    <input type="text" id="book-short" required placeholder="z. B. StVO">
-                                </div>
-                                <button type="submit" class="btn-secondary">Gesetzbuch anlegen</button>
-                                <span id="book-save-msg" class="save-msg hidden">Angelegt.</span>
                             </form>
                         </div>
                     </div>
@@ -493,7 +497,15 @@
                         </form>
                     </div>
 
-                    <h4 class="doc-gen-title mt-20">Aktuelle Vorschriften (Verwaltung)</h4>
+                    <div class="detail-header-row mt-20" style="margin-top: 28px; margin-bottom: 12px;">
+                        <h4 class="doc-gen-title" style="margin: 0;">Aktuelle Vorschriften (Verwaltung)</h4>
+                        <div class="filter-group">
+                            <label for="admin-laws-filter-book">Filter:</label>
+                            <select id="admin-laws-filter-book">
+                                <option value="alle">Alle Gesetzbücher</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="official-table" id="intern-laws-table">
                             <thead>

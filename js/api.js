@@ -284,11 +284,29 @@ const GesetzeAPI = (() => {
         save(data);
     }
 
+    async function deleteBook(bookId) {
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(`${API_BASE}?bookId=${encodeURIComponent(bookId)}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) return;
+            } catch {
+                // Fallback auf localStorage
+            }
+        }
+        const data = load();
+        data.laws = data.laws.filter(l => l.bookId !== bookId);
+        data.books = data.books.filter(b => b.id !== bookId);
+        save(data);
+    }
+
     return {
         getAll,
         addBook,
         addLaw,
         updateLaw,
-        deleteLaw
+        deleteLaw,
+        deleteBook
     };
 })();

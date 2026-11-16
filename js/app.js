@@ -548,29 +548,83 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const adminLawsFilter = document.getElementById('admin-laws-filter-book');
+    adminLawsFilter.addEventListener('change', renderGesetzeIntern);
+
     async function renderGesetzeIntern() {
         const data = await GesetzeAPI.getAll();
         const bookSelect = document.getElementById('law-book-select');
         const currentVal = bookSelect.value;
 
         bookSelect.innerHTML = '';
+        if (data.books.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '-- Bitte zuerst Gesetzbuch anlegen --';
+            bookSelect.appendChild(opt);
+        } else {
+            data.books.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id;
+                opt.textContent = b.title;
+                if (b.id === currentVal) opt.selected = true;
+                bookSelect.appendChild(opt);
+            });
+        }
+
+        // Filter-Dropdown über Verwaltungstabelle aktualisieren
+        const currentFilter = adminLawsFilter.value;
+        adminLawsFilter.innerHTML = '<option value="alle">Alle Gesetzbücher</option>';
         data.books.forEach(b => {
             const opt = document.createElement('option');
             opt.value = b.id;
             opt.textContent = b.title;
-            if (b.id === currentVal) opt.selected = true;
-            bookSelect.appendChild(opt);
+            if (b.id === currentFilter) opt.selected = true;
+            adminLawsFilter.appendChild(opt);
         });
+
+        // Angelegte Gesetzbücher-Liste rendern
+        const booksListEl = document.getElementById('admin-books-list');
+        if (data.books.length === 0) {
+            booksListEl.innerHTML = '<p class="demo-hint">Noch keine Gesetzbücher angelegt.</p>';
+        } else {
+            booksListEl.innerHTML = '';
+            data.books.forEach(b => {
+                const row = document.createElement('div');
+                row.className = 'detail-header-row';
+                row.style.padding = '5px 0';
+                row.style.borderBottom = '1px solid #E5E5E5';
+                row.innerHTML = `
+                    <span><strong>${escapeHtml(b.short)}</strong> – ${escapeHtml(b.title)}</span>
+                    <button type="button" class="btn-secondary btn-small btn-del-book" data-book-id="${escapeHtml(b.id)}">Löschen</button>
+                `;
+                booksListEl.appendChild(row);
+            });
+
+            booksListEl.querySelectorAll('.btn-del-book').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Gesetzbuch und alle darin enthaltenen Paragraphen wirklich löschen?')) return;
+                    await GesetzeAPI.deleteBook(btn.dataset.bookId);
+                    renderGesetzeIntern();
+                    renderGesetzePublic();
+                    renderNewBookNotice();
+                });
+            });
+        }
 
         const tbody = document.getElementById('intern-laws-tbody');
         tbody.innerHTML = '';
 
-        if (data.laws.length === 0) {
+        const filteredLaws = currentFilter === 'alle'
+            ? data.laws
+            : data.laws.filter(l => l.bookId === currentFilter);
+
+        if (filteredLaws.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5">Noch keine Vorschriften vorhanden.</td></tr>';
             return;
         }
 
-        data.laws.forEach(law => {
+        filteredLaws.forEach(law => {
             const book = data.books.find(b => b.id === law.bookId);
             const tr = document.createElement('tr');
             tr.innerHTML = `
