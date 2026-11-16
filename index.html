@@ -424,7 +424,10 @@
                 <!-- Detail- & Dokumenten-Editor -->
                 <div id="intern-detail-panel" class="detail-panel hidden">
                     <div class="detail-header-row" style="margin-bottom: 16px;">
-                        <h3 class="section-heading" style="margin: 0;">Aktenbearbeitung: <span id="detail-az" class="mono-bold"></span></h3>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h3 class="section-heading" style="margin: 0;">Aktenbearbeitung: <span id="detail-az" class="mono-bold"></span></h3>
+                            <button type="button" id="btn-copy-az" class="btn-secondary btn-small">AZ kopieren</button>
+                        </div>
                         <button type="button" id="btn-close-detail" class="btn-secondary btn-small">Schließen</button>
                     </div>
 
@@ -447,8 +450,8 @@
                     <!-- Akten-Reiter (Tabs) -->
                     <div class="sub-nav mt-20" role="tablist">
                         <button type="button" class="akte-tab active" data-aktetab="overview">Übersicht &amp; Status</button>
-                        <button type="button" class="akte-tab" data-aktetab="evidence">Beweismittel &amp; Anlagen</button>
-                        <button type="button" class="akte-tab" data-aktetab="history">Chronologie &amp; Nachträge</button>
+                        <button type="button" class="akte-tab" data-aktetab="evidence">Beweismittel &amp; Anlagen <span id="tab-count-bwm">(0)</span></button>
+                        <button type="button" class="akte-tab" data-aktetab="history">Chronologie &amp; Nachträge <span id="tab-count-hist">(0)</span></button>
                     </div>
 
                     <!-- Tab 1: Übersicht & Status -->

@@ -823,6 +823,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 `<div style="padding: 6px 0; border-bottom: 1px solid #E5E5E5;"><strong>${escapeHtml(n.timestamp)}</strong> (${escapeHtml(n.author)}):<br>${escapeHtml(n.text)}</div>`
             ).join('');
         }
+
+        document.getElementById('tab-count-bwm').textContent = `(${bwmList.length})`;
+        document.getElementById('tab-count-hist').textContent = `(${nachtraegeList.length})`;
         document.getElementById('detail-status-select').value = akte.status;
         document.getElementById('detail-vermerk').value = akte.vermerk || '';
         document.getElementById('save-feedback').classList.add('hidden');
@@ -832,6 +835,16 @@ document.addEventListener('DOMContentLoaded', () => {
         renderInternTable();
         panel.scrollIntoView({ behavior: 'smooth' });
     }
+
+    document.getElementById('btn-copy-az').addEventListener('click', async () => {
+        if (!currentSelectedAz) return;
+        try {
+            await navigator.clipboard.writeText(currentSelectedAz);
+            const btn = document.getElementById('btn-copy-az');
+            btn.textContent = 'Kopiert!';
+            setTimeout(() => { btn.textContent = 'AZ kopieren'; }, 1500);
+        } catch {}
+    });
 
     document.getElementById('btn-close-detail').addEventListener('click', () => {
         currentSelectedAz = null;
