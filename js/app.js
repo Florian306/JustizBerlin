@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         if (tabId === 'intern' && isLoggedIn) {
             renderInternTable();
+            renderGesetzeIntern();
+        }
+        if (tabId === 'gesetze') {
+            renderGesetzePublic();
         }
     }
 
@@ -379,6 +383,157 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         window.print();
+    });
+
+    // --- Gesetzessammlung (Öffentlich & Intern) ---
+    const gesetzeFilterBook = document.getElementById('gesetze-filter-book');
+    const gesetzeFilterSearch = document.getElementById('gesetze-filter-search');
+
+    gesetzeFilterBook.addEventListener('change', renderGesetzePublic);
+    gesetzeFilterSearch.addEventListener('input', renderGesetzePublic);
+
+    function renderGesetzePublic() {
+        const data = GesetzeAPI.getAll();
+        const currentBook = gesetzeFilterBook.value;
+        const search = gesetzeFilterSearch.value.trim().toLowerCase();
+
+        // Dropdown aktualisieren
+        gesetzeFilterBook.innerHTML = '<option value="alle">Alle Gesetzbücher</option>';
+        data.books.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id;
+            opt.textContent = b.title;
+            if (b.id === currentBook) opt.selected = true;
+            gesetzeFilterBook.appendChild(opt);
+        });
+
+        const container = document.getElementById('gesetze-public-list');
+        container.innerHTML = '';
+
+        const booksToShow = currentBook === 'alle'
+            ? data.books
+            : data.books.filter(b => b.id === currentBook);
+
+        let anyShown = false;
+
+        booksToShow.forEach(book => {
+            const laws = data.laws.filter(l => {
+                if (l.bookId !== book.id) return false;
+                if (!search) return true;
+                return l.paragraph.toLowerCase().includes(search) ||
+                    l.title.toLowerCase().includes(search) ||
+                    l.text.toLowerCase().includes(search);
+            });
+
+            if (laws.length === 0) return;
+            anyShown = true;
+
+            const section = document.createElement('div');
+            section.className = 'mb-20';
+            section.innerHTML = `<h3 class="section-heading">${escapeHtml(book.title)}</h3>`;
+
+            const table = document.createElement('table');
+            table.className = 'official-table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th style="width: 90px;">Paragraph</th>
+                        <th style="width: 240px;">Titel</th>
+                        <th>Wortlaut</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `;
+
+            const tbody = table.querySelector('tbody');
+            laws.forEach(law => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="mono-bold">${escapeHtml(law.paragraph)}</td>
+                    <td><strong>${escapeHtml(law.title)}</strong></td>
+                    <td>${escapeHtml(law.text)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            section.appendChild(table);
+            container.appendChild(section);
+        });
+
+        if (!anyShown) {
+            container.innerHTML = '<div class="notice-box">Keine passenden Vorschriften gefunden.</div>';
+        }
+    }
+
+    function renderGesetzeIntern() {
+        const data = GesetzeAPI.getAll();
+        const bookSelect = document.getElementById('law-book-select');
+        const currentVal = bookSelect.value;
+
+        bookSelect.innerHTML = '';
+        data.books.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id;
+            opt.textContent = b.title;
+            if (b.id === currentVal) opt.selected = true;
+            bookSelect.appendChild(opt);
+        });
+
+        const tbody = document.getElementById('intern-laws-tbody');
+        tbody.innerHTML = '';
+
+        if (data.laws.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">Noch keine Vorschriften vorhanden.</td></tr>';
+            return;
+        }
+
+        data.laws.forEach(law => {
+            const book = data.books.find(b => b.id === law.bookId);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${escapeHtml(book ? book.short : law.bookId)}</td>
+                <td class="mono-bold">${escapeHtml(law.paragraph)}</td>
+                <td>${escapeHtml(law.title)}</td>
+                <td><button type="button" class="btn-secondary btn-small btn-del-law" data-id="${law.id}">Löschen</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.querySelectorAll('.btn-del-law').forEach(btn => {
+            btn.addEventListener('click', () => {
+                GesetzeAPI.deleteLaw(Number(btn.dataset.id));
+                renderGesetzeIntern();
+                renderGesetzePublic();
+            });
+        });
+    }
+
+    document.getElementById('form-add-book').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('book-title').value.trim();
+        const short = document.getElementById('book-short').value.trim();
+        if (!title || !short) return;
+
+        GesetzeAPI.addBook(title, short);
+        e.target.reset();
+        document.getElementById('book-save-msg').classList.remove('hidden');
+        renderGesetzeIntern();
+        renderGesetzePublic();
+    });
+
+    document.getElementById('form-add-law').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const bookId = document.getElementById('law-book-select').value;
+        const title = document.getElementById('law-title').value.trim();
+        const text = document.getElementById('law-text').value.trim();
+        if (!bookId || !title || !text) return;
+
+        GesetzeAPI.addLaw(bookId, title, text);
+        document.getElementById('law-title').value = '';
+        document.getElementById('law-text').value = '';
+        document.getElementById('law-save-msg').classList.remove('hidden');
+        renderGesetzeIntern();
+        renderGesetzePublic();
     });
 
     function escapeHtml(str) {

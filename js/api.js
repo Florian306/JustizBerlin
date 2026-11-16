@@ -137,3 +137,111 @@ const AktenAPI = (() => {
         generateAktenzeichen
     };
 })();
+
+/**
+ * Data-Layer für Gesetzessammlung (Gesetzbücher & Paragraphen)
+ */
+const GesetzeAPI = (() => {
+    const STORAGE_KEY = 'justiz_berlin_gesetze_v1';
+
+    const DEFAULT_DATA = {
+        books: [
+            { id: 'stgb', title: 'Strafgesetzbuch (StGB)', short: 'StGB' },
+            { id: 'stpo', title: 'Strafprozessordnung (StPO)', short: 'StPO' },
+            { id: 'berljg', title: 'Berliner Justizgesetz (BerlJG)', short: 'BerlJG' }
+        ],
+        laws: [
+            {
+                id: 1,
+                bookId: 'stgb',
+                paragraph: '§ 1',
+                title: 'Keine Strafe ohne Gesetz',
+                text: 'Eine Tat kann nur bestraft werden, wenn die Strafbarkeit gesetzlich bestimmt war, bevor die Tat begangen wurde.'
+            },
+            {
+                id: 2,
+                bookId: 'stgb',
+                paragraph: '§ 2',
+                title: 'Schwerer Diebstahl & Bandenkriminalität',
+                text: 'Wer fremde bewegliche Sachen in Bandenabsicht oder unter Verwendung von Waffen entwendet, wird mit Freiheitsstrafe oder Geldstrafe bestraft.'
+            },
+            {
+                id: 3,
+                bookId: 'stpo',
+                paragraph: '§ 1',
+                title: 'Untersuchungshaft',
+                text: 'Die Untersuchungshaft darf gegen den Beschuldigten angeordnet werden, wenn er der Tat dringend verdächtig ist und ein Haftgrund (Flucht- oder Verdunkelungsgefahr) besteht.'
+            },
+            {
+                id: 4,
+                bookId: 'berljg',
+                paragraph: '§ 1',
+                title: 'Zuständigkeit der Berliner Gerichte',
+                text: 'Die ordentliche Gerichtsbarkeit im Land Berlin wird durch das Amtsgericht Tiergarten, das Landgericht Berlin sowie das Kammergericht ausgeübt.'
+            }
+        ]
+    };
+
+    function load() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+                return JSON.parse(JSON.stringify(DEFAULT_DATA));
+            }
+            return JSON.parse(raw);
+        } catch {
+            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+    }
+
+    function save(data) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            console.error('Speichern der Gesetze fehlgeschlagen:', e);
+        }
+    }
+
+    function getAll() {
+        return load();
+    }
+
+    function addBook(title, short) {
+        const data = load();
+        const id = short.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString().slice(-4);
+        const book = { id, title, short };
+        data.books.push(book);
+        save(data);
+        return book;
+    }
+
+    function addLaw(bookId, title, text) {
+        const data = load();
+        const existingInBook = data.laws.filter(l => l.bookId === bookId);
+        const nextNum = existingInBook.length + 1;
+        const law = {
+            id: Date.now(),
+            bookId,
+            paragraph: `§ ${nextNum}`,
+            title,
+            text
+        };
+        data.laws.push(law);
+        save(data);
+        return law;
+    }
+
+    function deleteLaw(id) {
+        const data = load();
+        data.laws = data.laws.filter(l => l.id !== id);
+        save(data);
+    }
+
+    return {
+        getAll,
+        addBook,
+        addLaw,
+        deleteLaw
+    };
+})();

@@ -46,6 +46,7 @@
                 <li><button type="button" class="nav-tab active" data-tab="start">Startseite &amp; Bekanntmachungen</button></li>
                 <li><button type="button" class="nav-tab" data-tab="service">Bürger- &amp; Polizei-Service</button></li>
                 <li><button type="button" class="nav-tab" data-tab="auskunft">Vorgangs- &amp; Aktenauskunft</button></li>
+                <li><button type="button" class="nav-tab" data-tab="gesetze">Gesetzessammlung</button></li>
                 <li><button type="button" class="nav-tab" data-tab="intern">Internes Dienstportal</button></li>
             </ul>
         </div>
@@ -273,6 +274,27 @@
             <div id="auskunft-ergebnis" class="result-box hidden"></div>
         </section>
 
+        <!-- TAB: Gesetzessammlung -->
+        <section id="tab-gesetze" class="tab-panel" aria-labelledby="heading-gesetze">
+            <h2 id="heading-gesetze" class="page-title">Berliner Gesetzessammlung</h2>
+            <p class="intro-text">Amtliche Übersicht der im Land Berlin geltenden Gesetzbücher und Einzelvorschriften. Neue Vorschriften werden durch das interne Dienstportal fortlaufend nummeriert und veröffentlicht.</p>
+
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="gesetze-filter-book">Gesetzbuch:</label>
+                    <select id="gesetze-filter-book">
+                        <option value="alle">Alle Gesetzbücher</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="gesetze-filter-search">Stichwort:</label>
+                    <input type="text" id="gesetze-filter-search" placeholder="Paragraph, Titel oder Text...">
+                </div>
+            </div>
+
+            <div id="gesetze-public-list"></div>
+        </section>
+
         <!-- TAB 4: Internes Dienstportal -->
         <section id="tab-intern" class="tab-panel" aria-labelledby="heading-intern">
             <h2 id="heading-intern" class="page-title">Internes Dienstportal (Staatsanwaltschaft &amp; Gericht)</h2>
@@ -389,6 +411,62 @@
                             </div>
                             <button type="button" id="btn-print-doc" class="btn-secondary">Amtliches Dokument drucken / als PDF speichern</button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Gesetzessammlung verwalten -->
+                <div class="detail-panel mt-20">
+                    <h3 class="section-heading">Gesetzessammlung verwalten (Automatische Nummerierung)</h3>
+                    <div class="grid-two-col">
+                        <div>
+                            <form id="form-add-law" class="official-form">
+                                <h4 class="box-title">Neues Gesetz / Paragraph hinzufügen</h4>
+                                <div class="form-row">
+                                    <label for="law-book-select">Gesetzbuch <span class="req">*</span></label>
+                                    <select id="law-book-select" required></select>
+                                </div>
+                                <div class="form-row">
+                                    <label for="law-title">Titel der Vorschrift <span class="req">*</span></label>
+                                    <input type="text" id="law-title" required placeholder="z. B. Unerlaubtes Entfernen vom Unfallort">
+                                </div>
+                                <div class="form-row">
+                                    <label for="law-text">Gesetzestext <span class="req">*</span></label>
+                                    <textarea id="law-text" rows="3" required placeholder="Wortlaut der Vorschrift..."></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary">Paragraph mit nächster §-Nummer speichern</button>
+                                <span id="law-save-msg" class="save-msg hidden">Hinzugefügt.</span>
+                            </form>
+                        </div>
+                        <div>
+                            <form id="form-add-book" class="official-form">
+                                <h4 class="box-title">Neues Gesetzbuch anlegen</h4>
+                                <div class="form-row">
+                                    <label for="book-title">Bezeichnung <span class="req">*</span></label>
+                                    <input type="text" id="book-title" required placeholder="z. B. Straßenverkehrsordnung (StVO)">
+                                </div>
+                                <div class="form-row">
+                                    <label for="book-short">Kürzel <span class="req">*</span></label>
+                                    <input type="text" id="book-short" required placeholder="z. B. StVO">
+                                </div>
+                                <button type="submit" class="btn-secondary">Gesetzbuch anlegen</button>
+                                <span id="book-save-msg" class="save-msg hidden">Angelegt.</span>
+                            </form>
+                        </div>
+                    </div>
+
+                    <h4 class="doc-gen-title mt-20">Aktuelle Vorschriften (Verwaltung)</h4>
+                    <div class="table-responsive">
+                        <table class="official-table" id="intern-laws-table">
+                            <thead>
+                                <tr>
+                                    <th>Gesetzbuch</th>
+                                    <th>Paragraph</th>
+                                    <th>Titel</th>
+                                    <th>Aktion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="intern-laws-tbody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
