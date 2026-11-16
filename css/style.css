@@ -1019,6 +1019,28 @@ a:hover {
     color: var(--text-main);
 }
 
+/* Cookie-Hinweis-Banner */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-white);
+    border-top: 3px solid var(--accent-red);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+    padding: 14px 0;
+    z-index: 1000;
+}
+
+.cookie-banner-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 13.5px;
+}
+
 /* ==========================================================================
    Druck-Stylesheet (@media print) für amtliche Beschlüsse
    ========================================================================== */

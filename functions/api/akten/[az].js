@@ -1,3 +1,5 @@
+import { verifySession } from '../_session.js';
+
 export async function onRequestPatch(context) {
     const az = decodeURIComponent(context.params.az);
     const body = await context.request.json();
@@ -24,6 +26,9 @@ export async function onRequestPatch(context) {
 }
 
 export async function onRequestDelete(context) {
+    const session = await verifySession(context);
+    if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
     const az = decodeURIComponent(context.params.az);
     await context.env.DB.prepare('DELETE FROM akten WHERE az = ?').bind(az).run();
     return Response.json({ deleted: az });

@@ -1,3 +1,5 @@
+import { verifySession } from './_session.js';
+
 async function ensureGesetzeTables(db) {
     await db.prepare(`
         CREATE TABLE IF NOT EXISTS books (
@@ -43,6 +45,9 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPost(context) {
+    const session = await verifySession(context);
+    if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
     await ensureGesetzeTables(context.env.DB);
     const body = await context.request.json();
     const today = getTodayDE();
@@ -83,6 +88,9 @@ export async function onRequestPost(context) {
 }
 
 export async function onRequestPatch(context) {
+    const session = await verifySession(context);
+    if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
     await ensureGesetzeTables(context.env.DB);
     const body = await context.request.json();
     const today = getTodayDE();
@@ -101,6 +109,9 @@ export async function onRequestPatch(context) {
 }
 
 export async function onRequestDelete(context) {
+    const session = await verifySession(context);
+    if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
     await ensureGesetzeTables(context.env.DB);
     const url = new URL(context.request.url);
     const id = url.searchParams.get('id');
