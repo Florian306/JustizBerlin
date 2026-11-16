@@ -967,9 +967,12 @@ a:hover {
 }
 
 .detail-panel {
-    background-color: var(--bg-light);
-    border: 1px solid var(--border-dark);
-    padding: 20px;
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-gray);
+    border-top: 4px solid var(--link-blue);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 24px;
     margin-top: 24px;
 }
 
@@ -1071,11 +1074,11 @@ a:hover {
 @media print {
     @page {
         size: A4;
-        margin: 0;
+        margin: 18mm 18mm 18mm 22mm;
     }
 
     body {
-        margin: 20mm 20mm 20mm 25mm;
+        margin: 0;
         background-color: #FFFFFF;
         color: #000000;
         font-family: "Times New Roman", Times, serif;
