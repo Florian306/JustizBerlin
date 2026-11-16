@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`subtab-${btn.dataset.subtab}`).classList.add('active');
             if (btn.dataset.subtab === 'gesetze-admin') {
                 renderGesetzeIntern();
+            } else if (btn.dataset.subtab === 'logs') {
+                renderLogsIntern();
             }
         });
     });
@@ -617,6 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 sessionStorage.setItem('justiz_auth_user', data.user);
                 applyLoggedInUI(data.user);
+                logActivity('Anmeldung', 'Erfolgreich im Internen Dienstportal angemeldet.');
             } else {
                 loginError.classList.remove('hidden');
             }
@@ -856,6 +859,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentSelectedAz) return;
         if (!confirm(`Vorgang ${currentSelectedAz} wirklich unwiderruflich löschen?`)) return;
         await AktenAPI.remove(currentSelectedAz);
+        logActivity('Akte gelöscht', `Vorgang ${currentSelectedAz} wurde gelöscht.`);
         currentSelectedAz = null;
         document.getElementById('intern-detail-panel').classList.add('hidden');
         renderInternTable();
@@ -938,6 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         await AktenAPI.update(currentSelectedAz, patch);
+        logActivity('Akte bearbeitet', `Vorgang ${currentSelectedAz} aktualisiert (Status: ${status}).`);
         document.getElementById('save-feedback').classList.remove('hidden');
         renderInternTable();
         updateStats();
@@ -1618,6 +1623,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         lawRefAutocomplete.classList.remove('hidden');
     });
+
+    // --- Aktivitäts- & Audit-Log ---
+    async function logActivity(action, details) {
+        const user = document.getElementById('logged-user-display').textContent || 'Dienststelle';
+        await LogsAPI.add(user, action, details);
+    }
+
+    async function renderLogsIntern() {
+        const tbody = document.getElementById('intern-logs-tbody');
+        const search = document.getElementById('logs-filter-search').value.trim().toLowerCase();
+        const logs = await LogsAPI.getAll();
+
+        const filtered = logs.filter(l => {
+            if (!search) return true;
+            return (l.user || '').toLowerCase().includes(search) ||
+                (l.action || '').toLowerCase().includes(search) ||
+                (l.details || '').toLowerCase().includes(search);
+        });
+
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">Noch keine Aktivitäten protokolliert.</td></tr>';
+            return;
+        }
+
+        filtered.forEach(l => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="white-space:nowrap;">${escapeHtml(l.timestamp)}</td>
+                <td><strong>${escapeHtml(l.user)}</strong></td>
+                <td>${escapeHtml(l.action)}</td>
+                <td>${escapeHtml(l.details)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById('logs-filter-search').addEventListener('input', renderLogsIntern);
+    document.getElementById('btn-refresh-logs').addEventListener('click', renderLogsIntern);
 
     function escapeHtml(str) {
         if (!str) return '';

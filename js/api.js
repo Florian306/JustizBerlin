@@ -327,3 +327,59 @@ const GesetzeAPI = (() => {
         deleteBook
     };
 })();
+
+/**
+ * Data-Layer für Aktivitäts- / Audit-Log
+ */
+const LogsAPI = (() => {
+    const STORAGE_KEY = 'justiz_berlin_logs_v1';
+    const API_BASE = '/api/logs';
+    const USE_REMOTE_API = true;
+
+    function loadLocal() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function saveLocal(logs) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(logs.slice(0, 100)));
+        } catch {}
+    }
+
+    async function getAll() {
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(API_BASE);
+                if (res.ok) return await res.json();
+            } catch {}
+        }
+        return loadLocal();
+    }
+
+    async function add(user, action, details) {
+        const timestamp = new Date().toLocaleString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) + ' Uhr';
+
+        if (USE_REMOTE_API) {
+            try {
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timestamp, user, action, details })
+                });
+                if (res.ok) return;
+            } catch {}
+        }
+        const logs = loadLocal();
+        logs.unshift({ id: Date.now(), timestamp, user, action, details });
+        saveLocal(logs);
+    }
+
+    return { getAll, add };
+})();

@@ -333,6 +333,7 @@
                 <div class="sub-nav" role="tablist">
                     <button type="button" class="sub-tab active" data-subtab="akten">Aktenverwaltung</button>
                     <button type="button" class="sub-tab" data-subtab="gesetze-admin">Gesetzessammlung verwalten</button>
+                    <button type="button" class="sub-tab" data-subtab="logs">Aktivitäts-Log</button>
                 </div>
 
                 <div id="subtab-akten" class="subtab-panel active">
@@ -641,6 +642,31 @@
                                 </tr>
                             </thead>
                             <tbody id="intern-laws-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Aktivitäts-Log -->
+                <div id="subtab-logs" class="subtab-panel">
+                    <h3 class="section-heading">Aktivitäts- &amp; Audit-Log</h3>
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label for="logs-filter-search">Suche:</label>
+                            <input type="text" id="logs-filter-search" placeholder="Benutzer, Aktion oder Aktenzeichen...">
+                        </div>
+                        <button type="button" id="btn-refresh-logs" class="btn-secondary btn-small" style="margin-left: auto;">Aktualisieren</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="official-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 170px;">Zeitstempel</th>
+                                    <th style="width: 150px;">Benutzer</th>
+                                    <th style="width: 210px;">Aktion</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="intern-logs-tbody"></tbody>
                         </table>
                     </div>
                 </div>
