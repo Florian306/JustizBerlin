@@ -912,7 +912,8 @@ a:hover {
     margin-bottom: 18px;
 }
 
-.sub-tab {
+.sub-tab,
+.akte-tab {
     background-color: var(--bg-light);
     border: 1px solid var(--border-gray);
     border-bottom: none;
@@ -924,17 +925,20 @@ a:hover {
     font-family: inherit;
 }
 
-.sub-tab.active {
+.sub-tab.active,
+.akte-tab.active {
     background-color: var(--bg-white);
     color: var(--accent-red);
     border-top: 3px solid var(--accent-red);
 }
 
-.subtab-panel {
+.subtab-panel,
+.aktetab-panel {
     display: none;
 }
 
-.subtab-panel.active {
+.subtab-panel.active,
+.aktetab-panel.active {
     display: block;
 }
 

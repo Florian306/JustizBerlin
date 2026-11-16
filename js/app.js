@@ -41,6 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Akten-Reiter (Tabs innerhalb der Aktenbearbeitung)
+    document.querySelectorAll('.akte-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.akte-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.aktetab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`aktetab-${btn.dataset.aktetab}`).classList.add('active');
+        });
+    });
+
     // Schnellzugriff-Kacheln auf der Startseite
     document.querySelectorAll('.quick-tab-link').forEach(link => {
         link.addEventListener('click', (e) => {
