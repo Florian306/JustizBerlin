@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!b) return;
                     previewBox.classList.remove('hidden');
                     if (!b.dataUrl) {
-                        previewBox.innerHTML = `<p><strong>${escapeHtml(b.kennung)} (${escapeHtml(b.name)}):</strong> Für Dateien über 1,5 MB ist keine direkte Browser-Vorschau gespeichert.</p>`;
+                        previewBox.innerHTML = `<p><strong>${escapeHtml(b.kennung)} (${escapeHtml(b.name)}):</strong> Für diese Datei ist keine direkte Browser-Vorschau gespeichert (nur bei neu hochgeladenen Dateien bis 10 MB verfügbar).</p>`;
                         return;
                     }
                     const header = `<div class="detail-header-row" style="margin-bottom:8px;"><strong>Vorschau: ${escapeHtml(b.kennung)} – ${escapeHtml(b.name)}</strong><button type="button" id="btn-close-preview" class="btn-secondary btn-small">Schließen</button></div>`;

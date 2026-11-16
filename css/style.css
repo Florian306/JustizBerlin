@@ -509,11 +509,36 @@ a:hover {
 .form-row select,
 .form-row textarea {
     width: 100%;
-    padding: 8px 10px;
+    padding: 9px 11px;
     border: 1px solid var(--border-dark);
     font-family: inherit;
     font-size: 14px;
     background-color: var(--bg-white);
+    transition: border-color 0.15s ease;
+}
+
+.form-row input[type="file"] {
+    width: 100%;
+    padding: 6px 0;
+    font-family: inherit;
+    font-size: 13.5px;
+}
+
+.form-row input[type="file"]::file-selector-button {
+    background-color: var(--bg-white);
+    color: var(--text-main);
+    border: 1px solid var(--border-dark);
+    padding: 6px 12px;
+    margin-right: 10px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.form-row input[type="file"]::file-selector-button:hover {
+    background-color: var(--bg-medium);
 }
 
 .form-row input:focus,
@@ -533,33 +558,38 @@ a:hover {
     background-color: var(--link-blue);
     color: var(--bg-white);
     border: 1px solid var(--link-blue);
-    padding: 9px 18px;
+    padding: 10px 20px;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     font-family: inherit;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-primary:hover {
     background-color: #002244;
+    border-color: #002244;
 }
 
 .btn-secondary {
     background-color: var(--bg-white);
     color: var(--text-main);
     border: 1px solid var(--border-dark);
-    padding: 8px 14px;
+    padding: 9px 16px;
     font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     font-family: inherit;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-secondary:hover {
     background-color: var(--bg-medium);
+    border-color: var(--text-main);
 }
 
 .btn-small {
-    padding: 4px 10px;
+    padding: 5px 11px;
     font-size: 13px;
 }
 
