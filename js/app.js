@@ -770,6 +770,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('detail-behoerde').textContent = akte.behoerde;
         document.getElementById('detail-beteiligter').textContent = akte.beteiligter;
         document.getElementById('detail-sachverhalt').textContent = akte.sachverhalt;
+        document.getElementById('detail-bearbeiter').value = akte.bearbeiter || '';
+        document.getElementById('detail-paragraphen').value = akte.paragraphen || '';
 
         let bwmList = [];
         try {
@@ -941,10 +943,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentSelectedAz) return;
         const status = document.getElementById('detail-status-select').value;
         const vermerk = document.getElementById('detail-vermerk').value;
+        const bearbeiter = document.getElementById('detail-bearbeiter').value.trim();
+        const paragraphen = document.getElementById('detail-paragraphen').value.trim();
 
         const akten = await AktenAPI.getAll();
         const akte = akten.find(a => a.az === currentSelectedAz);
-        const patch = { status, vermerk };
+        const patch = { status, vermerk, bearbeiter, paragraphen };
 
         if (akte && akte.status !== status) {
             let nachtraegeList = [];
@@ -1115,6 +1119,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Aktueller Status</th><td style="padding:8px; border:1px solid #999;"><strong>${escapeHtml(akte.status)}</strong></td></tr>
                         <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Antragsteller / Dienststelle</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)} (${escapeHtml(akte.behoerde)})</td></tr>
                         <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Betroffene Person</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.beteiligter)}</td></tr>
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Zuständiger Sachbearbeiter</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.bearbeiter || 'Nicht zugewiesen')}</td></tr>
+                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Angewandte Paragraphen</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.paragraphen || 'Keine Angabe')}</td></tr>
                     </table>
 
                     <div style="border-top: 2px solid #000; padding-top: 14px;">
@@ -1171,6 +1177,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Auf Antrag der Staatsanwaltschaft Berlin wird gegen <strong>${escapeHtml(akte.beteiligter)}</strong> gemäß § 407 StPO eine Geldstrafe festgesetzt.</p>
                 <p><strong>Tatvorwurf:</strong><br>${escapeHtml(akte.sachverhalt)}</p>
                 <p>Gegen diesen Strafbefehl kann innerhalb von zwei Wochen nach Zustellung schriftlich oder zu Protokoll der Geschäftsstelle Einspruch eingelegt werden.</p>
+            `;
+        } else if (docType === 'Einstellungsverfügung') {
+            signerEl.textContent = akte.bearbeiter || 'Staatsanwalt/-anwältin – Staatsanwaltschaft Berlin';
+            bodyEl.innerHTML = `
+                <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(akte.beteiligter)}</strong> wegen <strong>${escapeHtml(akte.paragraphen || 'des bekannten Tatvorwurfs')}</strong> wird das Verfahren gemäß § 170 Abs. 2 StPO eingestellt.</p>
+                <p><strong>Begründung:</strong><br>${escapeHtml(akte.vermerk || 'Die Ermittlungen haben keinen hinreichenden Tatverdacht für die Erhebung der öffentlichen Klage ergeben.')}</p>
             `;
         } else {
             signerEl.textContent = 'Präsident/in des Amtsgerichts Tiergarten (Schöffengeschäftsstelle)';

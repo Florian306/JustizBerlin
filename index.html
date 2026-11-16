@@ -421,9 +421,17 @@
                         <div class="grid-equal-2">
                             <div>
                                 <p style="margin-top: 0;"><strong>Sachverhalt:</strong></p>
-                                <div id="detail-sachverhalt" class="sachverhalt-box" style="min-height: 220px;"></div>
+                                <div id="detail-sachverhalt" class="sachverhalt-box" style="min-height: 180px;"></div>
+                                <div class="form-row mt-20">
+                                    <label for="detail-paragraphen">Angewandte Paragraphen / Tatvorwurf:</label>
+                                    <input type="text" id="detail-paragraphen" placeholder="z. B. StGB § 2, StPO § 1">
+                                </div>
                             </div>
                             <div class="control-box">
+                                <div class="form-row">
+                                    <label for="detail-bearbeiter">Zugewiesen an (Sachbearbeiter / Richter):</label>
+                                    <input type="text" id="detail-bearbeiter" placeholder="z. B. StA Weber oder RiAG Becker">
+                                </div>
                                 <div class="form-row">
                                     <label for="detail-status-select">Bearbeitungsstatus ändern:</label>
                                     <select id="detail-status-select">
@@ -454,6 +462,7 @@
                                         <option value="Haftbefehl">Haftbefehl (§ 112 StPO)</option>
                                         <option value="Durchsuchungsbeschluss">Durchsuchungsbeschluss (§ 102 StPO)</option>
                                         <option value="Strafbefehl">Strafbefehl (§ 407 StPO)</option>
+                                        <option value="Einstellungsverfügung">Einstellungsverfügung (§ 170 Abs. 2 StPO)</option>
                                         <option value="Schöffen-Ladung">Ladung zum Schöffendienst (§ 45 GVG)</option>
                                     </select>
                                 </div>

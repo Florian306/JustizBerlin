@@ -11,6 +11,8 @@ export async function onRequestPatch(context) {
 
     const status = body.status !== undefined ? body.status : current.status;
     const vermerk = body.vermerk !== undefined ? body.vermerk : current.vermerk;
+    const bearbeiter = body.bearbeiter !== undefined ? body.bearbeiter : current.bearbeiter;
+    const paragraphen = body.paragraphen !== undefined ? body.paragraphen : current.paragraphen;
     const beweismittel = body.beweismittel !== undefined
         ? (typeof body.beweismittel === 'string' ? body.beweismittel : JSON.stringify(body.beweismittel))
         : current.beweismittel;
@@ -19,10 +21,10 @@ export async function onRequestPatch(context) {
         : current.nachtraege;
 
     await context.env.DB.prepare(
-        'UPDATE akten SET status = ?, vermerk = ?, beweismittel = ?, nachtraege = ? WHERE az = ?'
-    ).bind(status, vermerk || '', beweismittel || '[]', nachtraege || '[]', az).run();
+        'UPDATE akten SET status = ?, vermerk = ?, beweismittel = ?, nachtraege = ?, bearbeiter = ?, paragraphen = ? WHERE az = ?'
+    ).bind(status, vermerk || '', beweismittel || '[]', nachtraege || '[]', bearbeiter || '', paragraphen || '', az).run();
 
-    return Response.json({ az, status, vermerk, beweismittel, nachtraege });
+    return Response.json({ az, status, vermerk, beweismittel, nachtraege, bearbeiter, paragraphen });
 }
 
 export async function onRequestDelete(context) {

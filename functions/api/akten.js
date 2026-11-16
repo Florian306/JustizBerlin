@@ -12,12 +12,16 @@ async function ensureAktenTable(db) {
             status TEXT NOT NULL DEFAULT 'Eingegangen',
             vermerk TEXT,
             beweismittel TEXT,
-            nachtraege TEXT
+            nachtraege TEXT,
+            bearbeiter TEXT,
+            paragraphen TEXT
         )
     `).run();
 
     try { await db.prepare('ALTER TABLE akten ADD COLUMN beweismittel TEXT').run(); } catch {}
     try { await db.prepare('ALTER TABLE akten ADD COLUMN nachtraege TEXT').run(); } catch {}
+    try { await db.prepare('ALTER TABLE akten ADD COLUMN bearbeiter TEXT').run(); } catch {}
+    try { await db.prepare('ALTER TABLE akten ADD COLUMN paragraphen TEXT').run(); } catch {}
 }
 
 export async function onRequestGet(context) {
