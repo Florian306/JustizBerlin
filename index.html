@@ -582,8 +582,11 @@
                     </div>
 
                     <!-- Bearbeitungs-Panel für einen Paragraphen -->
-                    <div id="edit-law-panel" class="official-form mt-20 hidden">
-                        <h4 class="box-title">Vorschrift bearbeiten</h4>
+                    <div id="edit-law-panel" class="official-form mt-20 hidden" style="border-top: 4px solid var(--link-blue); box-shadow: var(--shadow-md);">
+                        <div class="detail-header-row" style="margin-bottom: 12px;">
+                            <h4 class="box-title" style="margin: 0; border: none; padding: 0;">Vorschrift bearbeiten</h4>
+                            <button type="button" id="btn-cancel-edit-law-top" class="btn-secondary btn-small">Schließen</button>
+                        </div>
                         <form id="form-edit-law">
                             <input type="hidden" id="edit-law-id">
                             <div class="form-grid-2">
@@ -597,8 +600,18 @@
                                 </div>
                             </div>
                             <div class="form-row">
-                                <label for="edit-law-text">Gesetzestext <span class="req">*</span></label>
-                                <textarea id="edit-law-text" rows="3" required></textarea>
+                                <div class="detail-header-row" style="margin-bottom: 5px;">
+                                    <label for="edit-law-text" style="margin: 0;">Gesetzestext <span class="req">*</span></label>
+                                    <div class="editor-toolbar">
+                                        <button type="button" id="btn-edit-insert-absatz" class="btn-secondary btn-small">+ Absatz</button>
+                                        <button type="button" id="btn-edit-insert-bullet" class="btn-secondary btn-small">+ Aufzählung</button>
+                                        <button type="button" id="btn-edit-insert-ref" class="btn-secondary btn-small">@ Querverweis</button>
+                                        <button type="button" id="btn-edit-toggle-preview" class="btn-secondary btn-small">Vorschau</button>
+                                    </div>
+                                </div>
+                                <textarea id="edit-law-text" rows="8" required style="min-height: 180px;"></textarea>
+                                <div id="edit-law-ref-autocomplete" class="ref-autocomplete hidden"></div>
+                                <div id="edit-law-live-preview" class="sachverhalt-box law-text-formatted mt-10 hidden"></div>
                             </div>
                             <div class="form-actions">
                                 <button type="submit" class="btn-primary">Änderungen speichern</button>

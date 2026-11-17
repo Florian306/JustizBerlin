@@ -1603,6 +1603,40 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-cancel-edit-law').addEventListener('click', () => {
         document.getElementById('edit-law-panel').classList.add('hidden');
     });
+    document.getElementById('btn-cancel-edit-law-top').addEventListener('click', () => {
+        document.getElementById('edit-law-panel').classList.add('hidden');
+    });
+
+    const editLawTextInput = document.getElementById('edit-law-text');
+    const editLawLivePreview = document.getElementById('edit-law-live-preview');
+
+    document.getElementById('btn-edit-insert-absatz').addEventListener('click', () => {
+        const matches = editLawTextInput.value.match(/\(\d+\)/g);
+        const nextAbs = (matches ? matches.length : 0) + 1;
+        const prefix = editLawTextInput.value && !editLawTextInput.value.endsWith('\n') ? '\n' : '';
+        insertAtCursor(editLawTextInput, `${prefix}(${nextAbs}) `);
+    });
+
+    document.getElementById('btn-edit-insert-bullet').addEventListener('click', () => {
+        const prefix = editLawTextInput.value && !editLawTextInput.value.endsWith('\n') ? '\n' : '';
+        insertAtCursor(editLawTextInput, `${prefix}• `);
+    });
+
+    document.getElementById('btn-edit-insert-ref').addEventListener('click', () => {
+        insertAtCursor(editLawTextInput, '@');
+        editLawTextInput.dispatchEvent(new Event('input'));
+    });
+
+    document.getElementById('btn-edit-toggle-preview').addEventListener('click', () => {
+        if (editLawLivePreview.classList.contains('hidden')) {
+            editLawLivePreview.innerHTML = editLawTextInput.value.trim()
+                ? formatLawTextHtml(editLawTextInput.value)
+                : '<em>Noch kein Text eingegeben.</em>';
+            editLawLivePreview.classList.remove('hidden');
+        } else {
+            editLawLivePreview.classList.add('hidden');
+        }
+    });
 
     document.getElementById('form-edit-law').addEventListener('submit', async (e) => {
         e.preventDefault();
