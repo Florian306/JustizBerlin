@@ -732,15 +732,21 @@
                         </div>
                         <div class="form-row">
                             <label>Berechtigungen für diese Rolle:</label>
-                            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 6px;">
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px;">
                                 <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="new-role-perm-akten" checked style="width:auto;"> Aktenverwaltung
+                                    <input type="checkbox" id="new-role-perm-akten" checked style="width:auto;"> Akten ansehen &amp; Nachträge
+                                </label>
+                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="new-role-perm-akten-edit" style="width:auto;"> Status ändern &amp; PDF-Druck
+                                </label>
+                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="new-role-perm-akten-delete" style="width:auto;"> Akten löschen
                                 </label>
                                 <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
                                     <input type="checkbox" id="new-role-perm-gesetze" style="width:auto;"> Gesetzessammlung verwalten
                                 </label>
                                 <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="new-role-perm-logs" style="width:auto;"> Aktivitäts-Log &amp; Rollenverwaltung
+                                    <input type="checkbox" id="new-role-perm-logs" style="width:auto;"> Aktivitäts-Log &amp; Rollen
                                 </label>
                             </div>
                         </div>
@@ -754,8 +760,10 @@
                                 <tr>
                                     <th>Bezeichnung</th>
                                     <th>Discord-Rollen-ID</th>
-                                    <th style="text-align:center;">Aktenverwaltung</th>
-                                    <th style="text-align:center;">Gesetzessammlung</th>
+                                    <th style="text-align:center;">Akten sehen</th>
+                                    <th style="text-align:center;">Status / PDF</th>
+                                    <th style="text-align:center;">Akten löschen</th>
+                                    <th style="text-align:center;">Gesetze</th>
                                     <th style="text-align:center;">Log &amp; Rollen</th>
                                     <th>Aktion</th>
                                 </tr>

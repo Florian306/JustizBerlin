@@ -42,7 +42,7 @@ export async function onRequestGet(context) {
     return Response.json({
         authenticated: true,
         user: data.user,
-        permissions: data.permissions || ['akten', 'gesetze', 'logs']
+        permissions: data.permissions || ['akten', 'akten_edit', 'akten_delete', 'gesetze', 'logs']
     });
 }
 

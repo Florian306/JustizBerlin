@@ -699,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    function applyLoggedInUI(user, permissions = ['akten', 'gesetze', 'logs']) {
+    function applyLoggedInUI(user, permissions = ['akten', 'akten_edit', 'akten_delete', 'gesetze', 'logs']) {
         isLoggedIn = true;
         loginError.classList.add('hidden');
         loginView.classList.add('hidden');
@@ -715,6 +715,11 @@ document.addEventListener('DOMContentLoaded', () => {
         tabGesetze.classList.toggle('hidden', !permissions.includes('gesetze'));
         tabLogs.classList.toggle('hidden', !permissions.includes('logs'));
         tabRoles.classList.toggle('hidden', !permissions.includes('logs'));
+
+        // Feine Berechtigungen innerhalb der Aktenbearbeitung
+        document.getElementById('btn-delete-akte').classList.toggle('hidden', !permissions.includes('akten_delete'));
+        document.getElementById('btn-save-akte').classList.toggle('hidden', !permissions.includes('akten_edit'));
+        document.getElementById('btn-print-doc').classList.toggle('hidden', !permissions.includes('akten_edit'));
 
         // Ersten erlaubten Sub-Tab aktivieren
         const firstAllowed = [
@@ -2120,19 +2125,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tbody.innerHTML = '';
             if (roles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">Noch keine Discord-Rollen hinterlegt.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8">Noch keine Discord-Rollen hinterlegt.</td></tr>';
                 return;
             }
 
             roles.forEach(role => {
                 const tr = document.createElement('tr');
                 const hasAkten = role.perms.includes('akten');
+                const hasAktenEdit = role.perms.includes('akten_edit');
+                const hasAktenDelete = role.perms.includes('akten_delete');
                 const hasGesetze = role.perms.includes('gesetze');
                 const hasLogs = role.perms.includes('logs');
                 tr.innerHTML = `
                     <td><strong>${escapeHtml(role.name)}</strong></td>
                     <td class="mono-bold">${escapeHtml(role.id)}</td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten" ${hasAkten ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
+                    <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten_edit" ${hasAktenEdit ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
+                    <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten_delete" ${hasAktenDelete ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="gesetze" ${hasGesetze ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="logs" ${hasLogs ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td><button type="button" class="btn-secondary btn-small btn-del-role" data-id="${escapeHtml(role.id)}">Löschen</button></td>
@@ -2174,6 +2183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = document.getElementById('new-role-id').value.trim();
         const perms = [];
         if (document.getElementById('new-role-perm-akten').checked) perms.push('akten');
+        if (document.getElementById('new-role-perm-akten-edit').checked) perms.push('akten_edit');
+        if (document.getElementById('new-role-perm-akten-delete').checked) perms.push('akten_delete');
         if (document.getElementById('new-role-perm-gesetze').checked) perms.push('gesetze');
         if (document.getElementById('new-role-perm-logs').checked) perms.push('logs');
 
