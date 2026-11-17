@@ -6,11 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const navTabs = document.querySelectorAll('.nav-tab');
     const tabPanels = document.querySelectorAll('.tab-panel');
 
+    function syncUrlHash(tabId) {
+        let hash = `#${tabId}`;
+        if (tabId === 'gesetze' && selectedPublicBookId) {
+            hash += `/${encodeURIComponent(selectedPublicBookId)}`;
+            if (selectedPublicLawId) {
+                hash += `/${selectedPublicLawId}`;
+            }
+        }
+        if (window.location.hash !== hash) {
+            history.replaceState(null, '', hash);
+        }
+    }
+
     function switchTab(tabId) {
         sessionStorage.setItem('justiz_active_tab', tabId);
-        if (window.location.hash !== `#${tabId}`) {
-            history.replaceState(null, '', `#${tabId}`);
-        }
+        syncUrlHash(tabId);
         navTabs.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tabId);
         });
@@ -751,7 +762,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (subBtn) subBtn.click();
         }
 
-        const hashTab = window.location.hash.replace('#', '');
+        const rawHash = window.location.hash.replace('#', '');
+        const hashParts = rawHash.split('/');
+        const hashTab = hashParts[0];
+        if (hashTab === 'gesetze') {
+            if (hashParts[1]) selectedPublicBookId = decodeURIComponent(hashParts[1]);
+            if (hashParts[2]) selectedPublicLawId = Number(hashParts[2]);
+        }
         const savedTab = (hashTab && document.getElementById(`tab-${hashTab}`))
             ? hashTab
             : sessionStorage.getItem('justiz_active_tab');
@@ -1318,6 +1335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gesetzeFilterSearch.addEventListener('input', renderGesetzePublic);
 
     async function renderGesetzePublic() {
+        syncUrlHash('gesetze');
         const data = await GesetzeAPI.getAll();
         const search = gesetzeFilterSearch.value.trim().toLowerCase();
 
