@@ -718,42 +718,6 @@
                     </div>
                     <p class="intro-text">Alle Rollen deines Discord-Servers werden automatisch geladen. Hake einfach ab, welche Rolle welchen Bereich im Dienstportal sehen darf.</p>
 
-                    <form id="form-add-role" class="official-form">
-                        <h4 class="box-title">Neue Discord-Rolle hinzufügen</h4>
-                        <div class="form-grid-2">
-                            <div class="form-row">
-                                <label for="new-role-name">Rollen-Bezeichnung <span class="req">*</span></label>
-                                <input type="text" id="new-role-name" required placeholder="z. B. Staatsanwalt oder Senator">
-                            </div>
-                            <div class="form-row">
-                                <label for="new-role-id">Discord-Rollen-ID <span class="req">*</span></label>
-                                <input type="text" id="new-role-id" required placeholder="z. B. 123456789012345678">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <label>Berechtigungen für diese Rolle:</label>
-                            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px;">
-                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="new-role-perm-akten" checked style="width:auto;"> Akten ansehen &amp; Nachträge
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="new-role-perm-akten-edit" style="width:auto;"> Status ändern &amp; PDF-Druck
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="new-role-perm-akten-delete" style="width:auto;"> Akten löschen
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="new-role-perm-gesetze" style="width:auto;"> Gesetzessammlung verwalten
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="new-role-perm-logs" style="width:auto;"> Aktivitäts-Log &amp; Rollen
-                                </label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-primary btn-small">Rolle speichern</button>
-                        <span id="role-save-msg" class="save-msg hidden">Gespeichert.</span>
-                    </form>
-
                     <div class="table-responsive">
                         <table class="official-table">
                             <thead>
@@ -773,39 +737,78 @@
                         </table>
                     </div>
 
-                    <hr class="divider">
-                    <h3 class="section-heading">Benutzer-Sperrliste (Zugang sperren)</h3>
-                    <form id="form-ban-user" class="official-form">
-                        <div class="meta-grid-3">
-                            <div class="form-row">
-                                <label for="ban-user-id">Discord-User-ID <span class="req">*</span></label>
-                                <input type="text" id="ban-user-id" required placeholder="z. B. 345678901234567890">
+                    <details class="toc-section mt-20" style="background: var(--bg-white); padding: 12px 16px;">
+                        <summary style="font-size: 15px; padding: 4px 0;">+ Rolle manuell hinzufügen (optional)</summary>
+                        <form id="form-add-role" class="official-form mt-10" style="margin-bottom: 0;">
+                            <div class="form-grid-2">
+                                <div class="form-row">
+                                    <label for="new-role-name">Rollen-Bezeichnung <span class="req">*</span></label>
+                                    <input type="text" id="new-role-name" required placeholder="z. B. Staatsanwalt oder Senator">
+                                </div>
+                                <div class="form-row">
+                                    <label for="new-role-id">Discord-Rollen-ID <span class="req">*</span></label>
+                                    <input type="text" id="new-role-id" required placeholder="z. B. 123456789012345678">
+                                </div>
                             </div>
                             <div class="form-row">
-                                <label for="ban-user-name">Name (optional)</label>
-                                <input type="text" id="ban-user-name" placeholder="z. B. Max Mustermann">
+                                <label>Berechtigungen für diese Rolle:</label>
+                                <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px;">
+                                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                        <input type="checkbox" id="new-role-perm-akten" checked style="width:auto;"> Akten ansehen &amp; Nachträge
+                                    </label>
+                                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                        <input type="checkbox" id="new-role-perm-akten-edit" style="width:auto;"> Status ändern &amp; PDF-Druck
+                                    </label>
+                                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                        <input type="checkbox" id="new-role-perm-akten-delete" style="width:auto;"> Akten löschen
+                                    </label>
+                                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                        <input type="checkbox" id="new-role-perm-gesetze" style="width:auto;"> Gesetzessammlung verwalten
+                                    </label>
+                                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                        <input type="checkbox" id="new-role-perm-logs" style="width:auto;"> Aktivitäts-Log &amp; Rollen
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-row">
-                                <label for="ban-user-reason">Grund (optional)</label>
-                                <input type="text" id="ban-user-reason" placeholder="z. B. Ausgeschieden / Missbrauch">
+                            <button type="submit" class="btn-primary btn-small">Rolle speichern</button>
+                            <span id="role-save-msg" class="save-msg hidden">Gespeichert.</span>
+                        </form>
+                    </details>
+
+                    <details class="toc-section mt-10" style="background: var(--bg-white); padding: 12px 16px;">
+                        <summary style="font-size: 15px; padding: 4px 0;">Benutzer-Sperrliste (Zugang sperren / entsperren)</summary>
+                        <form id="form-ban-user" class="official-form mt-10">
+                            <div class="meta-grid-3">
+                                <div class="form-row">
+                                    <label for="ban-user-id">Discord-User-ID <span class="req">*</span></label>
+                                    <input type="text" id="ban-user-id" required placeholder="z. B. 345678901234567890">
+                                </div>
+                                <div class="form-row">
+                                    <label for="ban-user-name">Name (optional)</label>
+                                    <input type="text" id="ban-user-name" placeholder="z. B. Max Mustermann">
+                                </div>
+                                <div class="form-row">
+                                    <label for="ban-user-reason">Grund (optional)</label>
+                                    <input type="text" id="ban-user-reason" placeholder="z. B. Ausgeschieden / Missbrauch">
+                                </div>
                             </div>
+                            <button type="submit" class="btn-secondary btn-danger-outline btn-small">Benutzer sperren</button>
+                        </form>
+                        <div class="table-responsive">
+                            <table class="official-table">
+                                <thead>
+                                    <tr>
+                                        <th>Discord-User-ID</th>
+                                        <th>Name</th>
+                                        <th>Grund</th>
+                                        <th>Gesperrt am</th>
+                                        <th>Aktion</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="intern-bans-tbody"></tbody>
+                            </table>
                         </div>
-                        <button type="submit" class="btn-secondary btn-danger-outline btn-small">Benutzer sperren</button>
-                    </form>
-                    <div class="table-responsive">
-                        <table class="official-table">
-                            <thead>
-                                <tr>
-                                    <th>Discord-User-ID</th>
-                                    <th>Name</th>
-                                    <th>Grund</th>
-                                    <th>Gesperrt am</th>
-                                    <th>Aktion</th>
-                                </tr>
-                            </thead>
-                            <tbody id="intern-bans-tbody"></tbody>
-                        </table>
-                    </div>
+                    </details>
                 </div>
             </div>
         </section>
