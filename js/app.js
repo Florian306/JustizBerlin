@@ -1541,9 +1541,12 @@ document.addEventListener('DOMContentLoaded', () => {
             bulkLawsEl.innerHTML = sortedAll.map(l => {
                 const bk = data.books.find(b => b.id === l.bookId);
                 const short = bk ? bk.short : l.bookId;
+                const secBadge = l.section
+                    ? ` <span style="background:#E8EEF5; color:#003366; padding:1px 6px; border-radius:3px; font-size:11px; margin-left:4px;">${escapeHtml(l.section)}</span>`
+                    : '';
                 return `<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-weight:normal; cursor:pointer;">
                     <input type="checkbox" class="bulk-law-cb" value="${l.id}" style="width:auto;">
-                    <span><strong>${escapeHtml(short)} ${escapeHtml(l.paragraph)}</strong> – ${escapeHtml(l.title)}</span>
+                    <span><strong>${escapeHtml(short)} ${escapeHtml(l.paragraph)}</strong> – ${escapeHtml(l.title)}${secBadge}</span>
                 </label>`;
             }).join('');
         }
@@ -1857,9 +1860,12 @@ document.addEventListener('DOMContentLoaded', () => {
             bulkLawsEl.innerHTML = sortedAll.map(l => {
                 const bk = data.books.find(b => b.id === l.bookId);
                 const short = bk ? bk.short : l.bookId;
+                const secBadge = l.section
+                    ? ` <span style="background:#E8EEF5; color:#003366; padding:1px 6px; border-radius:3px; font-size:11px; margin-left:4px;">${escapeHtml(l.section)}</span>`
+                    : '';
                 return `<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-weight:normal; cursor:pointer;">
                     <input type="checkbox" class="bulk-law-cb" value="${l.id}" style="width:auto;">
-                    <span><strong>${escapeHtml(short)} ${escapeHtml(l.paragraph)}</strong> – ${escapeHtml(l.title)}</span>
+                    <span><strong>${escapeHtml(short)} ${escapeHtml(l.paragraph)}</strong> – ${escapeHtml(l.title)}${secBadge}</span>
                 </label>`;
             }).join('');
         }
