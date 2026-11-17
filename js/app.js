@@ -1962,6 +1962,52 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     }
 
+    function attachLawAutocomplete(inputId, dropdownId) {
+        const inputEl = document.getElementById(inputId);
+        const dropEl = document.getElementById(dropdownId);
+        if (!inputEl || !dropEl) return;
+
+        inputEl.addEventListener('input', async () => {
+            const parts = inputEl.value.split(',');
+            const query = parts[parts.length - 1].trim().toLowerCase();
+            if (!query) {
+                dropEl.classList.add('hidden');
+                return;
+            }
+            const data = await GesetzeAPI.getAll();
+            const matches = data.laws.map(l => {
+                const book = data.books.find(b => b.id === l.bookId);
+                const short = book ? book.short : l.bookId;
+                return {
+                    ref: `${short} ${l.paragraph}`,
+                    label: `${short} ${l.paragraph} – ${l.title}`
+                };
+            }).filter(item => item.label.toLowerCase().includes(query));
+
+            if (matches.length === 0) {
+                dropEl.classList.add('hidden');
+                return;
+            }
+            dropEl.innerHTML = '';
+            matches.slice(0, 8).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'ref-autocomplete-item';
+                div.textContent = item.label;
+                div.addEventListener('click', () => {
+                    parts[parts.length - 1] = ' ' + item.ref;
+                    inputEl.value = parts.map(p => p.trim()).filter(Boolean).join(', ') + ', ';
+                    dropEl.classList.add('hidden');
+                    inputEl.focus();
+                });
+                dropEl.appendChild(div);
+            });
+            dropEl.classList.remove('hidden');
+        });
+    }
+
+    attachLawAutocomplete('intern-new-paragraphen', 'intern-new-para-autocomplete');
+    attachLawAutocomplete('detail-paragraphen', 'detail-para-autocomplete');
+
     // @-Autocomplete & Editor-Toolbar für Gesetzestext
     const lawTextInput = document.getElementById('law-text');
     const lawRefAutocomplete = document.getElementById('law-ref-autocomplete');
