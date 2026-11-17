@@ -179,8 +179,15 @@
 
                 <!-- Beweismittel & Anlagen -->
                 <div class="form-row">
-                    <label for="beweismittel-input">Beweismittel &amp; Anlagen (PDF, Bilder, Videos, Audio)</label>
+                    <label for="beweismittel-input">Beweismittel &amp; Anlagen (PDF, Bilder bis ~700 KB oder externer Video-Link)</label>
                     <input type="file" id="beweismittel-input" multiple accept=".pdf,image/*,video/*,audio/*">
+                    <div class="form-grid-2 mt-10" style="gap: 8px;">
+                        <input type="text" id="bwm-link-title" placeholder="Bezeichnung (z. B. Bodycam-Clip)">
+                        <div style="display:flex; gap:6px;">
+                            <input type="text" id="bwm-link-url" placeholder="https://medal.tv/... oder YouTube-Link">
+                            <button type="button" id="btn-add-bwm-link" class="btn-secondary btn-small" style="white-space:nowrap;">+ Link</button>
+                        </div>
+                    </div>
                     <div id="beweismittel-list" class="mt-10"></div>
                 </div>
 

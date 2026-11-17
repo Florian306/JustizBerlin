@@ -390,6 +390,25 @@ document.addEventListener('DOMContentLoaded', () => {
         renderBeweismittelList();
     });
 
+    document.getElementById('btn-add-bwm-link').addEventListener('click', () => {
+        const url = document.getElementById('bwm-link-url').value.trim();
+        const title = document.getElementById('bwm-link-title').value.trim();
+        if (!url) return;
+        const num = Math.floor(100 + Math.random() * 899);
+        currentBeweismittel.push({
+            kennung: `BWM-26-${num}`,
+            name: title || url,
+            externalUrl: url,
+            type: 'link',
+            size: 'Externer Link',
+            addedAt: getTimestampDE(),
+            dataUrl: null
+        });
+        document.getElementById('bwm-link-url').value = '';
+        document.getElementById('bwm-link-title').value = '';
+        renderBeweismittelList();
+    });
+
     antragForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const typ = antragTypSelect.value;
@@ -851,6 +870,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.addEventListener('click', () => {
                     const b = bwmList[Number(btn.dataset.idx)];
                     if (!b) return;
+                    if (b.externalUrl) {
+                        window.open(b.externalUrl, '_blank', 'noopener');
+                        return;
+                    }
                     previewBox.classList.remove('hidden');
                     if (!b.dataUrl) {
                         previewBox.innerHTML = `<p><strong>${escapeHtml(b.kennung)} (${escapeHtml(b.name)}):</strong> Für diese Datei ist keine direkte Browser-Vorschau gespeichert (nur bei neu hochgeladenen Dateien bis 10 MB verfügbar).</p>`;
@@ -1117,9 +1140,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const bwmRows = bwmList.length === 0
                 ? '<tr><td colspan="4" style="padding: 8px; border: 1px solid #999;">Keine Beweismittel hinterlegt.</td></tr>'
                 : bwmList.map(b => {
-                    const viewUrl = `${window.location.origin}/api/beweismittel?az=${encodeURIComponent(akte.az)}&kennung=${encodeURIComponent(b.kennung)}`;
-                    const linkHtml = b.dataUrl
-                        ? `<a href="${viewUrl}" target="_blank" style="color:#003366; text-decoration:underline;">${escapeHtml(b.name)}</a>`
+                    const viewUrl = b.externalUrl
+                        ? b.externalUrl
+                        : `${window.location.origin}/api/beweismittel?az=${encodeURIComponent(akte.az)}&kennung=${encodeURIComponent(b.kennung)}`;
+                    const linkHtml = (b.dataUrl || b.externalUrl)
+                        ? `<a href="${escapeHtml(viewUrl)}" target="_blank" style="color:#003366; text-decoration:underline;">${escapeHtml(b.name)}</a>`
                         : escapeHtml(b.name);
                     return `
                     <tr>
