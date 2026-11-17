@@ -764,7 +764,7 @@ a:hover {
 /* gesetze-im-internet.de Look: Inhaltsverzeichnis + Lesebereich */
 .law-reader-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 320px 1fr;
     gap: 24px;
     align-items: start;
 }
@@ -785,6 +785,7 @@ a:hover {
     top: 20px;
     max-height: 75vh;
     overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .law-toc-title {
@@ -805,11 +806,21 @@ a:hover {
 }
 
 .law-toc-list a {
-    display: block;
-    padding: 7px 4px;
-    font-size: 13.5px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 7px 6px;
+    font-size: 13px;
+    line-height: 1.4;
     text-decoration: none;
     color: var(--text-main);
+}
+
+.law-toc-list a strong {
+    min-width: 38px;
+    flex-shrink: 0;
+    color: var(--link-blue);
+    font-family: Consolas, "Courier New", monospace;
 }
 
 .law-toc-list a:hover {
