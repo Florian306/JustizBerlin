@@ -1015,6 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('tab-count-bwm').textContent = `(${bwmList.length})`;
         document.getElementById('tab-count-hist').textContent = `(${nachtraegeList.length})`;
+        populateDocFields(akte);
         document.getElementById('detail-status-select').value = akte.status;
         document.getElementById('detail-vermerk').value = akte.vermerk || '';
         document.getElementById('save-feedback').classList.add('hidden');
@@ -1268,6 +1269,58 @@ document.addEventListener('DOMContentLoaded', () => {
         openAkteDetail(currentSelectedAz);
     });
 
+    function populateDocFields(akte) {
+        if (!akte) return;
+        const docType = document.getElementById('doc-type-select').value;
+        const customBox = document.getElementById('doc-custom-fields');
+        const signerInp = document.getElementById('doc-signer-input');
+        const targetInp = document.getElementById('doc-target-input');
+        const extraInp = document.getElementById('doc-extra-input');
+        const lblExtra = document.getElementById('lbl-doc-extra');
+        const bodyInp = document.getElementById('doc-body-input');
+
+        if (docType === 'Ermittlungsakte') {
+            customBox.classList.add('hidden');
+            signerInp.value = akte.bearbeiter || 'Staatsanwaltschaft Berlin / Geschäftsstelle';
+            return;
+        }
+
+        customBox.classList.remove('hidden');
+        targetInp.value = akte.beteiligter || `${akte.vorname} ${akte.nachname}`;
+        bodyInp.value = akte.sachverhalt || '';
+
+        if (docType === 'Haftbefehl') {
+            signerInp.value = akte.bearbeiter || 'Richter/in am Amtsgericht Tiergarten';
+            lblExtra.textContent = 'Haftgrund (§ 112 StPO):';
+            extraInp.value = 'Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)';
+        } else if (docType === 'Durchsuchungsbeschluss') {
+            signerInp.value = akte.bearbeiter || 'Ermittlungsrichter/in am Amtsgericht Tiergarten';
+            lblExtra.textContent = 'Durchsuchungsobjekt / Anschrift:';
+            extraInp.value = 'Wohn- und Geschäftsräume sowie mitgeführte Fahrzeuge';
+        } else if (docType === 'Strafbefehl') {
+            signerInp.value = akte.bearbeiter || 'Richter/in am Amtsgericht Tiergarten';
+            lblExtra.textContent = 'Festgesetzte Geldstrafe / Rechtsfolge:';
+            extraInp.value = '30 Tagessätze zu je 50,00 EUR (1.500,00 EUR)';
+        } else if (docType === 'Einstellungsverfügung') {
+            signerInp.value = akte.bearbeiter || 'Staatsanwalt/-anwältin – Staatsanwaltschaft Berlin';
+            lblExtra.textContent = 'Angewandte Paragraphen / Vorwurf:';
+            extraInp.value = akte.paragraphen || 'des bekannten Tatvorwurfs';
+            bodyInp.value = akte.vermerk || 'Die Ermittlungen haben keinen hinreichenden Tatverdacht für die Erhebung der öffentlichen Klage ergeben.';
+        } else {
+            signerInp.value = 'Präsident/in des Amtsgerichts Tiergarten (Schöffengeschäftsstelle)';
+            targetInp.value = `${akte.vorname} ${akte.nachname}`;
+            lblExtra.textContent = 'Sitzungssaal / Terminhinweis:';
+            extraInp.value = 'Amtsgericht Tiergarten – Ladung erfolgt gesondert';
+        }
+    }
+
+    document.getElementById('doc-type-select').addEventListener('change', async () => {
+        if (!currentSelectedAz) return;
+        const akten = await AktenAPI.getAll();
+        const akte = akten.find(a => a.az === currentSelectedAz);
+        populateDocFields(akte);
+    });
+
     // --- Amtlicher Dokumenten-Generator (PDF / Print) ---
     document.getElementById('btn-print-doc').addEventListener('click', async () => {
         if (!currentSelectedAz) return;
@@ -1291,8 +1344,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const bodyEl = document.getElementById('print-doc-body');
         const signerEl = document.getElementById('print-signer');
 
+        const customSigner = document.getElementById('doc-signer-input').value.trim();
+        const customTarget = document.getElementById('doc-target-input').value.trim() || akte.beteiligter;
+        const customExtra = document.getElementById('doc-extra-input').value.trim();
+        const customBody = document.getElementById('doc-body-input').value.trim() || akte.sachverhalt;
+
         if (docType === 'Ermittlungsakte') {
-            signerEl.textContent = 'Staatsanwaltschaft Berlin / Geschäftsstelle';
+            signerEl.textContent = customSigner || 'Staatsanwaltschaft Berlin / Geschäftsstelle';
 
             let bwmList = [];
             try {
@@ -1398,38 +1456,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="border: 1px solid #999; padding: 12px; background: #FAFAFA; white-space: pre-wrap;">${escapeHtml(akte.vermerk || 'Kein Vermerk hinterlegt.')}</div>
             `;
         } else if (docType === 'Haftbefehl') {
-            signerEl.textContent = 'Richter/in am Amtsgericht Tiergarten';
+            signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
             bodyEl.innerHTML = `
-                <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(akte.beteiligter)}</strong> wird auf Antrag der Staatsanwaltschaft Berlin die Untersuchungshaft angeordnet.</p>
-                <p><strong>Gründe:</strong><br>${escapeHtml(akte.sachverhalt)}</p>
-                <p>Es besteht dringender Tatverdacht sowie der Haftgrund der Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO). Die Vollstreckung obliegt der Polizei Berlin.</p>
+                <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(customTarget)}</strong> wird auf Antrag der Staatsanwaltschaft Berlin die Untersuchungshaft angeordnet.</p>
+                <p><strong>Gründe:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
+                <p>Es besteht dringender Tatverdacht sowie der Haftgrund: <strong>${escapeHtml(customExtra || 'Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)')}</strong>. Die Vollstreckung obliegt der Polizei Berlin.</p>
             `;
         } else if (docType === 'Durchsuchungsbeschluss') {
-            signerEl.textContent = 'Ermittlungsrichter/in am Amtsgericht Tiergarten';
+            signerEl.textContent = customSigner || 'Ermittlungsrichter/in am Amtsgericht Tiergarten';
             bodyEl.innerHTML = `
-                <p>In der Ermittlungssache betreffend <strong>${escapeHtml(akte.beteiligter)}</strong> wird gemäß §§ 102, 105 StPO die Durchsuchung der Wohn- und Geschäftsräume sowie der mitgeführten Fahrzeuge angeordnet.</p>
-                <p><strong>Sachverhalt:</strong><br>${escapeHtml(akte.sachverhalt)}</p>
+                <p>In der Ermittlungssache betreffend <strong>${escapeHtml(customTarget)}</strong> wird gemäß §§ 102, 105 StPO die Durchsuchung folgender Objekte angeordnet: <strong>${escapeHtml(customExtra || 'Wohn- und Geschäftsräume sowie mitgeführte Fahrzeuge')}</strong>.</p>
+                <p><strong>Sachverhalt:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
                 <p>Zweck der Maßnahme ist das Auffinden von Beweismitteln. Die Beschlagnahme verfahrensrelevanter Gegenstände wird hiermit angeordnet.</p>
             `;
         } else if (docType === 'Strafbefehl') {
-            signerEl.textContent = 'Richter/in am Amtsgericht Tiergarten';
+            signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
             bodyEl.innerHTML = `
-                <p>Auf Antrag der Staatsanwaltschaft Berlin wird gegen <strong>${escapeHtml(akte.beteiligter)}</strong> gemäß § 407 StPO eine Geldstrafe festgesetzt.</p>
-                <p><strong>Tatvorwurf:</strong><br>${escapeHtml(akte.sachverhalt)}</p>
+                <p>Auf Antrag der Staatsanwaltschaft Berlin wird gegen <strong>${escapeHtml(customTarget)}</strong> gemäß § 407 StPO folgende Rechtsfolge festgesetzt: <strong>${escapeHtml(customExtra || 'Geldstrafe')}</strong>.</p>
+                <p><strong>Tatvorwurf:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
                 <p>Gegen diesen Strafbefehl kann innerhalb von zwei Wochen nach Zustellung schriftlich oder zu Protokoll der Geschäftsstelle Einspruch eingelegt werden.</p>
             `;
         } else if (docType === 'Einstellungsverfügung') {
-            signerEl.textContent = akte.bearbeiter || 'Staatsanwalt/-anwältin – Staatsanwaltschaft Berlin';
+            signerEl.textContent = customSigner || akte.bearbeiter || 'Staatsanwalt/-anwältin – Staatsanwaltschaft Berlin';
             bodyEl.innerHTML = `
-                <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(akte.beteiligter)}</strong> wegen <strong>${escapeHtml(akte.paragraphen || 'des bekannten Tatvorwurfs')}</strong> wird das Verfahren gemäß § 170 Abs. 2 StPO eingestellt.</p>
-                <p><strong>Begründung:</strong><br>${escapeHtml(akte.vermerk || 'Die Ermittlungen haben keinen hinreichenden Tatverdacht für die Erhebung der öffentlichen Klage ergeben.')}</p>
+                <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(customTarget)}</strong> wegen <strong>${escapeHtml(customExtra || akte.paragraphen || 'des bekannten Tatvorwurfs')}</strong> wird das Verfahren gemäß § 170 Abs. 2 StPO eingestellt.</p>
+                <p><strong>Begründung:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
             `;
         } else {
-            signerEl.textContent = 'Präsident/in des Amtsgerichts Tiergarten (Schöffengeschäftsstelle)';
+            signerEl.textContent = customSigner || 'Präsident/in des Amtsgerichts Tiergarten (Schöffengeschäftsstelle)';
             bodyEl.innerHTML = `
-                <p>Sehr geehrte(r) <strong>${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)}</strong>,</p>
+                <p>Sehr geehrte(r) <strong>${escapeHtml(customTarget)}</strong>,</p>
                 <p>auf Grundlage Ihrer Bewerbung / der Vorschlagsliste werden Sie hiermit gemäß § 45 GVG zum ehrenamtlichen Schöffendienst am Amtsgericht Tiergarten berufen.</p>
-                <p><strong>Hinweis:</strong> Das Schöffenamt ist ein Ehrenamt. Die genaue Terminladung zu den Hauptverhandlungen erfolgt gesondert durch die jeweilige Strafkammer.</p>
+                <p><strong>Termin / Hinweis:</strong> ${escapeHtml(customExtra || 'Die genaue Terminladung zu den Hauptverhandlungen erfolgt gesondert.')}</p>
             `;
         }
 

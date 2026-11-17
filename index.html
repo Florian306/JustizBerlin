@@ -494,6 +494,7 @@
                         <button type="button" class="akte-tab active" data-aktetab="overview">Übersicht &amp; Status</button>
                         <button type="button" class="akte-tab" data-aktetab="evidence">Beweismittel &amp; Anlagen <span id="tab-count-bwm">(0)</span></button>
                         <button type="button" class="akte-tab" data-aktetab="history">Chronologie &amp; Nachträge <span id="tab-count-hist">(0)</span></button>
+                        <button type="button" class="akte-tab" data-aktetab="docs">Dokumente &amp; PDF</button>
                     </div>
 
                     <!-- Tab 1: Übersicht & Status -->
@@ -536,22 +537,6 @@
                                     <button type="button" id="btn-delete-akte" class="btn-secondary btn-danger-outline">Akte löschen</button>
                                 </div>
                                 <span id="save-feedback" class="save-msg hidden">Gespeichert.</span>
-
-                                <hr class="divider">
-
-                                <h4 class="doc-gen-title">Amtlicher Dokumenten-Generator</h4>
-                                <div class="form-row">
-                                    <label for="doc-type-select">Dokumentenart:</label>
-                                    <select id="doc-type-select">
-                                        <option value="Ermittlungsakte">Vollständige Ermittlungsakte (Deckblatt &amp; Beweismittel)</option>
-                                        <option value="Haftbefehl">Haftbefehl (§ 112 StPO)</option>
-                                        <option value="Durchsuchungsbeschluss">Durchsuchungsbeschluss (§ 102 StPO)</option>
-                                        <option value="Strafbefehl">Strafbefehl (§ 407 StPO)</option>
-                                        <option value="Einstellungsverfügung">Einstellungsverfügung (§ 170 Abs. 2 StPO)</option>
-                                        <option value="Schöffen-Ladung">Ladung zum Schöffendienst (§ 45 GVG)</option>
-                                    </select>
-                                </div>
-                                <button type="button" id="btn-print-doc" class="btn-secondary">Amtliches Dokument drucken / als PDF speichern</button>
                             </div>
                         </div>
                     </div>
@@ -584,6 +569,49 @@
                                     <button type="submit" class="btn-primary btn-small">Mit Zeitstempel zur Akte hinzufügen</button>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Dokumente & PDF -->
+                    <div id="aktetab-docs" class="aktetab-panel">
+                        <div class="control-box">
+                            <h4 class="doc-gen-title">Amtlicher Dokumenten-Generator</h4>
+                            <div class="form-grid-2">
+                                <div class="form-row">
+                                    <label for="doc-type-select">Dokumentenart:</label>
+                                    <select id="doc-type-select">
+                                        <option value="Ermittlungsakte">Vollständige Ermittlungsakte (Deckblatt &amp; Beweismittel)</option>
+                                        <option value="Haftbefehl">Haftbefehl (§ 112 StPO)</option>
+                                        <option value="Durchsuchungsbeschluss">Durchsuchungsbeschluss (§ 102 StPO)</option>
+                                        <option value="Strafbefehl">Strafbefehl (§ 407 StPO)</option>
+                                        <option value="Einstellungsverfügung">Einstellungsverfügung (§ 170 Abs. 2 StPO)</option>
+                                        <option value="Schöffen-Ladung">Ladung zum Schöffendienst (§ 45 GVG)</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <label for="doc-signer-input">Unterzeichner / Ausstellende Stelle:</label>
+                                    <input type="text" id="doc-signer-input" placeholder="z. B. Richter/in am Amtsgericht Tiergarten">
+                                </div>
+                            </div>
+
+                            <div id="doc-custom-fields">
+                                <div class="form-grid-2">
+                                    <div class="form-row">
+                                        <label for="doc-target-input">Adressat / Betroffene Person:</label>
+                                        <input type="text" id="doc-target-input" placeholder="Name des Beschuldigten / Empfängers">
+                                    </div>
+                                    <div class="form-row">
+                                        <label for="doc-extra-input" id="lbl-doc-extra">Haftgrund / Strafe / Objekt:</label>
+                                        <input type="text" id="doc-extra-input" placeholder="z. B. Fluchtgefahr, 2.500 EUR Geldstrafe oder Anschrift">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <label for="doc-body-input">Begründung / Beschlusstext (frei anpassbar):</label>
+                                    <textarea id="doc-body-input" rows="5" placeholder="Begründung oder Tatvorwurf..."></textarea>
+                                </div>
+                            </div>
+
+                            <button type="button" id="btn-print-doc" class="btn-primary">Amtliches Dokument drucken / als PDF speichern</button>
                         </div>
                     </div>
                 </div>
