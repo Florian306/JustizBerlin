@@ -71,15 +71,28 @@ export async function onRequestGet(context) {
         const member = await memberRes.json();
         const roles = member.roles || [];
 
-        const adminRole = context.env.ROLE_ADMIN_ID;
-        const aktenRole = context.env.ROLE_AKTEN_ID;
-        const gesetzeRole = context.env.ROLE_GESETZE_ID;
+        // Rollen aus D1 laden (Fallback auf Environment Variables)
+        let dbRoles = { admin: '', akten: '', gesetze: '' };
+        try {
+            const res = await context.env.DB.prepare('SELECT * FROM role_config').all();
+            (res.results || []).forEach(r => { dbRoles[r.key] = r.role_ids || ''; });
+        } catch {}
 
-        if (adminRole && roles.includes(adminRole)) {
+        const parseIds = (str) => (str || '').split(',').map(s => s.trim()).filter(Boolean);
+        const adminIds = parseIds(dbRoles.admin || context.env.ROLE_ADMIN_ID);
+        const aktenIds = parseIds(dbRoles.akten || context.env.ROLE_AKTEN_ID);
+        const gesetzeIds = parseIds(dbRoles.gesetze || context.env.ROLE_GESETZE_ID);
+
+        if (adminIds.some(id => roles.includes(id))) {
             permissions = ['akten', 'gesetze', 'logs'];
         } else {
-            if (aktenRole && roles.includes(aktenRole)) permissions.push('akten');
-            if (gesetzeRole && roles.includes(gesetzeRole)) permissions.push('gesetze');
+            if (aktenIds.some(id => roles.includes(id))) permissions.push('akten');
+            if (gesetzeIds.some(id => roles.includes(id))) permissions.push('gesetze');
+        }
+
+        // Falls noch gar keine Rollen konfiguriert wurden, Vollzugriff als Start-Fallback
+        if (adminIds.length === 0 && aktenIds.length === 0 && gesetzeIds.length === 0) {
+            permissions = ['akten', 'gesetze', 'logs'];
         }
 
         if (permissions.length === 0) {

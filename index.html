@@ -684,8 +684,31 @@
                     </details>
                 </div>
 
-                <!-- Aktivitäts-Log -->
+                <!-- Aktivitäts-Log & Rollenverwaltung -->
                 <div id="subtab-logs" class="subtab-panel">
+                    <div class="control-box mb-20" style="margin-bottom: 24px;">
+                        <h3 class="section-heading" style="margin-top: 0;">Discord-Rollen-Berechtigungen (Senator / Admin)</h3>
+                        <p class="demo-hint" style="margin-top: 0; margin-bottom: 12px;">Hier kannst du mehrere Discord-Rollen-IDs (mit Komma getrennt) eintragen, um festzulegen, wer welchen Bereich im Dienstportal sieht.</p>
+                        <form id="form-role-config">
+                            <div class="meta-grid-3">
+                                <div class="form-row">
+                                    <label for="role-admin-ids">Admin / Senator (Vollzugriff)</label>
+                                    <input type="text" id="role-admin-ids" placeholder="z. B. 123456789, 987654321">
+                                </div>
+                                <div class="form-row">
+                                    <label for="role-akten-ids">Aktenverwaltung</label>
+                                    <input type="text" id="role-akten-ids" placeholder="z. B. StA-Rolle, Richter-Rolle">
+                                </div>
+                                <div class="form-row">
+                                    <label for="role-gesetze-ids">Gesetzessammlung verwalten</label>
+                                    <input type="text" id="role-gesetze-ids" placeholder="z. B. Justizleitung-Rolle">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary btn-small">Rollen-Zuordnung speichern</button>
+                            <span id="role-save-msg" class="save-msg hidden">Gespeichert.</span>
+                        </form>
+                    </div>
+
                     <h3 class="section-heading">Aktivitäts- &amp; Audit-Log</h3>
                     <div class="filter-bar">
                         <div class="filter-group">

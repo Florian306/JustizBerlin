@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderGesetzeIntern();
             } else if (btn.dataset.subtab === 'logs') {
                 renderLogsIntern();
+                loadRoleConfig();
             }
         });
     });
@@ -2106,6 +2107,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('logs-filter-search').addEventListener('input', renderLogsIntern);
     document.getElementById('btn-refresh-logs').addEventListener('click', renderLogsIntern);
+
+    async function loadRoleConfig() {
+        try {
+            const res = await fetch('/api/roles');
+            if (!res.ok) return;
+            const data = await res.json();
+            document.getElementById('role-admin-ids').value = data.admin || '';
+            document.getElementById('role-akten-ids').value = data.akten || '';
+            document.getElementById('role-gesetze-ids').value = data.gesetze || '';
+        } catch {}
+    }
+
+    document.getElementById('form-role-config').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const admin = document.getElementById('role-admin-ids').value.trim();
+        const akten = document.getElementById('role-akten-ids').value.trim();
+        const gesetze = document.getElementById('role-gesetze-ids').value.trim();
+
+        const res = await fetch('/api/roles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin, akten, gesetze })
+        });
+        if (res.ok) {
+            const msg = document.getElementById('role-save-msg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 2500);
+            logActivity('Rollen geändert', 'Discord-Rollen-Zuordnung aktualisiert.');
+        }
+    });
 
     function escapeHtml(str) {
         if (!str) return '';
