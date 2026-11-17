@@ -2166,6 +2166,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch {}
     }
 
+    document.getElementById('btn-refresh-roles').addEventListener('click', renderRolesIntern);
+
     document.getElementById('form-add-role').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('new-role-name').value.trim();

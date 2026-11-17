@@ -712,8 +712,11 @@
 
                 <!-- Rollenverwaltung -->
                 <div id="subtab-roles" class="subtab-panel">
-                    <h3 class="section-heading">Discord-Rollenverwaltung</h3>
-                    <p class="intro-text">Lege hier Discord-Rollen per ID an und hake direkt ab, welche Bereiche des Dienstportals diese Rolle sehen und nutzen darf.</p>
+                    <div class="detail-header-row" style="margin-bottom: 12px;">
+                        <h3 class="section-heading" style="margin: 0;">Discord-Rollenverwaltung</h3>
+                        <button type="button" id="btn-refresh-roles" class="btn-secondary btn-small">Rollen vom Discord-Server neu laden</button>
+                    </div>
+                    <p class="intro-text">Alle Rollen deines Discord-Servers werden automatisch geladen. Hake einfach ab, welche Rolle welchen Bereich im Dienstportal sehen darf.</p>
 
                     <form id="form-add-role" class="official-form">
                         <h4 class="box-title">Neue Discord-Rolle hinzufügen</h4>

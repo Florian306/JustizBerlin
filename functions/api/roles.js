@@ -18,11 +18,36 @@ export async function onRequestGet(context) {
 
     await ensureRolesTable(context.env.DB);
     const { results } = await context.env.DB.prepare('SELECT * FROM discord_roles ORDER BY rowid ASC').all();
-    return Response.json(results.map(r => ({
-        id: r.id,
-        name: r.name,
-        perms: JSON.parse(r.perms || '[]')
-    })));
+    const savedMap = new Map();
+    results.forEach(r => savedMap.set(r.id, { id: r.id, name: r.name, perms: JSON.parse(r.perms || '[]') }));
+
+    const botToken = context.env.DISCORD_BOT_TOKEN;
+    const guildId = context.env.DISCORD_GUILD_ID;
+
+    if (botToken && guildId) {
+        try {
+            const dcRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
+                headers: { Authorization: `Bot ${botToken}` }
+            });
+            if (dcRes.ok) {
+                const dcRoles = await dcRes.json();
+                const merged = dcRoles
+                    .filter(r => r.name !== '@everyone' && !r.managed)
+                    .sort((a, b) => b.position - a.position)
+                    .map(r => {
+                        const saved = savedMap.get(r.id);
+                        return {
+                            id: r.id,
+                            name: r.name,
+                            perms: saved ? saved.perms : []
+                        };
+                    });
+                return Response.json(merged);
+            }
+        } catch {}
+    }
+
+    return Response.json(Array.from(savedMap.values()));
 }
 
 export async function onRequestPost(context) {
