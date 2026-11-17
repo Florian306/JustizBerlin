@@ -411,6 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     antragForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        // Falls noch ein Link im Feld steht, automatisch übernehmen
+        const pendingUrl = document.getElementById('bwm-link-url').value.trim();
+        if (pendingUrl) {
+            document.getElementById('btn-add-bwm-link').click();
+        }
         const typ = antragTypSelect.value;
         const vorname = document.getElementById('antrag-vorname').value.trim();
         const nachname = document.getElementById('antrag-nachname').value.trim();
