@@ -1684,10 +1684,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function formatLawTextHtml(rawText) {
-        const escaped = escapeHtml(rawText || '');
-        return escaped.replace(/\[\[([^\]]+)\]\]/g, (match, ref) => {
+        let html = escapeHtml(rawText || '');
+        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/__([^_]+)__/g, '<u>$1</u>');
+        html = html.replace(/\[\[([^\]]+)\]\]/g, (match, ref) => {
             return `<a href="#gesetze" class="law-ref-link" data-ref="${ref}">${ref}</a>`;
         });
+        return html;
     }
 
     // @-Autocomplete & Editor-Toolbar für Gesetzestext
@@ -1721,6 +1724,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const pos = start + textToInsert.length;
         textarea.setSelectionRange(pos, pos);
     }
+
+    function wrapSelection(textarea, prefix, suffix) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const val = textarea.value;
+        const selected = val.slice(start, end) || 'Text';
+        textarea.value = val.slice(0, start) + prefix + selected + suffix + val.slice(end);
+        textarea.focus();
+        textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+    }
+
+    document.getElementById('btn-insert-bold').addEventListener('click', () => {
+        wrapSelection(lawTextInput, '**', '**');
+    });
+
+    document.getElementById('btn-insert-underline').addEventListener('click', () => {
+        wrapSelection(lawTextInput, '__', '__');
+    });
+
+    document.getElementById('btn-insert-nr').addEventListener('click', () => {
+        const matches = lawTextInput.value.match(/^\d+\./gm);
+        const nextNr = (matches ? matches.length : 0) + 1;
+        const prefix = lawTextInput.value && !lawTextInput.value.endsWith('\n') ? '\n' : '';
+        insertAtCursor(lawTextInput, `${prefix}${nextNr}. `);
+    });
 
     document.getElementById('btn-insert-absatz').addEventListener('click', () => {
         const matches = lawTextInput.value.match(/\(\d+\)/g);
