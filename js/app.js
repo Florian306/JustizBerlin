@@ -2519,17 +2519,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('docgen-body').value = d.body || '';
                     document.getElementById('docgen-legal').value = d.legal || '';
                     document.getElementById('docgen-assign').value = d.assignedTo || '';
+                    const msg = document.getElementById('docgen-send-msg');
+                    msg.textContent = `✓ Vorlage "${d.docType}" (Az. ${d.az}) in den Editor geladen.`;
+                    msg.classList.remove('hidden');
+                    setTimeout(() => msg.classList.add('hidden'), 3000);
                 });
             });
 
             tbody.querySelectorAll('.btn-doc-approve').forEach(btn => {
                 btn.addEventListener('click', async () => {
+                    const d = docs.find(x => x.id === Number(btn.dataset.id));
                     const me = document.getElementById('logged-user-display').textContent || 'Richter/in';
                     await fetch('/api/docs', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ id: Number(btn.dataset.id), status: 'Genehmigt & Unterzeichnet', signer: me })
                     });
+                    // Falls Akte existiert, automatisch in deren Chronologie anhängen
+                    if (d && d.az) {
+                        const akten = await AktenAPI.getAll();
+                        const akte = akten.find(a => a.az === d.az);
+                        if (akte) {
+                            let nachtraege = [];
+                            try {
+                                nachtraege = typeof akte.nachtraege === 'string'
+                                    ? JSON.parse(akte.nachtraege)
+                                    : (akte.nachtraege || []);
+                            } catch { nachtraege = []; }
+                            nachtraege.push({
+                                timestamp: getTimestampDE(),
+                                author: me,
+                                text: `[Dokument genehmigt & unterzeichnet: ${d.docType}]`
+                            });
+                            await AktenAPI.update(akte.az, { nachtraege });
+                        }
+                    }
                     logActivity('Dokument genehmigt', `Dokument #${btn.dataset.id} richterlich unterzeichnet.`);
                     renderPendingDocs();
                 });
