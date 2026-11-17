@@ -164,6 +164,7 @@ const GesetzeAPI = (() => {
     const STORAGE_KEY = 'justiz_berlin_gesetze_v1';
     const API_BASE = '/api/gesetze';
     const USE_REMOTE_API = true;
+    let cachedGesetze = null;
 
     const DEFAULT_DATA = {
         books: [],
@@ -191,16 +192,23 @@ const GesetzeAPI = (() => {
         }
     }
 
-    async function getAll() {
+    async function getAll(forceRefresh = false) {
+        if (cachedGesetze && !forceRefresh) {
+            return cachedGesetze;
+        }
         if (USE_REMOTE_API) {
             try {
                 const res = await fetch(API_BASE);
-                if (res.ok) return await res.json();
+                if (res.ok) {
+                    cachedGesetze = await res.json();
+                    return cachedGesetze;
+                }
             } catch {
                 // Fallback auf localStorage
             }
         }
-        return load();
+        cachedGesetze = load();
+        return cachedGesetze;
     }
 
     function getTodayDE() {
@@ -212,6 +220,7 @@ const GesetzeAPI = (() => {
     }
 
     async function addBook(title, short) {
+        cachedGesetze = null;
         const createdAt = getTodayDE();
         if (USE_REMOTE_API) {
             try {
@@ -234,6 +243,7 @@ const GesetzeAPI = (() => {
     }
 
     async function addLaw(bookId, title, text, customParagraph = '', section = '') {
+        cachedGesetze = null;
         const updatedAt = getTodayDE();
         const paragraphTrimmed = (customParagraph || '').trim();
         const sectionTrimmed = (section || '').trim();
@@ -267,6 +277,7 @@ const GesetzeAPI = (() => {
     }
 
     async function updateLaw(id, patch) {
+        cachedGesetze = null;
         const updatedAt = getTodayDE();
         if (USE_REMOTE_API) {
             try {
@@ -291,6 +302,7 @@ const GesetzeAPI = (() => {
     }
 
     async function deleteLaw(id) {
+        cachedGesetze = null;
         if (USE_REMOTE_API) {
             try {
                 const res = await fetch(`${API_BASE}?id=${encodeURIComponent(id)}`, {
@@ -307,6 +319,7 @@ const GesetzeAPI = (() => {
     }
 
     async function deleteBook(bookId) {
+        cachedGesetze = null;
         if (USE_REMOTE_API) {
             try {
                 const res = await fetch(`${API_BASE}?bookId=${encodeURIComponent(bookId)}`, {

@@ -200,8 +200,14 @@ a:hover {
     display: none;
 }
 
+@keyframes fadeInSmooth {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .tab-panel.active {
     display: block;
+    animation: fadeInSmooth 0.16s ease-out;
 }
 
 .page-title {
