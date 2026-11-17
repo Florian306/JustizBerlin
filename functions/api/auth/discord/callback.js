@@ -57,7 +57,7 @@ export async function onRequestGet(context) {
         return new Response('Discord Benutzer konnte nicht abgerufen werden.', { status: 401 });
     }
     const discordUser = await userRes.json();
-    const displayName = discordUser.global_name || discordUser.username;
+    let displayName = discordUser.global_name || discordUser.username;
 
     // Sperrliste prüfen
     try {
@@ -77,6 +77,7 @@ export async function onRequestGet(context) {
             return new Response('Du bist kein Mitglied des hinterlegten Discord-Servers.', { status: 403 });
         }
         const member = await memberRes.json();
+        if (member.nick) displayName = member.nick;
         const roles = member.roles || [];
 
         // Rollen aus D1-Tabelle discord_roles laden
