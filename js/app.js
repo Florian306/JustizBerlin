@@ -1398,11 +1398,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const layout = document.createElement('div');
             layout.className = 'law-reader-layout';
 
-            // Linke Spalte: Inhaltsverzeichnis
+            // Linke Spalte: Inhaltsverzeichnis (mit aufklappbaren Abschnitten)
             const toc = document.createElement('aside');
             toc.className = 'law-toc';
-            toc.innerHTML = `<h4 class="law-toc-title">Inhaltsverzeichnis (${escapeHtml(book.short)})</h4><ul class="law-toc-list"></ul>`;
-            const tocList = toc.querySelector('.law-toc-list');
+            toc.innerHTML = `<h4 class="law-toc-title">Inhaltsverzeichnis (${escapeHtml(book.short)})</h4><div class="toc-container"></div>`;
+            const tocContainer = toc.querySelector('.toc-container');
 
             // Aktiven Paragraphen bestimmen (Standard: erster Paragraph)
             let activeIdx = laws.findIndex(l => l.id === selectedPublicLawId);
@@ -1412,11 +1412,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const activeLaw = laws[activeIdx];
 
-            laws.forEach(law => {
-                const isActive = law.id === activeLaw.id;
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#law-${law.id}" class="toc-jump${isActive ? ' active' : ''}" data-law-id="${law.id}"><strong>${escapeHtml(law.paragraph)}</strong> ${escapeHtml(law.title)}</a>`;
-                tocList.appendChild(li);
+            const noSectionLaws = laws.filter(l => !l.section);
+            if (noSectionLaws.length > 0) {
+                const ul = document.createElement('ul');
+                ul.className = 'law-toc-list';
+                noSectionLaws.forEach(law => {
+                    const isActive = law.id === activeLaw.id;
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#law-${law.id}" class="toc-jump${isActive ? ' active' : ''}" data-law-id="${law.id}"><strong>${escapeHtml(law.paragraph)}</strong> ${escapeHtml(law.title)}</a>`;
+                    ul.appendChild(li);
+                });
+                tocContainer.appendChild(ul);
+            }
+
+            const sections = [...new Set(laws.map(l => l.section).filter(Boolean))];
+            sections.forEach(secName => {
+                const secLaws = laws.filter(l => l.section === secName);
+                const details = document.createElement('details');
+                details.className = 'toc-section';
+                details.open = true;
+                details.innerHTML = `<summary>${escapeHtml(secName)}</summary><ul class="law-toc-list"></ul>`;
+                const ul = details.querySelector('.law-toc-list');
+                secLaws.forEach(law => {
+                    const isActive = law.id === activeLaw.id;
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#law-${law.id}" class="toc-jump${isActive ? ' active' : ''}" data-law-id="${law.id}"><strong>${escapeHtml(law.paragraph)}</strong> ${escapeHtml(law.title)}</a>`;
+                    ul.appendChild(li);
+                });
+                tocContainer.appendChild(details);
             });
 
             // Rechte Spalte: Einzelne Gesetzes-Seite
@@ -1504,6 +1527,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateNextParagraphPlaceholder(data);
 
+        // Abschnitt-Vorschläge aktualisieren
+        const secDatalist = document.getElementById('section-suggestions');
+        const allSections = [...new Set(data.laws.map(l => l.section).filter(Boolean))];
+        secDatalist.innerHTML = allSections.map(s => `<option value="${escapeHtml(s)}">`).join('');
+
         // Filter-Dropdown über Verwaltungstabelle aktualisieren
         const currentFilter = adminLawsFilter.value;
         adminLawsFilter.innerHTML = '<option value="alle">Alle Gesetzbücher</option>';
@@ -1584,6 +1612,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('edit-law-id').value = law.id;
                 document.getElementById('edit-law-paragraph').value = law.paragraph;
                 document.getElementById('edit-law-title').value = law.title;
+                document.getElementById('edit-law-section').value = law.section || '';
                 document.getElementById('edit-law-text').value = law.text;
                 const panel = document.getElementById('edit-law-panel');
                 panel.classList.remove('hidden');
@@ -1658,10 +1687,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = Number(document.getElementById('edit-law-id').value);
         const paragraph = document.getElementById('edit-law-paragraph').value.trim();
         const title = document.getElementById('edit-law-title').value.trim();
+        const section = document.getElementById('edit-law-section').value.trim();
         const text = document.getElementById('edit-law-text').value.trim();
         if (!id || !paragraph || !title || !text) return;
 
-        await GesetzeAPI.updateLaw(id, { paragraph, title, text });
+        await GesetzeAPI.updateLaw(id, { paragraph, title, text, section });
         document.getElementById('edit-law-panel').classList.add('hidden');
         renderGesetzeIntern();
         renderGesetzePublic();
@@ -1685,11 +1715,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const bookId = document.getElementById('law-book-select').value;
         const customParagraph = document.getElementById('law-paragraph').value.trim();
+        const section = document.getElementById('law-section').value.trim();
         const title = document.getElementById('law-title').value.trim();
         const text = document.getElementById('law-text').value.trim();
         if (!bookId || !title || !text) return;
 
-        await GesetzeAPI.addLaw(bookId, title, text, customParagraph);
+        await GesetzeAPI.addLaw(bookId, title, text, customParagraph, section);
         document.getElementById('law-paragraph').value = '';
         document.getElementById('law-title').value = '';
         document.getElementById('law-text').value = '';
@@ -1740,6 +1771,11 @@ document.addEventListener('DOMContentLoaded', () => {
     lawBookSelect.addEventListener('change', async () => {
         const data = await GesetzeAPI.getAll();
         updateNextParagraphPlaceholder(data);
+
+        // Abschnitt-Vorschläge aktualisieren
+        const secDatalist = document.getElementById('section-suggestions');
+        const allSections = [...new Set(data.laws.map(l => l.section).filter(Boolean))];
+        secDatalist.innerHTML = allSections.map(s => `<option value="${escapeHtml(s)}">`).join('');
     });
 
     function insertAtCursor(textarea, textToInsert) {

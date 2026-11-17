@@ -17,13 +17,15 @@ async function ensureGesetzeTables(db) {
             paragraph TEXT NOT NULL,
             title TEXT NOT NULL,
             text TEXT NOT NULL,
-            updatedAt TEXT
+            updatedAt TEXT,
+            section TEXT
         )
     `).run();
 
     // Migration für bestehende Tabellen
     try { await db.prepare('ALTER TABLE books ADD COLUMN createdAt TEXT').run(); } catch {}
     try { await db.prepare('ALTER TABLE laws ADD COLUMN updatedAt TEXT').run(); } catch {}
+    try { await db.prepare('ALTER TABLE laws ADD COLUMN section TEXT').run(); } catch {}
 }
 
 function getTodayDE() {
@@ -71,8 +73,8 @@ export async function onRequestPost(context) {
         }
 
         const res = await context.env.DB.prepare(
-            'INSERT INTO laws (bookId, paragraph, title, text, updatedAt) VALUES (?, ?, ?, ?, ?)'
-        ).bind(body.bookId, paragraph, body.title, body.text, today).run();
+            'INSERT INTO laws (bookId, paragraph, title, text, updatedAt, section) VALUES (?, ?, ?, ?, ?, ?)'
+        ).bind(body.bookId, paragraph, body.title, body.text, today, (body.section || '').trim()).run();
 
         return Response.json({
             id: res.meta.last_row_id,
@@ -80,7 +82,8 @@ export async function onRequestPost(context) {
             paragraph,
             title: body.title,
             text: body.text,
-            updatedAt: today
+            updatedAt: today,
+            section: (body.section || '').trim()
         }, { status: 201 });
     }
 
@@ -96,15 +99,16 @@ export async function onRequestPatch(context) {
     const today = getTodayDE();
 
     await context.env.DB.prepare(
-        'UPDATE laws SET paragraph = ?, title = ?, text = ?, updatedAt = ? WHERE id = ?'
-    ).bind(body.paragraph, body.title, body.text, today, Number(body.id)).run();
+        'UPDATE laws SET paragraph = ?, title = ?, text = ?, updatedAt = ?, section = ? WHERE id = ?'
+    ).bind(body.paragraph, body.title, body.text, today, (body.section || '').trim(), Number(body.id)).run();
 
     return Response.json({
         id: Number(body.id),
         paragraph: body.paragraph,
         title: body.title,
         text: body.text,
-        updatedAt: today
+        updatedAt: today,
+        section: (body.section || '').trim()
     });
 }
 

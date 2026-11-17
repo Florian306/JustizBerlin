@@ -231,15 +231,16 @@ const GesetzeAPI = (() => {
         return book;
     }
 
-    async function addLaw(bookId, title, text, customParagraph = '') {
+    async function addLaw(bookId, title, text, customParagraph = '', section = '') {
         const updatedAt = getTodayDE();
         const paragraphTrimmed = (customParagraph || '').trim();
+        const sectionTrimmed = (section || '').trim();
         if (USE_REMOTE_API) {
             try {
                 const res = await fetch(API_BASE, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'addLaw', bookId, title, text, paragraph: paragraphTrimmed })
+                    body: JSON.stringify({ action: 'addLaw', bookId, title, text, paragraph: paragraphTrimmed, section: sectionTrimmed })
                 });
                 if (res.ok) return await res.json();
             } catch {
@@ -255,7 +256,8 @@ const GesetzeAPI = (() => {
             paragraph: paragraphTrimmed || `§ ${nextNum}`,
             title,
             text,
-            updatedAt
+            updatedAt,
+            section: sectionTrimmed
         };
         data.laws.push(law);
         save(data);

@@ -836,6 +836,32 @@ a:hover {
     padding-left: 8px;
 }
 
+.toc-section {
+    margin-bottom: 8px;
+    border: 1px solid var(--border-gray);
+    border-radius: 4px;
+    background-color: var(--bg-light);
+}
+
+.toc-section summary {
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--text-main);
+    cursor: pointer;
+    user-select: none;
+}
+
+.toc-section[open] summary {
+    border-bottom: 1px solid var(--border-gray);
+    color: var(--accent-red);
+}
+
+.toc-section .law-toc-list {
+    background-color: var(--bg-white);
+    padding: 0 4px;
+}
+
 .law-pagination {
     display: flex;
     justify-content: space-between;
