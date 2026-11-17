@@ -648,29 +648,32 @@
                         </form>
                     </div>
 
-                    <div class="detail-header-row mt-20" style="margin-top: 28px; margin-bottom: 12px;">
-                        <h4 class="doc-gen-title" style="margin: 0;">Aktuelle Vorschriften (Verwaltung)</h4>
-                        <div class="filter-group">
-                            <label for="admin-laws-filter-book">Filter:</label>
-                            <select id="admin-laws-filter-book">
-                                <option value="alle">Alle Gesetzbücher</option>
-                            </select>
+                    <details class="toc-section mt-20" style="background: var(--bg-white); padding: 12px 16px;">
+                        <summary style="font-size: 15px; padding: 4px 0;">Aktuelle Vorschriften (Verwaltung – auf-/zuklappen)</summary>
+                        <div class="detail-header-row mt-10" style="margin-bottom: 12px;">
+                            <div class="filter-group">
+                                <label for="admin-laws-filter-book">Filter:</label>
+                                <select id="admin-laws-filter-book">
+                                    <option value="alle">Alle Gesetzbücher</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="official-table" id="intern-laws-table">
-                            <thead>
-                                <tr>
-                                    <th>Gesetzbuch</th>
-                                    <th>Paragraph</th>
-                                    <th>Titel</th>
-                                    <th>Letzte Änderung</th>
-                                    <th>Aktionen</th>
-                                </tr>
-                            </thead>
-                            <tbody id="intern-laws-tbody"></tbody>
-                        </table>
-                    </div>
+                        <div class="table-responsive">
+                            <table class="official-table" id="intern-laws-table">
+                                <thead>
+                                    <tr>
+                                        <th>Gesetzbuch</th>
+                                        <th>Paragraph</th>
+                                        <th>Titel</th>
+                                        <th>Abschnitt (Verschieben)</th>
+                                        <th>Letzte Änderung</th>
+                                        <th>Aktionen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="intern-laws-tbody"></tbody>
+                            </table>
+                        </div>
+                    </details>
                 </div>
 
                 <!-- Aktivitäts-Log -->

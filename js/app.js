@@ -1601,17 +1601,22 @@ document.addEventListener('DOMContentLoaded', () => {
         ).sort((a, b) => a.paragraph.localeCompare(b.paragraph, 'de', { numeric: true }));
 
         if (filteredLaws.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5">Noch keine Vorschriften vorhanden.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">Noch keine Vorschriften vorhanden.</td></tr>';
             return;
         }
 
         filteredLaws.forEach(law => {
             const book = data.books.find(b => b.id === law.bookId);
             const tr = document.createElement('tr');
+            const secOptions = [`<option value="">-- Ohne Abschnitt --</option>`]
+                .concat(allSections.map(s => `<option value="${escapeHtml(s)}"${law.section === s ? ' selected' : ''}>${escapeHtml(s)}</option>`))
+                .join('');
+
             tr.innerHTML = `
                 <td>${escapeHtml(book ? book.short : law.bookId)}</td>
                 <td class="mono-bold">${escapeHtml(law.paragraph)}</td>
                 <td>${escapeHtml(law.title)}</td>
+                <td><select class="inline-section-select" data-id="${law.id}" style="padding:4px 6px; font-size:13px; border:1px solid var(--border-dark); border-radius:4px; max-width:200px;">${secOptions}</select></td>
                 <td>${escapeHtml(law.updatedAt || 'Initial')}</td>
                 <td>
                     <button type="button" class="btn-secondary btn-small btn-edit-law" data-id="${law.id}">Bearbeiten</button>
@@ -1619,6 +1624,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             `;
             tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('.inline-section-select').forEach(sel => {
+            sel.addEventListener('change', async () => {
+                const id = Number(sel.dataset.id);
+                const law = data.laws.find(l => l.id === id);
+                if (!law) return;
+                await GesetzeAPI.updateLaw(id, {
+                    paragraph: law.paragraph,
+                    title: law.title,
+                    text: law.text,
+                    section: sel.value
+                });
+                renderGesetzeIntern();
+                renderGesetzePublic();
+            });
         });
 
         document.querySelectorAll('.btn-edit-law').forEach(btn => {
@@ -1716,7 +1737,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-assign-section').addEventListener('click', async () => {
         const secName = document.getElementById('bulk-section-name').value.trim();
         const checkedIds = Array.from(document.querySelectorAll('.bulk-law-cb:checked')).map(cb => Number(cb.value));
-        if (!secName || checkedIds.length === 0) return;
+        const msgEl = document.getElementById('bulk-section-msg');
+
+        if (!secName || checkedIds.length === 0) {
+            msgEl.textContent = 'Bitte Namen eingeben und mindestens 1 Paragraphen wählen.';
+            msgEl.style.color = '#CC0000';
+            msgEl.classList.remove('hidden');
+            setTimeout(() => { msgEl.classList.add('hidden'); msgEl.style.color = ''; }, 3000);
+            return;
+        }
 
         const data = await GesetzeAPI.getAll();
         for (const id of checkedIds) {
@@ -1731,8 +1760,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         document.getElementById('bulk-section-name').value = '';
-        document.getElementById('bulk-section-msg').classList.remove('hidden');
-        setTimeout(() => document.getElementById('bulk-section-msg').classList.add('hidden'), 2000);
+        msgEl.textContent = `✓ Zugewiesen (${checkedIds.length} Vorschriften).`;
+        msgEl.style.color = '#006600';
+        msgEl.classList.remove('hidden');
+        setTimeout(() => msgEl.classList.add('hidden'), 3000);
         renderGesetzeIntern();
         renderGesetzePublic();
     });
