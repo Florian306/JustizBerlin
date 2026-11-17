@@ -39,7 +39,11 @@ export async function onRequestGet(context) {
     if (!data) {
         return Response.json({ authenticated: false }, { status: 401 });
     }
-    return Response.json({ authenticated: true, user: data.user });
+    return Response.json({
+        authenticated: true,
+        user: data.user,
+        permissions: data.permissions || ['akten', 'gesetze', 'logs']
+    });
 }
 
 export async function onRequestPost(context) {

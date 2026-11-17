@@ -697,14 +697,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    function applyLoggedInUI(user) {
+    function applyLoggedInUI(user, permissions = ['akten', 'gesetze', 'logs']) {
         isLoggedIn = true;
         loginError.classList.add('hidden');
         loginView.classList.add('hidden');
         dashboardView.classList.remove('hidden');
         document.getElementById('logged-user-display').textContent = user;
-        renderInternTable();
-        renderGesetzeIntern();
+
+        const tabAkten = document.querySelector('.sub-tab[data-subtab="akten"]');
+        const tabGesetze = document.querySelector('.sub-tab[data-subtab="gesetze-admin"]');
+        const tabLogs = document.querySelector('.sub-tab[data-subtab="logs"]');
+
+        tabAkten.classList.toggle('hidden', !permissions.includes('akten'));
+        tabGesetze.classList.toggle('hidden', !permissions.includes('gesetze'));
+        tabLogs.classList.toggle('hidden', !permissions.includes('logs'));
+
+        // Ersten erlaubten Sub-Tab aktivieren
+        const firstAllowed = [
+            permissions.includes('akten') ? tabAkten : null,
+            permissions.includes('gesetze') ? tabGesetze : null,
+            permissions.includes('logs') ? tabLogs : null
+        ].find(Boolean);
+        if (firstAllowed) firstAllowed.click();
+
+        if (permissions.includes('akten')) renderInternTable();
+        if (permissions.includes('gesetze')) renderGesetzeIntern();
     }
 
     loginForm.addEventListener('submit', async (e) => {
@@ -748,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 const data = await res.json();
                 if (data.authenticated) {
-                    applyLoggedInUI(data.user);
+                    applyLoggedInUI(data.user, data.permissions);
                 }
             }
         } catch {
