@@ -1527,10 +1527,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateNextParagraphPlaceholder(data);
 
-        // Abschnitt-Vorschläge aktualisieren
-        const secDatalist = document.getElementById('section-suggestions');
+        // Abschnitt-Dropdowns aktualisieren
         const allSections = [...new Set(data.laws.map(l => l.section).filter(Boolean))];
-        secDatalist.innerHTML = allSections.map(s => `<option value="${escapeHtml(s)}">`).join('');
+        ['law-section-select', 'edit-law-section-select'].forEach(selId => {
+            const sel = document.getElementById(selId);
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">-- Ohne Abschnitt --</option>';
+            allSections.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                sel.appendChild(opt);
+            });
+            const newOpt = document.createElement('option');
+            newOpt.value = '__new__';
+            newOpt.textContent = '+ Neuen Abschnitt eingeben...';
+            sel.appendChild(newOpt);
+            if (prev && (allSections.includes(prev) || prev === '__new__')) sel.value = prev;
+        });
 
         // Checkbox-Liste für Zwischenüberschrift-Zuweisung befüllen
         const bulkLawsEl = document.getElementById('bulk-section-laws');
@@ -1652,7 +1666,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('edit-law-id').value = law.id;
                 document.getElementById('edit-law-paragraph').value = law.paragraph;
                 document.getElementById('edit-law-title').value = law.title;
-                document.getElementById('edit-law-section').value = law.section || '';
+                document.getElementById('edit-law-section-select').value = law.section || '';
+                document.getElementById('edit-law-section').classList.add('hidden');
+                document.getElementById('edit-law-section').value = '';
                 document.getElementById('edit-law-text').value = law.text;
                 const panel = document.getElementById('edit-law-panel');
                 panel.classList.remove('hidden');
@@ -1722,12 +1738,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('law-section-select').addEventListener('change', (e) => {
+        document.getElementById('law-section').classList.toggle('hidden', e.target.value !== '__new__');
+    });
+    document.getElementById('edit-law-section-select').addEventListener('change', (e) => {
+        document.getElementById('edit-law-section').classList.toggle('hidden', e.target.value !== '__new__');
+    });
+
     document.getElementById('form-edit-law').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = Number(document.getElementById('edit-law-id').value);
         const paragraph = document.getElementById('edit-law-paragraph').value.trim();
         const title = document.getElementById('edit-law-title').value.trim();
-        const section = document.getElementById('edit-law-section').value.trim();
+        const secSel = document.getElementById('edit-law-section-select').value;
+        const section = secSel === '__new__'
+            ? document.getElementById('edit-law-section').value.trim()
+            : secSel;
         const text = document.getElementById('edit-law-text').value.trim();
         if (!id || !paragraph || !title || !text) return;
 
@@ -1789,13 +1815,18 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const bookId = document.getElementById('law-book-select').value;
         const customParagraph = document.getElementById('law-paragraph').value.trim();
-        const section = document.getElementById('law-section').value.trim();
+        const secSel = document.getElementById('law-section-select').value;
+        const section = secSel === '__new__'
+            ? document.getElementById('law-section').value.trim()
+            : secSel;
         const title = document.getElementById('law-title').value.trim();
         const text = document.getElementById('law-text').value.trim();
         if (!bookId || !title || !text) return;
 
         await GesetzeAPI.addLaw(bookId, title, text, customParagraph, section);
         document.getElementById('law-paragraph').value = '';
+        document.getElementById('law-section').value = '';
+        document.getElementById('law-section').classList.add('hidden');
         document.getElementById('law-title').value = '';
         document.getElementById('law-text').value = '';
         document.getElementById('law-save-msg').classList.remove('hidden');
@@ -1846,10 +1877,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await GesetzeAPI.getAll();
         updateNextParagraphPlaceholder(data);
 
-        // Abschnitt-Vorschläge aktualisieren
-        const secDatalist = document.getElementById('section-suggestions');
+        // Abschnitt-Dropdowns aktualisieren
         const allSections = [...new Set(data.laws.map(l => l.section).filter(Boolean))];
-        secDatalist.innerHTML = allSections.map(s => `<option value="${escapeHtml(s)}">`).join('');
+        ['law-section-select', 'edit-law-section-select'].forEach(selId => {
+            const sel = document.getElementById(selId);
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">-- Ohne Abschnitt --</option>';
+            allSections.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                sel.appendChild(opt);
+            });
+            const newOpt = document.createElement('option');
+            newOpt.value = '__new__';
+            newOpt.textContent = '+ Neuen Abschnitt eingeben...';
+            sel.appendChild(newOpt);
+            if (prev && (allSections.includes(prev) || prev === '__new__')) sel.value = prev;
+        });
 
         // Checkbox-Liste für Zwischenüberschrift-Zuweisung befüllen
         const bulkLawsEl = document.getElementById('bulk-section-laws');

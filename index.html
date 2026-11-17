@@ -570,9 +570,12 @@
                                     </div>
                                 </div>
                                 <div class="form-row">
-                                    <label for="law-section">Abschnitt / Zwischenüberschrift (optional)</label>
-                                    <input type="text" id="law-section" list="section-suggestions" placeholder="z. B. Erster Abschnitt – Allgemeiner Teil (oder aus Liste wählen)">
-                                    <datalist id="section-suggestions"></datalist>
+                                    <label for="law-section-select">Abschnitt / Zwischenüberschrift (optional)</label>
+                                    <select id="law-section-select">
+                                        <option value="">-- Ohne Abschnitt --</option>
+                                        <option value="__new__">+ Neuen Abschnitt eingeben...</option>
+                                    </select>
+                                    <input type="text" id="law-section" class="hidden mt-10" placeholder="Name des neuen Abschnitts eingeben...">
                                 </div>
                                 <div class="form-row">
                                     <label for="law-title">Titel der Vorschrift <span class="req">*</span></label>
@@ -621,8 +624,12 @@
                                 </div>
                             </div>
                             <div class="form-row">
-                                <label for="edit-law-section">Abschnitt / Zwischenüberschrift (optional)</label>
-                                <input type="text" id="edit-law-section" list="section-suggestions" placeholder="z. B. Erster Abschnitt – Allgemeiner Teil">
+                                <label for="edit-law-section-select">Abschnitt / Zwischenüberschrift (optional)</label>
+                                <select id="edit-law-section-select">
+                                    <option value="">-- Ohne Abschnitt --</option>
+                                    <option value="__new__">+ Neuen Abschnitt eingeben...</option>
+                                </select>
+                                <input type="text" id="edit-law-section" class="hidden mt-10" placeholder="Name des neuen Abschnitts eingeben...">
                             </div>
                             <div class="form-row">
                                 <div class="detail-header-row" style="margin-bottom: 5px;">
