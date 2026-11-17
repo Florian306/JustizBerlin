@@ -541,6 +541,19 @@
                                 <hr class="divider">
                                 <h4 class="doc-gen-title">Angelegte Gesetzbücher</h4>
                                 <div id="admin-books-list"></div>
+
+                                <hr class="divider">
+                                <h4 class="doc-gen-title">Zwischenüberschrift zuweisen</h4>
+                                <div class="form-row">
+                                    <label for="bulk-section-name">Name der Zwischenüberschrift</label>
+                                    <input type="text" id="bulk-section-name" placeholder="z. B. Erster Abschnitt – Allgemeiner Teil">
+                                </div>
+                                <div class="form-row">
+                                    <label>Paragraphen auswählen:</label>
+                                    <div id="bulk-section-laws" style="max-height: 160px; overflow-y: auto; border: 1px solid var(--border-dark); padding: 8px; border-radius: 4px; background: var(--bg-light); font-size: 13px;"></div>
+                                </div>
+                                <button type="button" id="btn-assign-section" class="btn-secondary btn-small">Zwischenüberschrift zuweisen</button>
+                                <span id="bulk-section-msg" class="save-msg hidden">Zugewiesen.</span>
                             </form>
                         </div>
                         <div>

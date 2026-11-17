@@ -1532,6 +1532,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const allSections = [...new Set(data.laws.map(l => l.section).filter(Boolean))];
         secDatalist.innerHTML = allSections.map(s => `<option value="${escapeHtml(s)}">`).join('');
 
+        // Checkbox-Liste für Zwischenüberschrift-Zuweisung befüllen
+        const bulkLawsEl = document.getElementById('bulk-section-laws');
+        if (data.laws.length === 0) {
+            bulkLawsEl.innerHTML = '<span class="demo-hint">Noch keine Paragraphen vorhanden.</span>';
+        } else {
+            const sortedAll = [...data.laws].sort((a, b) => a.paragraph.localeCompare(b.paragraph, 'de', { numeric: true }));
+            bulkLawsEl.innerHTML = sortedAll.map(l => {
+                const bk = data.books.find(b => b.id === l.bookId);
+                const short = bk ? bk.short : l.bookId;
+                return `<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-weight:normal; cursor:pointer;">
+                    <input type="checkbox" class="bulk-law-cb" value="${l.id}" style="width:auto;">
+                    <span><strong>${escapeHtml(short)} ${escapeHtml(l.paragraph)}</strong> – ${escapeHtml(l.title)}</span>
+                </label>`;
+            }).join('');
+        }
+
         // Filter-Dropdown über Verwaltungstabelle aktualisieren
         const currentFilter = adminLawsFilter.value;
         adminLawsFilter.innerHTML = '<option value="alle">Alle Gesetzbücher</option>';
@@ -1697,6 +1713,30 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGesetzePublic();
     });
 
+    document.getElementById('btn-assign-section').addEventListener('click', async () => {
+        const secName = document.getElementById('bulk-section-name').value.trim();
+        const checkedIds = Array.from(document.querySelectorAll('.bulk-law-cb:checked')).map(cb => Number(cb.value));
+        if (!secName || checkedIds.length === 0) return;
+
+        const data = await GesetzeAPI.getAll();
+        for (const id of checkedIds) {
+            const law = data.laws.find(l => l.id === id);
+            if (law) {
+                await GesetzeAPI.updateLaw(id, {
+                    paragraph: law.paragraph,
+                    title: law.title,
+                    text: law.text,
+                    section: secName
+                });
+            }
+        }
+        document.getElementById('bulk-section-name').value = '';
+        document.getElementById('bulk-section-msg').classList.remove('hidden');
+        setTimeout(() => document.getElementById('bulk-section-msg').classList.add('hidden'), 2000);
+        renderGesetzeIntern();
+        renderGesetzePublic();
+    });
+
     document.getElementById('form-add-book').addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = document.getElementById('book-title').value.trim();
@@ -1776,6 +1816,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const secDatalist = document.getElementById('section-suggestions');
         const allSections = [...new Set(data.laws.map(l => l.section).filter(Boolean))];
         secDatalist.innerHTML = allSections.map(s => `<option value="${escapeHtml(s)}">`).join('');
+
+        // Checkbox-Liste für Zwischenüberschrift-Zuweisung befüllen
+        const bulkLawsEl = document.getElementById('bulk-section-laws');
+        if (data.laws.length === 0) {
+            bulkLawsEl.innerHTML = '<span class="demo-hint">Noch keine Paragraphen vorhanden.</span>';
+        } else {
+            const sortedAll = [...data.laws].sort((a, b) => a.paragraph.localeCompare(b.paragraph, 'de', { numeric: true }));
+            bulkLawsEl.innerHTML = sortedAll.map(l => {
+                const bk = data.books.find(b => b.id === l.bookId);
+                const short = bk ? bk.short : l.bookId;
+                return `<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-weight:normal; cursor:pointer;">
+                    <input type="checkbox" class="bulk-law-cb" value="${l.id}" style="width:auto;">
+                    <span><strong>${escapeHtml(short)} ${escapeHtml(l.paragraph)}</strong> – ${escapeHtml(l.title)}</span>
+                </label>`;
+            }).join('');
+        }
     });
 
     function insertAtCursor(textarea, textToInsert) {
