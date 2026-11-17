@@ -1706,12 +1706,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<a href="#gesetze" class="law-ref-link" data-ref="${ref}">${ref}</a>`;
         });
         const lines = html.split('\n');
-        return lines.map(line => {
-            if (/^\s*[•\-]\s+/.test(line)) {
-                return `<div class="law-bullet-item">${line.trim()}</div>`;
+        let result = '';
+        lines.forEach((line, idx) => {
+            const trimmed = line.trim();
+            if (/^[•\-]\s+/.test(trimmed)) {
+                result += `<div class="law-bullet-item">${trimmed}</div>`;
+            } else if (/^\(\d+\)\s+/.test(trimmed)) {
+                result += `<div class="law-absatz">${trimmed}</div>`;
+            } else {
+                result += (idx > 0 && !lines[idx - 1].trim().match(/^([•\-]|\(\d+\))\s+/) ? '\n' : '') + line;
             }
-            return line;
-        }).join('\n');
+        });
+        return result;
     }
 
     // @-Autocomplete & Editor-Toolbar für Gesetzestext

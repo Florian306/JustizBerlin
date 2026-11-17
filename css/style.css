@@ -699,7 +699,11 @@ a:hover {
 .law-bullet-item {
     padding-left: 20px;
     text-indent: -12px;
-    margin: 2px 0;
+    margin: 3px 0;
+}
+
+.law-absatz {
+    margin-top: 10px;
 }
 
 .editor-toolbar {
