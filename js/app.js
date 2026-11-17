@@ -2519,10 +2519,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('docgen-body').value = d.body || '';
                     document.getElementById('docgen-legal').value = d.legal || '';
                     document.getElementById('docgen-assign').value = d.assignedTo || '';
-                    const msg = document.getElementById('docgen-send-msg');
-                    msg.textContent = `✓ Vorlage "${d.docType}" (Az. ${d.az}) in den Editor geladen.`;
-                    msg.classList.remove('hidden');
-                    setTimeout(() => msg.classList.add('hidden'), 3000);
+
+                    // Direkt als PDF öffnen (mit echter Richter-Unterschrift, falls genehmigt)
+                    document.getElementById('print-az').textContent = d.az;
+                    document.getElementById('print-datum').textContent = d.datum;
+                    document.getElementById('print-doc-title').textContent = d.docType.toUpperCase();
+
+                    const sigHtml = d.status === 'Genehmigt & Unterzeichnet'
+                        ? `<div style="font-family: 'Brush Script MT', 'Segoe Script', cursive; font-size: 22pt; color: #002266; margin-bottom: -8px;">${escapeHtml(d.signer)}</div>`
+                        : '';
+                    document.getElementById('print-signer').innerHTML = `${sigHtml}${escapeHtml(d.signer || 'Richter/in am Amtsgericht')}`;
+
+                    let html = `<p><strong>Betroffene Person / Adressat:</strong> ${escapeHtml(d.target)}</p>`;
+                    if (d.laws) html += `<p><strong>Tatvorwurf / Angewandte Vorschriften:</strong> ${escapeHtml(d.laws)}</p>`;
+                    if (d.extra) html += `<p><strong>Anordnung / Maßnahme / Rechtsfolge:</strong> ${escapeHtml(d.extra)}</p>`;
+                    html += `<p style="margin-top: 16px;"><strong>Begründung / Beschlusstext:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(d.body)}</span></p>`;
+                    if (d.legal) html += `<p style="margin-top: 18px; font-size: 10.5pt; border-top: 1px solid #999; padding-top: 10px;"><strong>Rechtsmittelbelehrung / Hinweis:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(d.legal)}</span></p>`;
+
+                    document.getElementById('print-doc-body').innerHTML = html;
+                    window.print();
                 });
             });
 
