@@ -1117,6 +1117,29 @@ a:hover {
     font-size: 13.5px;
 }
 
+/* Eigenes Bestätigungs-Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 2000;
+}
+
+.modal-box {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-gray);
+    border-top: 4px solid var(--accent-red);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+    max-width: 460px;
+    width: 100%;
+    padding: 22px 24px;
+}
+
 /* ==========================================================================
    Druck-Stylesheet (@media print) für amtliche Beschlüsse
    ========================================================================== */

@@ -711,6 +711,18 @@
         </div>
     </section>
 
+    <!-- Eigenes Bestätigungs-Modal -->
+    <div id="confirm-modal" class="modal-overlay no-print hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div class="modal-box">
+            <h3 id="confirm-modal-title" class="box-title" style="color: var(--accent-red);">Sicherheitsabfrage</h3>
+            <p id="confirm-modal-text"></p>
+            <div class="form-actions" style="justify-content: flex-end; margin-top: 20px;">
+                <button type="button" id="confirm-modal-cancel" class="btn-secondary">Abbrechen</button>
+                <button type="button" id="confirm-modal-ok" class="btn-primary" style="background-color: var(--accent-red); border-color: var(--accent-red);">Unwiderruflich löschen</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Cookie-Hinweis (nur technisch notwendiges Session-Cookie) -->
     <div id="cookie-banner" class="cookie-banner no-print" role="dialog" aria-label="Cookie-Hinweis">
         <div class="container cookie-banner-inner">

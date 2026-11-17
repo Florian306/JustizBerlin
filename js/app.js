@@ -951,9 +951,37 @@ document.addEventListener('DOMContentLoaded', () => {
         renderInternTable();
     });
 
+    function showConfirmModal(title, message) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-modal-title').textContent = title;
+            document.getElementById('confirm-modal-text').textContent = message;
+            modal.classList.remove('hidden');
+
+            const okBtn = document.getElementById('confirm-modal-ok');
+            const cancelBtn = document.getElementById('confirm-modal-cancel');
+
+            function cleanup(result) {
+                modal.classList.add('hidden');
+                okBtn.removeEventListener('click', onOk);
+                cancelBtn.removeEventListener('click', onCancel);
+                resolve(result);
+            }
+            function onOk() { cleanup(true); }
+            function onCancel() { cleanup(false); }
+
+            okBtn.addEventListener('click', onOk);
+            cancelBtn.addEventListener('click', onCancel);
+        });
+    }
+
     document.getElementById('btn-delete-akte').addEventListener('click', async () => {
         if (!currentSelectedAz) return;
-        if (!confirm(`Vorgang ${currentSelectedAz} wirklich unwiderruflich löschen?`)) return;
+        const ok = await showConfirmModal(
+            'Akte unwiderruflich löschen',
+            `Möchten Sie den Vorgang ${currentSelectedAz} inklusive aller Beweismittel und Nachträge wirklich unwiderruflich löschen?`
+        );
+        if (!ok) return;
         await AktenAPI.remove(currentSelectedAz);
         logActivity('Akte gelöscht', `Vorgang ${currentSelectedAz} wurde gelöscht.`);
         currentSelectedAz = null;
@@ -1507,7 +1535,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             booksListEl.querySelectorAll('.btn-del-book').forEach(btn => {
                 btn.addEventListener('click', async () => {
-                    if (!confirm('Gesetzbuch und alle darin enthaltenen Paragraphen wirklich löschen?')) return;
+                    const ok = await showConfirmModal(
+                        'Gesetzbuch löschen',
+                        'Möchten Sie dieses Gesetzbuch und alle darin enthaltenen Paragraphen wirklich unwiderruflich löschen?'
+                    );
+                    if (!ok) return;
                     await GesetzeAPI.deleteBook(btn.dataset.bookId);
                     renderGesetzeIntern();
                     renderGesetzePublic();
