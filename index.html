@@ -132,8 +132,49 @@
 
             <form id="antrag-form" class="official-form">
                 <div class="form-row">
-                    <label for="antrag-typ">Vorgangsart <span class="req">*</span></label>
-                    <select id="antrag-typ" required>
+                    <label>Vorgangsart auswählen <span class="req">*</span></label>
+                    <div id="antrag-type-cards">
+                        <p class="type-group-title">Für Bürgerinnen, Bürger &amp; Rechtsanwälte</p>
+                        <div class="type-cards-grid">
+                            <button type="button" class="type-card" data-value="Strafanzeige / Ermittlungsakte der Polizei">
+                                <span class="type-card-title">Strafanzeige erstatten</span>
+                                <span class="type-card-desc">Straftat melden &amp; Beweise beifügen</span>
+                            </button>
+                            <button type="button" class="type-card" data-value="Zivilrechtliche Schlichtung / Verbraucherschutz-Beschwerde">
+                                <span class="type-card-title">Zivilrecht / Schlichtung</span>
+                                <span class="type-card-desc">Verbraucherschutz &amp; Streitigkeiten</span>
+                            </button>
+                            <button type="button" class="type-card" data-value="Einspruch gegen Bußgeld / Strafbefehl">
+                                <span class="type-card-title">Einspruch (Bußgeld / Strafbefehl)</span>
+                                <span class="type-card-desc">Bescheid oder Ticket anfechten</span>
+                            </button>
+                            <button type="button" class="type-card" data-value="Bewerbung als ehrenamtliche/r Schöffe/in">
+                                <span class="type-card-title">Schöffen-Bewerbung</span>
+                                <span class="type-card-desc">Ehrenamtliche/r Richter/in werden</span>
+                            </button>
+                            <button type="button" class="type-card" data-value="Antrag auf Akteneinsicht / Verteidigeranzeige">
+                                <span class="type-card-title">Akteneinsicht / Verteidiger</span>
+                                <span class="type-card-desc">Für Rechtsanwälte &amp; Verteidiger</span>
+                            </button>
+                            <button type="button" class="type-card" data-value="Antrag auf Hafterleichterung / Haftprüfung">
+                                <span class="type-card-title">Haftprüfung / Erleichterung</span>
+                                <span class="type-card-desc">Antrag für Inhaftierte</span>
+                            </button>
+                        </div>
+
+                        <p class="type-group-title">Für Polizei &amp; Ermittlungsbehörden</p>
+                        <div class="type-cards-grid" style="margin-bottom: 0;">
+                            <button type="button" class="type-card" data-value="Strafanzeige / Ermittlungsakte der Polizei">
+                                <span class="type-card-title">Ermittlungsakte einreichen</span>
+                                <span class="type-card-desc">Polizeiliche Akte an Staatsanwaltschaft</span>
+                            </button>
+                            <button type="button" class="type-card" data-value="Antrag auf Haftbefehl / Durchsuchungsbeschluss">
+                                <span class="type-card-title">Haftbefehl / Durchsuchung</span>
+                                <span class="type-card-desc">Richterlichen Beschluss beantragen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <select id="antrag-typ" class="hidden" required>
                         <option value="">-- Bitte wählen --</option>
                         <option value="Strafanzeige / Ermittlungsakte der Polizei">Strafanzeige / Ermittlungsakte der Polizei</option>
                         <option value="Antrag auf Haftbefehl / Durchsuchungsbeschluss">Antrag auf Haftbefehl / Durchsuchungsbeschluss</option>

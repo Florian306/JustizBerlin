@@ -359,6 +359,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     antragTypSelect.addEventListener('change', updateDynamicFormFields);
 
+    document.querySelectorAll('.type-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            antragTypSelect.value = card.dataset.value;
+            updateDynamicFormFields();
+        });
+    });
+
     function renderBeweismittelList() {
         if (currentBeweismittel.length === 0) {
             beweismittelListEl.innerHTML = '';
