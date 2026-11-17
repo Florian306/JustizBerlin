@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function switchTab(tabId) {
         sessionStorage.setItem('justiz_active_tab', tabId);
+        if (window.location.hash !== `#${tabId}`) {
+            history.replaceState(null, '', `#${tabId}`);
+        }
         navTabs.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tabId);
         });
@@ -748,7 +751,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (subBtn) subBtn.click();
         }
 
-        const savedTab = sessionStorage.getItem('justiz_active_tab');
+        const hashTab = window.location.hash.replace('#', '');
+        const savedTab = (hashTab && document.getElementById(`tab-${hashTab}`))
+            ? hashTab
+            : sessionStorage.getItem('justiz_active_tab');
         if (savedTab && document.getElementById(`tab-${savedTab}`)) {
             switchTab(savedTab);
         }
