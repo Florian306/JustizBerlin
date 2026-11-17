@@ -324,6 +324,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             extraFieldsContainer.classList.remove('hidden');
+        } else if (typ.includes('Einspruch')) {
+            lblBehoerde.textContent = 'Wohnanschrift';
+            inpBehoerde.placeholder = 'z. B. Musterstraße 12, 10115 Berlin';
+            lblBeteiligter.textContent = 'Ausstellende Behörde';
+            inpBeteiligter.placeholder = 'z. B. Polizei Berlin / Ordnungsamt / Amtsgericht';
+            lblSachverhalt.innerHTML = 'Begründung des Einspruchs <span class="req">*</span>';
+            inpSachverhalt.placeholder = 'Begründen Sie, warum der Bußgeldbescheid bzw. Strafbefehl fehlerhaft ist...';
+            lblWahrheit.textContent = 'Ich versichere, sämtliche Angaben nach bestem Wissen und Gewissen wahrheitsgemäß gemacht zu haben.';
+            extraFieldsContainer.innerHTML = `
+                <div class="form-row">
+                    <label for="extra-bescheid-az">Aktenzeichen / Ticket-Nummer des Bescheids</label>
+                    <input type="text" id="extra-bescheid-az" placeholder="z. B. OWi-2026-4412 oder 88/26 AG">
+                </div>
+            `;
+            extraFieldsContainer.classList.remove('hidden');
+        } else if (typ.includes('Hafterleichterung')) {
+            lblBehoerde.textContent = 'Kanzlei / Anschrift';
+            inpBehoerde.placeholder = 'z. B. Kanzlei oder Wohnanschrift';
+            lblBeteiligter.textContent = 'Betroffene/r Inhaftierte/r';
+            inpBeteiligter.placeholder = 'Name der inhaftierten Person';
+            lblSachverhalt.innerHTML = 'Begründung des Antrags <span class="req">*</span>';
+            inpSachverhalt.placeholder = 'Begründen Sie den Antrag auf Haftprüfung oder Hafterleichterung (z. B. Wegfall der Fluchtgefahr)...';
+            lblWahrheit.textContent = 'Ich versichere, sämtliche Angaben nach bestem Wissen und Gewissen wahrheitsgemäß gemacht zu haben.';
+            extraFieldsContainer.innerHTML = `
+                <div class="form-row">
+                    <label for="extra-haft-az">Haftanstalt / Aktuelles Aktenzeichen</label>
+                    <input type="text" id="extra-haft-az" placeholder="z. B. JVA Moabit, Az. 204/26 StA">
+                </div>
+            `;
+            extraFieldsContainer.classList.remove('hidden');
         }
     }
 

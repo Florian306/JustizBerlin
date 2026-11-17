@@ -143,6 +143,8 @@ const AktenAPI = (() => {
         else if (typ.includes('Schlichtung')) suffix = 'VS';
         else if (typ.includes('Schöffe')) suffix = 'Schö';
         else if (typ.includes('Akteneinsicht')) suffix = 'AE';
+        else if (typ.includes('Einspruch')) suffix = 'OWi';
+        else if (typ.includes('Hafterleichterung')) suffix = 'Haft';
         return `${num}/26 ${suffix}`;
     }
 
