@@ -1080,7 +1080,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-toggle-new-akte').addEventListener('click', () => {
-        document.getElementById('intern-new-akte-panel').classList.toggle('hidden');
+        const panel = document.getElementById('intern-new-akte-panel');
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) {
+            const bearbeiterInput = document.getElementById('intern-new-bearbeiter');
+            if (!bearbeiterInput.value) {
+                bearbeiterInput.value = document.getElementById('logged-user-display').textContent || '';
+            }
+        }
     });
 
     document.getElementById('btn-close-new-akte').addEventListener('click', () => {
@@ -1093,12 +1100,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const status = document.getElementById('intern-new-status').value;
         const nameRaw = document.getElementById('intern-new-name').value.trim();
         const beteiligter = document.getElementById('intern-new-beteiligter').value.trim();
+        const kontakt = document.getElementById('intern-new-kontakt').value.trim();
+        const bearbeiter = document.getElementById('intern-new-bearbeiter').value.trim();
+        const paragraphen = document.getElementById('intern-new-paragraphen').value.trim();
+        const customAz = document.getElementById('intern-new-az').value.trim();
         const sachverhalt = document.getElementById('intern-new-sachverhalt').value.trim();
 
         const parts = nameRaw.split(' ');
         const vorname = parts.length > 1 ? parts.slice(0, -1).join(' ') : 'Dienststelle';
         const nachname = parts[parts.length - 1];
-        const az = AktenAPI.generateAktenzeichen(typ);
+        const az = customAz || AktenAPI.generateAktenzeichen(typ);
         const heute = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const author = document.getElementById('logged-user-display').textContent || 'Dienststelle';
 
@@ -1108,10 +1119,13 @@ document.addEventListener('DOMContentLoaded', () => {
             typ,
             vorname,
             nachname,
+            kontakt,
             behoerde: 'Internes Dienstportal (SenJustV)',
             beteiligter,
             sachverhalt,
             status,
+            bearbeiter,
+            paragraphen,
             vermerk: `Direkt eröffnet durch ${author}.`,
             beweismittel: [],
             nachtraege: [{
@@ -1120,6 +1134,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 text: `Akte direkt im Dienstportal eröffnet (Status: ${status}).`
             }]
         });
+
+        logActivity('Akte eröffnet', `Neue Akte ${az} direkt im Dienstportal angelegt.`);
 
         e.target.reset();
         document.getElementById('intern-new-akte-panel').classList.add('hidden');
