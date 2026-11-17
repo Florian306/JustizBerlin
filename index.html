@@ -681,10 +681,39 @@
 
                         <div class="form-row">
                             <label for="docgen-legal">Rechtsmittelbelehrung / Zusatzhinweis (optional)</label>
-                            <textarea id="docgen-legal" rows="2" placeholder="z. B. Gegen diesen Beschluss ist das Rechtsmittel der Beschwerde zulässig..."></textarea>
+                            <textarea id="docgen-legal" rows="2" placeholder="Wird je nach Dokumentenart automatisch rechtssicher vorausgefüllt..."></textarea>
                         </div>
 
-                        <button type="button" id="btn-docgen-print" class="btn-primary">Amtliches Dokument drucken / als PDF speichern</button>
+                        <div class="form-grid-2" style="align-items: end;">
+                            <div class="form-row" style="margin-bottom: 0;">
+                                <label for="docgen-assign">An Richter / Stelle zur Unterschrift zuweisen</label>
+                                <input type="text" id="docgen-assign" placeholder="z. B. RiAG Becker oder Richterschaft">
+                            </div>
+                            <div class="form-actions" style="margin-top: 0;">
+                                <button type="button" id="btn-docgen-send" class="btn-secondary">An Richter zur Unterschrift senden</button>
+                                <button type="button" id="btn-docgen-print" class="btn-primary">Als PDF drucken</button>
+                            </div>
+                        </div>
+                        <span id="docgen-send-msg" class="save-msg hidden" style="display:inline-block; margin-top:8px;"></span>
+                    </div>
+
+                    <div class="mt-20">
+                        <h4 class="doc-gen-title">Vorlagen zur richterlichen Prüfung / Unterschrift</h4>
+                        <div class="table-responsive">
+                            <table class="official-table">
+                                <thead>
+                                    <tr>
+                                        <th>Az.</th>
+                                        <th>Dokumentenart</th>
+                                        <th>Betroffene Person</th>
+                                        <th>Zugewiesen an</th>
+                                        <th>Status</th>
+                                        <th>Aktionen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="docgen-pending-tbody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 

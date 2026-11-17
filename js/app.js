@@ -2459,8 +2459,129 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function applyDocGenLegalTemplate() {
+        const type = document.getElementById('docgen-type').value;
+        const legalEl = document.getElementById('docgen-legal');
+        const templates = {
+            'Haftbefehl': 'Gegen diesen Haftbefehl kann gemäß § 117 StPO jederzeit Antrag auf gerichtliche Haftprüfung oder gemäß § 304 StPO Beschwerde beim Landgericht Berlin eingelegt werden.',
+            'Durchsuchungsbeschluss': 'Gegen diesen Beschluss ist gemäß § 304 StPO die Beschwerde zulässig, die schriftlich oder zu Protokoll der Geschäftsstelle beim Amtsgericht Tiergarten einzulegen ist.',
+            'Strafbefehl': 'Gegen diesen Strafbefehl kann gemäß § 410 StPO innerhalb von zwei Wochen nach Zustellung schriftlich oder zu Protokoll der Geschäftsstelle beim Amtsgericht Tiergarten Einspruch eingelegt werden.',
+            'Einstellungsverfügung': 'Gegen diese Einstellungsverfügung kann der Verletzte gemäß § 172 StPO binnen zwei Wochen nach Bekanntmachung Beschwerde bei der Generalstaatsanwaltschaft Berlin einlegen.',
+            'Schöffen-Ladung': 'Das Schöffenamt ist ein Ehrenamt (§ 31 GVG). Ein unentschuldigtes Fernbleiben kann gemäß § 56 GVG mit einem Ordnungsgeld geahndet werden.'
+        };
+        if (templates[type]) legalEl.value = templates[type];
+    }
+
+    document.getElementById('docgen-type').addEventListener('change', applyDocGenLegalTemplate);
+
+    async function renderPendingDocs() {
+        const tbody = document.getElementById('docgen-pending-tbody');
+        try {
+            const res = await fetch('/api/docs');
+            if (!res.ok) return;
+            const docs = await res.json();
+            tbody.innerHTML = '';
+            if (docs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">Keine Dokumente zur Prüfung vorgelegt.</td></tr>';
+                return;
+            }
+            docs.forEach(d => {
+                const tr = document.createElement('tr');
+                let badge = 'status-pruefung';
+                if (d.status === 'Genehmigt & Unterzeichnet') badge = 'status-beschluss';
+                else if (d.status === 'Abgelehnt') badge = 'status-anklage';
+                tr.innerHTML = `
+                    <td class="mono-bold">${escapeHtml(d.az)}</td>
+                    <td>${escapeHtml(d.docType)}</td>
+                    <td>${escapeHtml(d.target)}</td>
+                    <td>${escapeHtml(d.assignedTo || 'Richterschaft')}</td>
+                    <td><span class="status-badge ${badge}">${escapeHtml(d.status)}</span></td>
+                    <td>
+                        <button type="button" class="btn-secondary btn-small btn-doc-load" data-id="${d.id}">Laden</button>
+                        <button type="button" class="btn-primary btn-small btn-doc-approve" data-id="${d.id}">Genehmigen</button>
+                        <button type="button" class="btn-secondary btn-small btn-doc-reject" data-id="${d.id}">Ablehnen</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            tbody.querySelectorAll('.btn-doc-load').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const d = docs.find(x => x.id === Number(btn.dataset.id));
+                    if (!d) return;
+                    document.getElementById('docgen-type').value = d.docType;
+                    document.getElementById('docgen-az').value = d.az;
+                    document.getElementById('docgen-date').value = d.datum;
+                    document.getElementById('docgen-target').value = d.target;
+                    document.getElementById('docgen-laws').value = d.laws || '';
+                    document.getElementById('docgen-extra').value = d.extra || '';
+                    document.getElementById('docgen-signer').value = d.signer || '';
+                    document.getElementById('docgen-body').value = d.body || '';
+                    document.getElementById('docgen-legal').value = d.legal || '';
+                    document.getElementById('docgen-assign').value = d.assignedTo || '';
+                });
+            });
+
+            tbody.querySelectorAll('.btn-doc-approve').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const me = document.getElementById('logged-user-display').textContent || 'Richter/in';
+                    await fetch('/api/docs', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: Number(btn.dataset.id), status: 'Genehmigt & Unterzeichnet', signer: me })
+                    });
+                    logActivity('Dokument genehmigt', `Dokument #${btn.dataset.id} richterlich unterzeichnet.`);
+                    renderPendingDocs();
+                });
+            });
+
+            tbody.querySelectorAll('.btn-doc-reject').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await fetch('/api/docs', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: Number(btn.dataset.id), status: 'Abgelehnt' })
+                    });
+                    logActivity('Dokument abgelehnt', `Dokument #${btn.dataset.id} abgelehnt.`);
+                    renderPendingDocs();
+                });
+            });
+        } catch {}
+    }
+
+    document.getElementById('btn-docgen-send').addEventListener('click', async () => {
+        const docType = document.getElementById('docgen-type').value;
+        const az = document.getElementById('docgen-az').value.trim() || 'Ohne Az.';
+        const datum = document.getElementById('docgen-date').value.trim() || new Date().toLocaleDateString('de-DE');
+        const target = document.getElementById('docgen-target').value.trim();
+        const laws = document.getElementById('docgen-laws').value.trim();
+        const extra = document.getElementById('docgen-extra').value.trim();
+        const signer = document.getElementById('docgen-signer').value.trim();
+        const body = document.getElementById('docgen-body').value.trim();
+        const legal = document.getElementById('docgen-legal').value.trim();
+        const assignedTo = document.getElementById('docgen-assign').value.trim() || 'Richterschaft';
+
+        if (!target || !body) return;
+
+        const res = await fetch('/api/docs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ az, docType, datum, target, laws, extra, signer, body, legal, assignedTo })
+        });
+        if (res.ok) {
+            const msg = document.getElementById('docgen-send-msg');
+            msg.textContent = `✓ An "${assignedTo}" zur Unterschrift vorgelegt.`;
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+            logActivity('Dokument vorgelegt', `${docType} (Az. ${az}) an ${assignedTo} zugewiesen.`);
+            renderPendingDocs();
+        }
+    });
+
     // --- Eigenständiger Haupt-Tab: Dokumenten-Generator ---
     async function renderDocGenTab() {
+        applyDocGenLegalTemplate();
+        renderPendingDocs();
         const sel = document.getElementById('docgen-load-akte');
         const dateInp = document.getElementById('docgen-date');
         if (!dateInp.value) {
