@@ -715,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tabAkten.classList.toggle('hidden', !permissions.includes('akten'));
         tabGesetze.classList.toggle('hidden', !permissions.includes('gesetze'));
         tabLogs.classList.toggle('hidden', !permissions.includes('logs'));
-        tabRoles.classList.toggle('hidden', !permissions.includes('logs'));
+        tabRoles.classList.toggle('hidden', !permissions.includes('roles'));
 
         // Feine Berechtigungen innerhalb der Aktenbearbeitung
         document.getElementById('btn-delete-akte').classList.toggle('hidden', !permissions.includes('akten_delete'));
@@ -2138,18 +2138,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hasAktenDelete = role.perms.includes('akten_delete');
                 const hasGesetze = role.perms.includes('gesetze');
                 const hasLogs = role.perms.includes('logs');
+                const hasRoles = role.perms.includes('roles');
                 const membersText = (role.members && role.members.length > 0)
-                    ? `${role.members.length}: ${role.members.slice(0, 5).join(', ')}${role.members.length > 5 ? ' …' : ''}`
+                    ? `${role.members.length}: ${role.members.slice(0, 4).join(', ')}${role.members.length > 4 ? ' …' : ''}`
                     : '<span style="color:#888;">–</span>';
                 tr.innerHTML = `
-                    <td><strong>${escapeHtml(role.name)}</strong><br><small class="mono-bold" style="color:#666;">${escapeHtml(role.id)}</small></td>
-                    <td style="font-size:12.5px; max-width:220px;">${role.members && role.members.length > 0 ? escapeHtml(membersText) : membersText}</td>
+                    <td title="Discord-ID: ${escapeHtml(role.id)}"><strong>${escapeHtml(role.name)}</strong></td>
+                    <td style="font-size:12.5px; max-width:200px;">${role.members && role.members.length > 0 ? escapeHtml(membersText) : membersText}</td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="login" ${hasLogin ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten" ${hasAkten ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten_edit" ${hasAktenEdit ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten_delete" ${hasAktenDelete ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="gesetze" ${hasGesetze ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="logs" ${hasLogs ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
+                    <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="roles" ${hasRoles ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td><button type="button" class="btn-secondary btn-small btn-del-role" data-id="${escapeHtml(role.id)}">Löschen</button></td>
                 `;
                 tbody.appendChild(tr);
