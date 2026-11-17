@@ -53,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderGesetzeIntern();
             } else if (btn.dataset.subtab === 'logs') {
                 renderLogsIntern();
-                loadRoleConfig();
+            } else if (btn.dataset.subtab === 'roles') {
+                renderRolesIntern();
             }
         });
     });
@@ -708,10 +709,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const tabAkten = document.querySelector('.sub-tab[data-subtab="akten"]');
         const tabGesetze = document.querySelector('.sub-tab[data-subtab="gesetze-admin"]');
         const tabLogs = document.querySelector('.sub-tab[data-subtab="logs"]');
+        const tabRoles = document.querySelector('.sub-tab[data-subtab="roles"]');
 
         tabAkten.classList.toggle('hidden', !permissions.includes('akten'));
         tabGesetze.classList.toggle('hidden', !permissions.includes('gesetze'));
         tabLogs.classList.toggle('hidden', !permissions.includes('logs'));
+        tabRoles.classList.toggle('hidden', !permissions.includes('logs'));
 
         // Ersten erlaubten Sub-Tab aktivieren
         const firstAllowed = [
@@ -2108,33 +2111,83 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logs-filter-search').addEventListener('input', renderLogsIntern);
     document.getElementById('btn-refresh-logs').addEventListener('click', renderLogsIntern);
 
-    async function loadRoleConfig() {
+    async function renderRolesIntern() {
+        const tbody = document.getElementById('intern-roles-tbody');
         try {
             const res = await fetch('/api/roles');
             if (!res.ok) return;
-            const data = await res.json();
-            document.getElementById('role-admin-ids').value = data.admin || '';
-            document.getElementById('role-akten-ids').value = data.akten || '';
-            document.getElementById('role-gesetze-ids').value = data.gesetze || '';
+            const roles = await res.json();
+
+            tbody.innerHTML = '';
+            if (roles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">Noch keine Discord-Rollen hinterlegt.</td></tr>';
+                return;
+            }
+
+            roles.forEach(role => {
+                const tr = document.createElement('tr');
+                const hasAkten = role.perms.includes('akten');
+                const hasGesetze = role.perms.includes('gesetze');
+                const hasLogs = role.perms.includes('logs');
+                tr.innerHTML = `
+                    <td><strong>${escapeHtml(role.name)}</strong></td>
+                    <td class="mono-bold">${escapeHtml(role.id)}</td>
+                    <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten" ${hasAkten ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
+                    <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="gesetze" ${hasGesetze ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
+                    <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="logs" ${hasLogs ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
+                    <td><button type="button" class="btn-secondary btn-small btn-del-role" data-id="${escapeHtml(role.id)}">Löschen</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            tbody.querySelectorAll('.role-perm-cb').forEach(cb => {
+                cb.addEventListener('change', async () => {
+                    const roleId = cb.dataset.id;
+                    const role = roles.find(r => r.id === roleId);
+                    if (!role) return;
+                    const rowCbs = tbody.querySelectorAll(`.role-perm-cb[data-id="${CSS.escape(roleId)}"]`);
+                    const newPerms = Array.from(rowCbs).filter(c => c.checked).map(c => c.dataset.perm);
+                    await fetch('/api/roles', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: role.id, name: role.name, perms: newPerms })
+                    });
+                    logActivity('Rolle geändert', `Berechtigungen für "${role.name}" aktualisiert.`);
+                });
+            });
+
+            tbody.querySelectorAll('.btn-del-role').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await fetch(`/api/roles?id=${encodeURIComponent(btn.dataset.id)}`, { method: 'DELETE' });
+                    logActivity('Rolle gelöscht', `Discord-Rolle ${btn.dataset.id} entfernt.`);
+                    renderRolesIntern();
+                });
+            });
         } catch {}
     }
 
-    document.getElementById('form-role-config').addEventListener('submit', async (e) => {
+    document.getElementById('form-add-role').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const admin = document.getElementById('role-admin-ids').value.trim();
-        const akten = document.getElementById('role-akten-ids').value.trim();
-        const gesetze = document.getElementById('role-gesetze-ids').value.trim();
+        const name = document.getElementById('new-role-name').value.trim();
+        const id = document.getElementById('new-role-id').value.trim();
+        const perms = [];
+        if (document.getElementById('new-role-perm-akten').checked) perms.push('akten');
+        if (document.getElementById('new-role-perm-gesetze').checked) perms.push('gesetze');
+        if (document.getElementById('new-role-perm-logs').checked) perms.push('logs');
 
         const res = await fetch('/api/roles', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ admin, akten, gesetze })
+            body: JSON.stringify({ id, name, perms })
         });
         if (res.ok) {
+            e.target.reset();
+            document.getElementById('new-role-perm-akten').checked = true;
             const msg = document.getElementById('role-save-msg');
             msg.classList.remove('hidden');
             setTimeout(() => msg.classList.add('hidden'), 2500);
-            logActivity('Rollen geändert', 'Discord-Rollen-Zuordnung aktualisiert.');
+            logActivity('Rolle hinzugefügt', `Discord-Rolle "${name}" (${id}) angelegt.`);
+            renderRolesIntern();
         }
     });
 

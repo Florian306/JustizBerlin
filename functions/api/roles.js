@@ -2,9 +2,10 @@ import { verifySession } from './_session.js';
 
 async function ensureRolesTable(db) {
     await db.prepare(`
-        CREATE TABLE IF NOT EXISTS role_config (
-            key TEXT PRIMARY KEY,
-            role_ids TEXT
+        CREATE TABLE IF NOT EXISTS discord_roles (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            perms TEXT NOT NULL
         )
     `).run();
 }
@@ -16,10 +17,12 @@ export async function onRequestGet(context) {
     }
 
     await ensureRolesTable(context.env.DB);
-    const { results } = await context.env.DB.prepare('SELECT * FROM role_config').all();
-    const map = { admin: '', akten: '', gesetze: '' };
-    results.forEach(r => { map[r.key] = r.role_ids || ''; });
-    return Response.json(map);
+    const { results } = await context.env.DB.prepare('SELECT * FROM discord_roles ORDER BY rowid ASC').all();
+    return Response.json(results.map(r => ({
+        id: r.id,
+        name: r.name,
+        perms: JSON.parse(r.perms || '[]')
+    })));
 }
 
 export async function onRequestPost(context) {
@@ -30,12 +33,32 @@ export async function onRequestPost(context) {
 
     await ensureRolesTable(context.env.DB);
     const body = await context.request.json();
+    const id = (body.id || '').trim();
+    const name = (body.name || '').trim();
+    const perms = JSON.stringify(body.perms || []);
 
-    for (const key of ['admin', 'akten', 'gesetze']) {
-        await context.env.DB.prepare(
-            'INSERT INTO role_config (key, role_ids) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET role_ids = excluded.role_ids'
-        ).bind(key, (body[key] || '').trim()).run();
+    if (!id || !name) {
+        return Response.json({ error: 'Missing id or name' }, { status: 400 });
     }
 
-    return Response.json({ ok: true });
+    await context.env.DB.prepare(
+        'INSERT INTO discord_roles (id, name, perms) VALUES (?, ?, ?) ON CONFLICT(id) DO UPDATE SET name = excluded.name, perms = excluded.perms'
+    ).bind(id, name, perms).run();
+
+    return Response.json({ id, name, perms: body.perms || [] }, { status: 201 });
+}
+
+export async function onRequestDelete(context) {
+    const session = await verifySession(context);
+    if (!session || !(session.permissions || ['logs']).includes('logs')) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    await ensureRolesTable(context.env.DB);
+    const url = new URL(context.request.url);
+    const id = url.searchParams.get('id');
+    if (!id) return Response.json({ error: 'Missing id' }, { status: 400 });
+
+    await context.env.DB.prepare('DELETE FROM discord_roles WHERE id = ?').bind(id).run();
+    return Response.json({ deleted: id });
 }
