@@ -201,6 +201,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateDynamicFormFields() {
         const typ = antragTypSelect.value;
+        const wrapper = document.getElementById('antrag-fields-wrapper');
+        if (!typ) {
+            wrapper.classList.add('hidden');
+            return;
+        }
+        wrapper.classList.remove('hidden');
+
         const lblBehoerde = document.getElementById('lbl-behoerde');
         const inpBehoerde = document.getElementById('antrag-behoerde');
         const lblBeteiligter = document.getElementById('lbl-beteiligter');
