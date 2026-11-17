@@ -506,12 +506,16 @@
                                     <label for="detail-paragraphen">Angewandte Paragraphen / Tatvorwurf:</label>
                                     <input type="text" id="detail-paragraphen" placeholder="Tippen zum Suchen (z. B. Hausfriedensbruch oder § 5)">
                                     <div id="detail-para-autocomplete" class="ref-autocomplete hidden"></div>
+                                    <div id="detail-para-badges" class="mt-10"></div>
                                 </div>
                             </div>
                             <div class="control-box">
                                 <div class="form-row">
                                     <label for="detail-bearbeiter">Zugewiesen an (Sachbearbeiter / Richter):</label>
-                                    <input type="text" id="detail-bearbeiter" placeholder="z. B. StA Weber oder RiAG Becker">
+                                    <div style="display:flex; gap:6px;">
+                                        <input type="text" id="detail-bearbeiter" placeholder="z. B. StA Weber oder RiAG Becker">
+                                        <button type="button" id="btn-assign-me" class="btn-secondary btn-small" style="white-space:nowrap;">Mir zuweisen</button>
+                                    </div>
                                 </div>
                                 <div class="form-row">
                                     <label for="detail-status-select">Bearbeitungsstatus ändern:</label>

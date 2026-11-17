@@ -929,6 +929,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('detail-sachverhalt').textContent = akte.sachverhalt;
         document.getElementById('detail-bearbeiter').value = akte.bearbeiter || '';
         document.getElementById('detail-paragraphen').value = akte.paragraphen || '';
+        renderDetailParaBadges();
 
         let bwmList = [];
         try {
@@ -1023,6 +1024,38 @@ document.addEventListener('DOMContentLoaded', () => {
         renderInternTable();
         panel.scrollIntoView({ behavior: 'smooth' });
     }
+
+    document.getElementById('btn-assign-me').addEventListener('click', () => {
+        const me = document.getElementById('logged-user-display').textContent || '';
+        document.getElementById('detail-bearbeiter').value = me;
+    });
+
+    function renderDetailParaBadges() {
+        const container = document.getElementById('detail-para-badges');
+        const val = document.getElementById('detail-paragraphen').value || '';
+        const refs = val.split(',').map(s => s.trim()).filter(Boolean);
+        if (refs.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+        container.innerHTML = refs.map(r => `<a href="#gesetze" class="law-ref-link" data-ref="${escapeHtml(r)}">${escapeHtml(r)}</a>`).join(' ');
+        container.querySelectorAll('.law-ref-link').forEach(link => {
+            link.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const ref = link.dataset.ref;
+                const d = await GesetzeAPI.getAll();
+                const targetBook = d.books.find(b => ref.toLowerCase().startsWith(b.short.toLowerCase() + ' '));
+                if (targetBook) {
+                    const targetLaw = d.laws.find(l => l.bookId === targetBook.id && `${targetBook.short} ${l.paragraph}`.toLowerCase() === ref.toLowerCase());
+                    selectedPublicBookId = targetBook.id;
+                    selectedPublicLawId = targetLaw ? targetLaw.id : null;
+                    switchTab('gesetze');
+                }
+            });
+        });
+    }
+
+    document.getElementById('detail-paragraphen').addEventListener('input', renderDetailParaBadges);
 
     document.getElementById('btn-copy-az').addEventListener('click', async () => {
         if (!currentSelectedAz) return;
