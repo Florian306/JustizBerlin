@@ -1610,6 +1610,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const editLawTextInput = document.getElementById('edit-law-text');
     const editLawLivePreview = document.getElementById('edit-law-live-preview');
 
+    document.getElementById('btn-edit-insert-bold').addEventListener('click', () => {
+        wrapSelection(editLawTextInput, '**', '**');
+    });
+
+    document.getElementById('btn-edit-insert-underline').addEventListener('click', () => {
+        wrapSelection(editLawTextInput, '__', '__');
+    });
+
+    document.getElementById('btn-edit-insert-nr').addEventListener('click', () => {
+        const matches = editLawTextInput.value.match(/^\d+\./gm);
+        const nextNr = (matches ? matches.length : 0) + 1;
+        const prefix = editLawTextInput.value && !editLawTextInput.value.endsWith('\n') ? '\n' : '';
+        insertAtCursor(editLawTextInput, `${prefix}${nextNr}. `);
+    });
+
     document.getElementById('btn-edit-insert-absatz').addEventListener('click', () => {
         const matches = editLawTextInput.value.match(/\(\d+\)/g);
         const nextAbs = (matches ? matches.length : 0) + 1;
