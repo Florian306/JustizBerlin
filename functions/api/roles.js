@@ -31,6 +31,25 @@ export async function onRequestGet(context) {
             });
             if (dcRes.ok) {
                 const dcRoles = await dcRes.json();
+
+                // Mitglieder abrufen (benötigt Server Members Intent im Discord Bot)
+                let membersByRole = {};
+                try {
+                    const memRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, {
+                        headers: { Authorization: `Bot ${botToken}` }
+                    });
+                    if (memRes.ok) {
+                        const members = await memRes.json();
+                        members.forEach(m => {
+                            const mName = m.nick || m.user?.global_name || m.user?.username || m.user?.id;
+                            (m.roles || []).forEach(rId => {
+                                if (!membersByRole[rId]) membersByRole[rId] = [];
+                                membersByRole[rId].push(mName);
+                            });
+                        });
+                    }
+                } catch {}
+
                 const merged = dcRoles
                     .filter(r => r.name !== '@everyone' && !r.managed)
                     .sort((a, b) => b.position - a.position)
@@ -39,7 +58,8 @@ export async function onRequestGet(context) {
                         return {
                             id: r.id,
                             name: r.name,
-                            perms: saved ? saved.perms : []
+                            perms: saved ? saved.perms : [],
+                            members: membersByRole[r.id] || []
                         };
                     });
                 return Response.json(merged);

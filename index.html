@@ -759,7 +759,8 @@
                             <thead>
                                 <tr>
                                     <th>Bezeichnung</th>
-                                    <th>Discord-Rollen-ID</th>
+                                    <th>Mitglieder</th>
+                                    <th style="text-align:center;">Login</th>
                                     <th style="text-align:center;">Akten sehen</th>
                                     <th style="text-align:center;">Status / PDF</th>
                                     <th style="text-align:center;">Akten löschen</th>
@@ -769,6 +770,40 @@
                                 </tr>
                             </thead>
                             <tbody id="intern-roles-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <hr class="divider">
+                    <h3 class="section-heading">Benutzer-Sperrliste (Zugang sperren)</h3>
+                    <form id="form-ban-user" class="official-form">
+                        <div class="meta-grid-3">
+                            <div class="form-row">
+                                <label for="ban-user-id">Discord-User-ID <span class="req">*</span></label>
+                                <input type="text" id="ban-user-id" required placeholder="z. B. 345678901234567890">
+                            </div>
+                            <div class="form-row">
+                                <label for="ban-user-name">Name (optional)</label>
+                                <input type="text" id="ban-user-name" placeholder="z. B. Max Mustermann">
+                            </div>
+                            <div class="form-row">
+                                <label for="ban-user-reason">Grund (optional)</label>
+                                <input type="text" id="ban-user-reason" placeholder="z. B. Ausgeschieden / Missbrauch">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-secondary btn-danger-outline btn-small">Benutzer sperren</button>
+                    </form>
+                    <div class="table-responsive">
+                        <table class="official-table">
+                            <thead>
+                                <tr>
+                                    <th>Discord-User-ID</th>
+                                    <th>Name</th>
+                                    <th>Grund</th>
+                                    <th>Gesperrt am</th>
+                                    <th>Aktion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="intern-bans-tbody"></tbody>
                         </table>
                     </div>
                 </div>

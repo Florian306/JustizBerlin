@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderLogsIntern();
             } else if (btn.dataset.subtab === 'roles') {
                 renderRolesIntern();
+                renderBansIntern();
             }
         });
     });
@@ -2131,14 +2132,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             roles.forEach(role => {
                 const tr = document.createElement('tr');
+                const hasLogin = role.perms.includes('login');
                 const hasAkten = role.perms.includes('akten');
                 const hasAktenEdit = role.perms.includes('akten_edit');
                 const hasAktenDelete = role.perms.includes('akten_delete');
                 const hasGesetze = role.perms.includes('gesetze');
                 const hasLogs = role.perms.includes('logs');
+                const membersText = (role.members && role.members.length > 0)
+                    ? `${role.members.length}: ${role.members.slice(0, 5).join(', ')}${role.members.length > 5 ? ' …' : ''}`
+                    : '<span style="color:#888;">–</span>';
                 tr.innerHTML = `
-                    <td><strong>${escapeHtml(role.name)}</strong></td>
-                    <td class="mono-bold">${escapeHtml(role.id)}</td>
+                    <td><strong>${escapeHtml(role.name)}</strong><br><small class="mono-bold" style="color:#666;">${escapeHtml(role.id)}</small></td>
+                    <td style="font-size:12.5px; max-width:220px;">${role.members && role.members.length > 0 ? escapeHtml(membersText) : membersText}</td>
+                    <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="login" ${hasLogin ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten" ${hasAkten ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten_edit" ${hasAktenEdit ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
                     <td style="text-align:center;"><input type="checkbox" class="role-perm-cb" data-id="${escapeHtml(role.id)}" data-perm="akten_delete" ${hasAktenDelete ? 'checked' : ''} style="width:auto; cursor:pointer;"></td>
@@ -2201,6 +2207,57 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => msg.classList.add('hidden'), 2500);
             logActivity('Rolle hinzugefügt', `Discord-Rolle "${name}" (${id}) angelegt.`);
             renderRolesIntern();
+        }
+    });
+
+    async function renderBansIntern() {
+        const tbody = document.getElementById('intern-bans-tbody');
+        try {
+            const res = await fetch('/api/bans');
+            if (!res.ok) return;
+            const bans = await res.json();
+            tbody.innerHTML = '';
+            if (bans.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">Keine Benutzer gesperrt.</td></tr>';
+                return;
+            }
+            bans.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="mono-bold">${escapeHtml(b.user_id)}</td>
+                    <td>${escapeHtml(b.name)}</td>
+                    <td>${escapeHtml(b.reason)}</td>
+                    <td>${escapeHtml(b.bannedAt)}</td>
+                    <td><button type="button" class="btn-secondary btn-small btn-unban" data-id="${escapeHtml(b.user_id)}">Entsperren</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            tbody.querySelectorAll('.btn-unban').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await fetch(`/api/bans?id=${encodeURIComponent(btn.dataset.id)}`, { method: 'DELETE' });
+                    logActivity('Benutzer entsperrt', `Discord-User ${btn.dataset.id} entsperrt.`);
+                    renderBansIntern();
+                });
+            });
+        } catch {}
+    }
+
+    document.getElementById('form-ban-user').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const user_id = document.getElementById('ban-user-id').value.trim();
+        const name = document.getElementById('ban-user-name').value.trim();
+        const reason = document.getElementById('ban-user-reason').value.trim();
+        if (!user_id) return;
+
+        const res = await fetch('/api/bans', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id, name, reason })
+        });
+        if (res.ok) {
+            e.target.reset();
+            logActivity('Benutzer gesperrt', `Discord-User ${user_id} (${name || 'ohne Name'}) gesperrt.`);
+            renderBansIntern();
         }
     });
 

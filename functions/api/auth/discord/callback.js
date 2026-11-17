@@ -59,6 +59,14 @@ export async function onRequestGet(context) {
     const discordUser = await userRes.json();
     const displayName = discordUser.global_name || discordUser.username;
 
+    // Sperrliste prüfen
+    try {
+        const banned = await context.env.DB.prepare('SELECT * FROM banned_users WHERE user_id = ?').bind(discordUser.id).first();
+        if (banned) {
+            return new Response(`Zugriff gesperrt: Dein Account wurde für das Dienstportal gesperrt (Grund: ${banned.reason || 'Keine Angabe'}).`, { status: 403 });
+        }
+    } catch {}
+
     // 3. Rollen auf dem Server prüfen (falls Bot-Token & Guild-ID gesetzt)
     let permissions = [];
     if (botToken && guildId) {
@@ -87,6 +95,9 @@ export async function onRequestGet(context) {
                     } catch {}
                 }
             });
+            if (!permSet.has('login')) {
+                return new Response('Zugriff verweigert: Keine deiner Discord-Rollen hat die Berechtigung zum Anmelden.', { status: 403 });
+            }
             permissions = Array.from(permSet);
         } else {
             // Fallback auf Environment Variables oder Vollzugriff wenn noch nichts konfiguriert
