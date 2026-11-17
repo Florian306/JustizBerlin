@@ -736,14 +736,18 @@ a:hover {
 
 .law-ref-link {
     display: inline-block;
+    text-indent: 0;
+    margin: 0 3px;
     background-color: #E8EEF5;
     color: var(--link-blue);
-    padding: 1px 6px;
+    padding: 1px 7px;
     border-radius: 3px;
     font-weight: 600;
     font-size: 13px;
+    line-height: 1.4;
     text-decoration: none;
     border: 1px solid #C5D5E8;
+    vertical-align: baseline;
 }
 
 .law-ref-link:hover {
