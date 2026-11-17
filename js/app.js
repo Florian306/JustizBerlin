@@ -700,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const loginError = document.getElementById('login-error');
 
-    function applyLoggedInUI(user, permissions = ['akten', 'akten_edit', 'akten_delete', 'gesetze', 'logs']) {
+    function applyLoggedInUI(user, permissions = ['login', 'akten', 'akten_edit', 'akten_delete', 'gesetze', 'logs', 'roles']) {
         isLoggedIn = true;
         loginError.classList.add('hidden');
         loginView.classList.add('hidden');
