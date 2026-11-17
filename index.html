@@ -138,10 +138,11 @@
                         <option value="Antrag auf Haftbefehl / Durchsuchungsbeschluss">Antrag auf Haftbefehl / Durchsuchungsbeschluss</option>
                         <option value="Zivilrechtliche Schlichtung / Verbraucherschutz-Beschwerde">Zivilrechtliche Schlichtung / Verbraucherschutz-Beschwerde</option>
                         <option value="Bewerbung als ehrenamtliche/r Schöffe/in">Bewerbung als ehrenamtliche/r Schöffe/in</option>
+                        <option value="Antrag auf Akteneinsicht / Verteidigeranzeige">Antrag auf Akteneinsicht / Verteidigeranzeige (Rechtsanwälte)</option>
                     </select>
                 </div>
 
-                <div class="form-grid-2">
+                <div class="meta-grid-3">
                     <div class="form-row">
                         <label for="antrag-vorname">Vorname (Antragsteller / Sachbearbeiter) <span class="req">*</span></label>
                         <input type="text" id="antrag-vorname" required placeholder="z. B. Max">
@@ -149,6 +150,10 @@
                     <div class="form-row">
                         <label for="antrag-nachname">Nachname <span class="req">*</span></label>
                         <input type="text" id="antrag-nachname" required placeholder="z. B. Mustermann">
+                    </div>
+                    <div class="form-row">
+                        <label for="antrag-kontakt">Telefonnummer (IC) / Discord-Name <span class="req">*</span></label>
+                        <input type="text" id="antrag-kontakt" required placeholder="z. B. 555-1234 / @max.rp">
                     </div>
                 </div>
 
@@ -181,7 +186,7 @@
                 <div class="form-row">
                     <label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
                         <input type="checkbox" id="antrag-wahrheit" required style="width: auto; margin-top: 3px;">
-                        <span>Ich versichere, sämtliche Angaben nach bestem Wissen und Gewissen wahrheitsgemäß gemacht zu haben (Hinweis auf § 164 StGB – Falsche Verdächtigung). <span class="req">*</span></span>
+                        <span id="lbl-wahrheit-text">Ich versichere, sämtliche Angaben nach bestem Wissen und Gewissen wahrheitsgemäß gemacht zu haben (Hinweis auf § 164 StGB – Falsche Verdächtigung).</span> <span class="req">*</span>
                     </label>
                 </div>
 

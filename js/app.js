@@ -202,18 +202,28 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateDynamicFormFields() {
         const typ = antragTypSelect.value;
         const lblBehoerde = document.getElementById('lbl-behoerde');
+        const inpBehoerde = document.getElementById('antrag-behoerde');
         const lblBeteiligter = document.getElementById('lbl-beteiligter');
+        const inpBeteiligter = document.getElementById('antrag-beteiligter');
         const rowBeteiligter = document.getElementById('row-beteiligter');
         const lblSachverhalt = document.getElementById('lbl-sachverhalt');
+        const inpSachverhalt = document.getElementById('antrag-sachverhalt');
+        const lblWahrheit = document.getElementById('lbl-wahrheit-text');
 
         extraFieldsContainer.innerHTML = '';
         extraFieldsContainer.classList.add('hidden');
         rowBeteiligter.classList.remove('hidden');
 
+        // Standard-Texte zurücksetzen
+        lblWahrheit.textContent = 'Ich versichere, sämtliche Angaben nach bestem Wissen und Gewissen wahrheitsgemäß gemacht zu haben (Hinweis auf § 164 StGB – Falsche Verdächtigung).';
+
         if (typ.includes('Strafanzeige')) {
             lblBehoerde.textContent = 'Dienststelle / Anschrift';
+            inpBehoerde.placeholder = 'z. B. Polizei Berlin LKA 41 oder Wohnanschrift';
             lblBeteiligter.textContent = 'Tatverdächtige/r / Beschuldigte/r';
+            inpBeteiligter.placeholder = 'Name des Beschuldigten (falls bekannt)';
             lblSachverhalt.innerHTML = 'Tathergang / Ermittlungsergebnis <span class="req">*</span>';
+            inpSachverhalt.placeholder = 'Schildern Sie den Tathergang sachlich und vollständig (Ort, Zeit, Tatvorwurf)...';
             extraFieldsContainer.innerHTML = `
                 <div class="form-grid-2">
                     <div class="form-row">
@@ -229,8 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
             extraFieldsContainer.classList.remove('hidden');
         } else if (typ.includes('Haftbefehl')) {
             lblBehoerde.textContent = 'Antragstellende Dienststelle / StA';
+            inpBehoerde.placeholder = 'z. B. Polizei Berlin LKA 41 / StA Berlin';
             lblBeteiligter.textContent = 'Zielperson / Beschuldigte/r';
+            inpBeteiligter.placeholder = 'Name und Geburtsdatum der Zielperson';
             lblSachverhalt.innerHTML = 'Dringender Tatverdacht &amp; Begründung <span class="req">*</span>';
+            inpSachverhalt.placeholder = 'Begründen Sie den dringenden Tatverdacht und die beantragte Maßnahme...';
             extraFieldsContainer.innerHTML = `
                 <div class="form-row">
                     <label for="extra-haftgrund">Haftgrund / Dringlichkeit</label>
@@ -240,8 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
             extraFieldsContainer.classList.remove('hidden');
         } else if (typ.includes('Schlichtung')) {
             lblBehoerde.textContent = 'Wohnanschrift';
+            inpBehoerde.placeholder = 'z. B. Musterstraße 12, 10115 Berlin';
             lblBeteiligter.textContent = 'Antragsgegner / Unternehmen';
+            inpBeteiligter.placeholder = 'Name des Antragsgegners oder Unternehmens';
             lblSachverhalt.innerHTML = 'Streitgegenstand / Beschwerde <span class="req">*</span>';
+            inpSachverhalt.placeholder = 'Schildern Sie den Streitgegenstand und Ihre Forderung...';
             extraFieldsContainer.innerHTML = `
                 <div class="form-row">
                     <label for="extra-streitwert">Streitwert / Forderung (in EUR)</label>
@@ -251,8 +267,11 @@ document.addEventListener('DOMContentLoaded', () => {
             extraFieldsContainer.classList.remove('hidden');
         } else if (typ.includes('Schöffe')) {
             lblBehoerde.textContent = 'Meldeanschrift in Berlin';
+            inpBehoerde.placeholder = 'z. B. Musterstraße 12, 10115 Berlin';
             rowBeteiligter.classList.add('hidden');
             lblSachverhalt.innerHTML = 'Motivation &amp; Eignung <span class="req">*</span>';
+            inpSachverhalt.placeholder = 'Warum möchten Sie das Schöffenamt ausüben? Kurze Darstellung Ihrer Eignung...';
+            lblWahrheit.textContent = 'Ich versichere, dass keine Vorstrafen vorliegen und alle Angaben wahrheitsgemäß sind.';
             extraFieldsContainer.innerHTML = `
                 <div class="form-grid-2">
                     <div class="form-row">
@@ -263,6 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         <label for="extra-beruf">Beruf / Tätigkeit</label>
                         <input type="text" id="extra-beruf" placeholder="z. B. Kaufmann / Angestellte">
                     </div>
+                </div>
+            `;
+            extraFieldsContainer.classList.remove('hidden');
+        } else if (typ.includes('Akteneinsicht')) {
+            lblBehoerde.textContent = 'Kanzlei / Anschrift';
+            inpBehoerde.placeholder = 'z. B. Kanzlei Dr. Baumann, Kurfürstendamm 12';
+            lblBeteiligter.textContent = 'Mandant / Beschuldigte/r';
+            inpBeteiligter.placeholder = 'Name des vertretenen Mandanten';
+            lblSachverhalt.innerHTML = 'Begründung / Umfang der Akteneinsicht <span class="req">*</span>';
+            inpSachverhalt.placeholder = 'Beantragt wird vollständige Akteneinsicht gemäß § 147 StPO...';
+            lblWahrheit.textContent = 'Ich versichere, dass eine ordnungsgemäße Verteidigungsvollmacht vorliegt und alle Angaben wahrheitsgemäß sind.';
+            extraFieldsContainer.innerHTML = `
+                <div class="form-row">
+                    <label for="extra-az">Bestehendes Aktenzeichen (falls vorhanden)</label>
+                    <input type="text" id="extra-az" placeholder="z. B. 204/26 StA">
                 </div>
             `;
             extraFieldsContainer.classList.remove('hidden');
@@ -354,6 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const typ = antragTypSelect.value;
         const vorname = document.getElementById('antrag-vorname').value.trim();
         const nachname = document.getElementById('antrag-nachname').value.trim();
+        const kontakt = document.getElementById('antrag-kontakt').value.trim();
         const behoerde = document.getElementById('antrag-behoerde').value.trim() || 'Keine Angabe';
         const beteiligter = document.getElementById('antrag-beteiligter').value.trim() || 'Keine Angabe';
         let sachverhalt = document.getElementById('antrag-sachverhalt').value.trim();
@@ -383,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
             typ,
             vorname,
             nachname,
+            kontakt,
             behoerde,
             beteiligter,
             sachverhalt,
@@ -766,7 +802,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentSelectedAz = az;
         document.getElementById('detail-az').textContent = akte.az;
-        document.getElementById('detail-name').textContent = `${akte.vorname} ${akte.nachname}`;
+        const kontaktInfo = akte.kontakt ? ` (${akte.kontakt})` : '';
+        document.getElementById('detail-name').textContent = `${akte.vorname} ${akte.nachname}${kontaktInfo}`;
         document.getElementById('detail-behoerde').textContent = akte.behoerde;
         document.getElementById('detail-beteiligter').textContent = akte.beteiligter;
         document.getElementById('detail-sachverhalt').textContent = akte.sachverhalt;
