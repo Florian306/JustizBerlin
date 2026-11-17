@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`subtab-${btn.dataset.subtab}`).classList.add('active');
             if (btn.dataset.subtab === 'gesetze-admin') {
                 renderGesetzeIntern();
+            } else if (btn.dataset.subtab === 'docgen') {
+                renderDocGenTab();
             } else if (btn.dataset.subtab === 'logs') {
                 renderLogsIntern();
             } else if (btn.dataset.subtab === 'roles') {
@@ -747,11 +749,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('logged-user-display').textContent = user;
 
         const tabAkten = document.querySelector('.sub-tab[data-subtab="akten"]');
+        const tabDocGen = document.querySelector('.sub-tab[data-subtab="docgen"]');
         const tabGesetze = document.querySelector('.sub-tab[data-subtab="gesetze-admin"]');
         const tabLogs = document.querySelector('.sub-tab[data-subtab="logs"]');
         const tabRoles = document.querySelector('.sub-tab[data-subtab="roles"]');
 
         tabAkten.classList.toggle('hidden', !permissions.includes('akten'));
+        tabDocGen.classList.toggle('hidden', !permissions.includes('akten_edit'));
         tabGesetze.classList.toggle('hidden', !permissions.includes('gesetze'));
         tabLogs.classList.toggle('hidden', !permissions.includes('logs'));
         tabRoles.classList.toggle('hidden', !permissions.includes('roles'));
@@ -2453,6 +2457,65 @@ document.addEventListener('DOMContentLoaded', () => {
             logActivity('Benutzer gesperrt', `Discord-User ${user_id} (${name || 'ohne Name'}) gesperrt.`);
             renderBansIntern();
         }
+    });
+
+    // --- Eigenständiger Haupt-Tab: Dokumenten-Generator ---
+    async function renderDocGenTab() {
+        const sel = document.getElementById('docgen-load-akte');
+        const dateInp = document.getElementById('docgen-date');
+        if (!dateInp.value) {
+            dateInp.value = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+        const akten = await AktenAPI.getAll();
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">-- Frei ausfüllen (ohne Akte) --</option>';
+        akten.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a.az;
+            opt.textContent = `${a.az} – ${a.beteiligter || a.nachname} (${a.typ})`;
+            sel.appendChild(opt);
+        });
+        if (prev) sel.value = prev;
+    }
+
+    document.getElementById('docgen-load-akte').addEventListener('change', async (e) => {
+        const az = e.target.value;
+        if (!az) return;
+        const akten = await AktenAPI.getAll();
+        const a = akten.find(x => x.az === az);
+        if (!a) return;
+        document.getElementById('docgen-az').value = a.az;
+        document.getElementById('docgen-target').value = a.beteiligter || `${a.vorname} ${a.nachname}`;
+        document.getElementById('docgen-laws').value = a.paragraphen || '';
+        document.getElementById('docgen-signer').value = a.bearbeiter || document.getElementById('logged-user-display').textContent || '';
+        document.getElementById('docgen-body').value = a.sachverhalt || '';
+    });
+
+    document.getElementById('btn-docgen-print').addEventListener('click', () => {
+        const docType = document.getElementById('docgen-type').value;
+        const az = document.getElementById('docgen-az').value.trim() || 'Ohne Az.';
+        const datum = document.getElementById('docgen-date').value.trim() || new Date().toLocaleDateString('de-DE');
+        const target = document.getElementById('docgen-target').value.trim() || 'Unbekannt';
+        const laws = document.getElementById('docgen-laws').value.trim();
+        const extra = document.getElementById('docgen-extra').value.trim();
+        const signer = document.getElementById('docgen-signer').value.trim() || 'Senatsverwaltung für Justiz und Verbraucherschutz';
+        const bodyText = document.getElementById('docgen-body').value.trim();
+        const legalText = document.getElementById('docgen-legal').value.trim();
+
+        document.getElementById('print-az').textContent = az;
+        document.getElementById('print-datum').textContent = datum;
+        document.getElementById('print-doc-title').textContent = docType.toUpperCase();
+        document.getElementById('print-signer').textContent = signer;
+
+        let html = `<p><strong>Betroffene Person / Adressat:</strong> ${escapeHtml(target)}</p>`;
+        if (laws) html += `<p><strong>Tatvorwurf / Angewandte Vorschriften:</strong> ${escapeHtml(laws)}</p>`;
+        if (extra) html += `<p><strong>Anordnung / Maßnahme / Rechtsfolge:</strong> ${escapeHtml(extra)}</p>`;
+        html += `<p style="margin-top: 16px;"><strong>Begründung / Beschlusstext:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(bodyText)}</span></p>`;
+        if (legalText) html += `<p style="margin-top: 18px; font-size: 10.5pt; border-top: 1px solid #999; padding-top: 10px;"><strong>Rechtsmittelbelehrung / Hinweis:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(legalText)}</span></p>`;
+
+        document.getElementById('print-doc-body').innerHTML = html;
+        logActivity('Dokument erstellt', `${docType} (Az. ${az}) im Dokumenten-Generator gedruckt.`);
+        window.print();
     });
 
     function escapeHtml(str) {

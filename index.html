@@ -353,6 +353,7 @@
                 <!-- Sub-Navigation im Dienstportal -->
                 <div class="sub-nav" role="tablist">
                     <button type="button" class="sub-tab active" data-subtab="akten">Aktenverwaltung</button>
+                    <button type="button" class="sub-tab" data-subtab="docgen">Dokumenten-Generator</button>
                     <button type="button" class="sub-tab" data-subtab="gesetze-admin">Gesetzessammlung verwalten</button>
                     <button type="button" class="sub-tab" data-subtab="logs">Aktivitäts-Log</button>
                     <button type="button" class="sub-tab" data-subtab="roles">Rollenverwaltung</button>
@@ -615,6 +616,76 @@
                         </div>
                     </div>
                 </div>
+                </div>
+
+                <!-- Eigenständiger Haupt-Tab: Dokumenten-Generator -->
+                <div id="subtab-docgen" class="subtab-panel">
+                    <h3 class="section-heading">Amtlicher Dokumenten-Generator</h3>
+                    <p class="intro-text">Erstelle Haftbefehle, Durchsuchungsbeschlüsse, Strafbefehle oder freie Verfügungen – unabhängig von einer offenen Akte oder optional mit Daten aus einer bestehenden Akte.</p>
+
+                    <div class="official-form">
+                        <div class="meta-grid-3">
+                            <div class="form-row">
+                                <label for="docgen-load-akte">Daten aus Akte übernehmen (optional)</label>
+                                <select id="docgen-load-akte">
+                                    <option value="">-- Frei ausfüllen (ohne Akte) --</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="docgen-type">Dokumentenart <span class="req">*</span></label>
+                                <select id="docgen-type">
+                                    <option value="Haftbefehl">Haftbefehl (§ 112 StPO)</option>
+                                    <option value="Durchsuchungsbeschluss">Durchsuchungsbeschluss (§ 102 StPO)</option>
+                                    <option value="Strafbefehl">Strafbefehl (§ 407 StPO)</option>
+                                    <option value="Einstellungsverfügung">Einstellungsverfügung (§ 170 Abs. 2 StPO)</option>
+                                    <option value="Schöffen-Ladung">Ladung zum Schöffendienst (§ 45 GVG)</option>
+                                    <option value="Freier Beschluss">Freier Beschluss / Amtliche Verfügung</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="docgen-az">Aktenzeichen / Geschäftszeichen <span class="req">*</span></label>
+                                <input type="text" id="docgen-az" placeholder="z. B. 204/26 StA">
+                            </div>
+                        </div>
+
+                        <div class="meta-grid-3">
+                            <div class="form-row">
+                                <label for="docgen-date">Ausstellungsdatum</label>
+                                <input type="text" id="docgen-date" placeholder="TT.MM.JJJJ">
+                            </div>
+                            <div class="form-row">
+                                <label for="docgen-target">Adressat / Betroffene Person <span class="req">*</span></label>
+                                <input type="text" id="docgen-target" placeholder="Name, ggf. Geburtsdatum &amp; Anschrift">
+                            </div>
+                            <div class="form-row">
+                                <label for="docgen-laws">Tatvorwurf / Angewandte Paragraphen</label>
+                                <input type="text" id="docgen-laws" placeholder="z. B. StGB § 2, StPO § 1">
+                            </div>
+                        </div>
+
+                        <div class="form-grid-2">
+                            <div class="form-row">
+                                <label for="docgen-extra">Haftgrund / Objekt / Geldstrafe / Termin</label>
+                                <input type="text" id="docgen-extra" placeholder="z. B. Fluchtgefahr (§ 112 StPO) oder 2.500 EUR Geldstrafe">
+                            </div>
+                            <div class="form-row">
+                                <label for="docgen-signer">Unterzeichner / Ausstellende Stelle</label>
+                                <input type="text" id="docgen-signer" placeholder="z. B. Richter/in am Amtsgericht Tiergarten">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="docgen-body">Begründung / Beschlusstext <span class="req">*</span></label>
+                            <textarea id="docgen-body" rows="6" placeholder="Ausführliche Begründung, Sachverhalt und Anordnung..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="docgen-legal">Rechtsmittelbelehrung / Zusatzhinweis (optional)</label>
+                            <textarea id="docgen-legal" rows="2" placeholder="z. B. Gegen diesen Beschluss ist das Rechtsmittel der Beschwerde zulässig..."></textarea>
+                        </div>
+
+                        <button type="button" id="btn-docgen-print" class="btn-primary">Amtliches Dokument drucken / als PDF speichern</button>
+                    </div>
                 </div>
 
                 <!-- Gesetzessammlung verwalten -->
