@@ -1690,7 +1690,13 @@ document.addEventListener('DOMContentLoaded', () => {
         html = html.replace(/\[\[([^\]]+)\]\]/g, (match, ref) => {
             return `<a href="#gesetze" class="law-ref-link" data-ref="${ref}">${ref}</a>`;
         });
-        return html;
+        const lines = html.split('\n');
+        return lines.map(line => {
+            if (/^\s*[•\-]\s+/.test(line)) {
+                return `<div class="law-bullet-item">${line.trim()}</div>`;
+            }
+            return line;
+        }).join('\n');
     }
 
     // @-Autocomplete & Editor-Toolbar für Gesetzestext

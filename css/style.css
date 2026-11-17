@@ -696,6 +696,12 @@ a:hover {
     line-height: 1.6;
 }
 
+.law-bullet-item {
+    padding-left: 20px;
+    text-indent: -12px;
+    margin: 2px 0;
+}
+
 .editor-toolbar {
     display: flex;
     gap: 6px;
