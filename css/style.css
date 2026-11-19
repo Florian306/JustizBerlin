@@ -30,6 +30,63 @@ body {
     line-height: 1.55;
     color: var(--text-main);
     background-color: #FCFCFD;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark Mode (Nachtdienst) */
+body.dark-mode {
+    --bg-white: #1E2227;
+    --bg-light: #262B31;
+    --bg-medium: #30363E;
+    --text-main: #E8ECEF;
+    --text-muted: #A4AEB8;
+    --accent-red: #E04848;
+    --link-blue: #63A4FF;
+    --border-gray: #3B424C;
+    --border-dark: #4E5764;
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.45);
+    background-color: #14171A;
+}
+
+body.dark-mode .official-table tbody tr:nth-child(even) {
+    background-color: #23282E;
+}
+
+body.dark-mode .type-card.active,
+body.dark-mode .law-toc-list a.active,
+body.dark-mode .official-table tbody tr.active-row {
+    background-color: #253345 !important;
+}
+
+body.dark-mode .law-ref-link {
+    background-color: #253345;
+    border-color: #3B5475;
+    color: #7DB6FF;
+}
+
+body.dark-mode .btn-primary {
+    background-color: #2563EB;
+    border-color: #2563EB;
+}
+
+body.dark-mode .btn-primary:hover {
+    background-color: #1D4ED8;
+}
+
+.darkmode-toggle {
+    background: none;
+    border: 1px solid #555;
+    color: #FFFFFF;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.darkmode-toggle:hover {
+    background-color: #333;
 }
 
 a {

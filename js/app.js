@@ -2,6 +2,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSelectedAz = null;
     let isLoggedIn = false;
 
+    // --- Dark Mode Schalter ---
+    const darkBtn = document.getElementById('btn-darkmode');
+    function applyDarkMode(enabled) {
+        document.body.classList.toggle('dark-mode', enabled);
+        if (darkBtn) darkBtn.textContent = enabled ? '☀️ Hellmodus' : '🌙 Dunkelmodus';
+    }
+    applyDarkMode(localStorage.getItem('justiz_darkmode') === '1');
+    if (darkBtn) {
+        darkBtn.addEventListener('click', () => {
+            const next = !document.body.classList.contains('dark-mode');
+            localStorage.setItem('justiz_darkmode', next ? '1' : '0');
+            applyDarkMode(next);
+        });
+    }
+
     // --- Tab-Navigation (mit Zustandserhalt über Reload) ---
     const navTabs = document.querySelectorAll('.nav-tab');
     const tabPanels = document.querySelectorAll('.tab-panel');
