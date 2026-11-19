@@ -1890,8 +1890,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-edit-insert-nr').addEventListener('click', () => {
-        const matches = editLawTextInput.value.match(/^\d+\./gm);
-        const nextNr = (matches ? matches.length : 0) + 1;
+        const nextNr = getNextNrInCurrentAbsatz(editLawTextInput);
         const prefix = editLawTextInput.value && !editLawTextInput.value.endsWith('\n') ? '\n' : '';
         insertAtCursor(editLawTextInput, `${prefix}${nextNr}. `);
     });
@@ -2165,9 +2164,16 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapSelection(lawTextInput, '__', '__');
     });
 
+    function getNextNrInCurrentAbsatz(textarea) {
+        const beforeCursor = textarea.value.slice(0, textarea.selectionStart);
+        const absatzSplits = beforeCursor.split(/^\(\d+\)/m);
+        const currentChunk = absatzSplits[absatzSplits.length - 1] || '';
+        const matches = currentChunk.match(/^\d+\./gm);
+        return (matches ? matches.length : 0) + 1;
+    }
+
     document.getElementById('btn-insert-nr').addEventListener('click', () => {
-        const matches = lawTextInput.value.match(/^\d+\./gm);
-        const nextNr = (matches ? matches.length : 0) + 1;
+        const nextNr = getNextNrInCurrentAbsatz(lawTextInput);
         const prefix = lawTextInput.value && !lawTextInput.value.endsWith('\n') ? '\n' : '';
         insertAtCursor(lawTextInput, `${prefix}${nextNr}. `);
     });
