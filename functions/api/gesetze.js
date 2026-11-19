@@ -40,9 +40,13 @@ export async function onRequestGet(context) {
     await ensureGesetzeTables(context.env.DB);
     const booksRes = await context.env.DB.prepare('SELECT * FROM books ORDER BY rowid ASC').all();
     const lawsRes = await context.env.DB.prepare('SELECT * FROM laws ORDER BY id ASC').all();
+    const normalizedLaws = (lawsRes.results || []).map(l => ({
+        ...l,
+        paragraph: l.paragraph && !/^(§|Art\.)/i.test(l.paragraph.trim()) ? `§ ${l.paragraph.trim()}` : l.paragraph
+    }));
     return Response.json({
         books: booksRes.results,
-        laws: lawsRes.results
+        laws: normalizedLaws
     });
 }
 
@@ -70,6 +74,8 @@ export async function onRequestPost(context) {
             ).bind(body.bookId).first();
             const nextNum = (countRes?.cnt || 0) + 1;
             paragraph = `§ ${nextNum}`;
+        } else if (!/^(§|Art\.)/i.test(paragraph)) {
+            paragraph = `§ ${paragraph}`;
         }
 
         const res = await context.env.DB.prepare(
@@ -98,13 +104,18 @@ export async function onRequestPatch(context) {
     const body = await context.request.json();
     const today = getTodayDE();
 
+    let paragraph = (body.paragraph || '').trim();
+    if (paragraph && !/^(§|Art\.)/i.test(paragraph)) {
+        paragraph = `§ ${paragraph}`;
+    }
+
     await context.env.DB.prepare(
         'UPDATE laws SET paragraph = ?, title = ?, text = ?, updatedAt = ?, section = ? WHERE id = ?'
-    ).bind(body.paragraph, body.title, body.text, today, (body.section || '').trim(), Number(body.id)).run();
+    ).bind(paragraph, body.title, body.text, today, (body.section || '').trim(), Number(body.id)).run();
 
     return Response.json({
         id: Number(body.id),
-        paragraph: body.paragraph,
+        paragraph,
         title: body.title,
         text: body.text,
         updatedAt: today,
