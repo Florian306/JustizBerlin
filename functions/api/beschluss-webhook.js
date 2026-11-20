@@ -1,9 +1,15 @@
-import { getSessionFromRequest, jsonResponse } from './_session.js';
-import { sendDiscordEmbed } from './_webhook.js';
+import { verifySession } from './_session.js';
+
+function jsonResponse(data, status = 200) {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: { 'Content-Type': 'application/json; charset=utf-8' }
+    });
+}
 
 export async function onRequestPost(context) {
     const { request, env } = context;
-    const session = await getSessionFromRequest(request, env);
+    const session = await verifySession(context);
     if (!session) return jsonResponse({ error: 'Nicht angemeldet' }, 401);
 
     const webhookUrl = env.DISCORD_BESCHLUSS_WEBHOOK || env.DISCORD_BEKANNTMACHUNGEN_WEBHOOK;
@@ -38,10 +44,18 @@ export async function onRequestPost(context) {
         `👉 **Online-Prüfung & Vorgangsauskunft:** ${verifyUrl}`
     ].filter(Boolean).join('\n');
 
-    await sendDiscordEmbed(webhookUrl, {
-        title: `${emoji} Amtlicher ${docType} erlassen`,
-        description: lines,
-        color
+    await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: 'Senatsverwaltung für Justiz und Verbraucherschutz',
+            embeds: [{
+                title: `${emoji} Amtlicher ${docType} erlassen`,
+                description: lines,
+                color,
+                footer: { text: 'ℹ️ Fiktives Roleplay-Projekt · Senatsverwaltung für Justiz und Verbraucherschutz – Land Berlin' }
+            }]
+        })
     });
 
     return jsonResponse({ ok: true });
