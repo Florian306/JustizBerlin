@@ -69,7 +69,8 @@ export async function onRequestPost(context) {
             title: `Gesetzbuch veröffentlicht: ${body.title}`,
             description: `Das Gesetzbuch **${body.title}** (${body.short}) wurde neu in die Berliner Gesetzessammlung aufgenommen und ist ab sofort öffentlich einsehbar.`,
             az: body.short,
-            datum: today
+            datum: today,
+            link: `https://justizberlin.pages.dev/#gesetze/${encodeURIComponent(id)}`
         });
 
         return Response.json({ id, title: body.title, short: body.short, createdAt: today }, { status: 201 });

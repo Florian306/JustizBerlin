@@ -30,7 +30,8 @@ export async function onRequestPatch(context) {
             title: `${status} (${current.typ})`,
             description: `Im Verfahren **${az}** wurde der Status auf **${status}** gesetzt.`,
             az,
-            datum: current.datum
+            datum: current.datum,
+            link: 'https://justizberlin.pages.dev/#auskunft'
         });
     }
 
