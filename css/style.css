@@ -1348,7 +1348,7 @@ a:hover {
 @media print {
     @page {
         size: A4;
-        margin: 14mm 18mm 14mm 22mm;
+        margin: 14mm 18mm 14mm 8mm;
     }
 
     body,
@@ -1375,25 +1375,25 @@ a:hover {
     /* DIN 5008 Falz- & Lochmarken */
     .print-fold-mark {
         position: fixed;
-        left: -17mm;
+        left: 0;
         height: 0;
-        border-top: 0.6pt solid #666666;
+        border-top: 0.75pt solid #444444;
         z-index: 5;
     }
 
     .print-fold-1 {
-        top: 85mm;
+        top: 91mm;
         width: 4.5mm;
     }
 
     .print-hole-mark {
-        top: 128.5mm;
+        top: 134.5mm;
         width: 6.5mm;
-        border-top-width: 0.9pt;
+        border-top-width: 1pt;
     }
 
     .print-fold-2 {
-        top: 190mm;
+        top: 196mm;
         width: 4.5mm;
     }
 
@@ -1448,7 +1448,7 @@ a:hover {
     .print-tbody-cell,
     .print-tfoot-cell {
         border: none;
-        padding: 0;
+        padding: 0 0 0 14mm;
         vertical-align: top;
     }
 
