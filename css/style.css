@@ -1348,7 +1348,7 @@ a:hover {
 @media print {
     @page {
         size: A4;
-        margin: 20mm 18mm 20mm 22mm;
+        margin: 14mm 18mm 14mm 22mm;
     }
 
     body,
@@ -1427,35 +1427,51 @@ a:hover {
         transform: rotate(-18deg);
     }
 
-    /* Wiederkehrende Kopf- & Fußzeile */
+    /* Wiederkehrende Kopf- & Fußzeile via Tabellen-Wrapper */
+    .print-page-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: none;
+        position: relative;
+        z-index: 1;
+    }
+
+    .print-page-table thead {
+        display: table-header-group;
+    }
+
+    .print-page-table tfoot {
+        display: table-footer-group;
+    }
+
+    .print-thead-cell,
+    .print-tbody-cell,
+    .print-tfoot-cell {
+        border: none;
+        padding: 0;
+        vertical-align: top;
+    }
+
     .print-running-header {
-        position: fixed;
-        top: -12mm;
-        left: 0;
-        right: 0;
         display: flex;
         justify-content: space-between;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 7.5pt;
         color: #555555;
         border-bottom: 0.5pt solid #CCCCCC;
-        padding-bottom: 2mm;
-        z-index: 2;
+        padding-bottom: 4px;
+        margin-bottom: 12px;
     }
 
     .print-running-footer {
-        position: fixed;
-        bottom: -12mm;
-        left: 0;
-        right: 0;
         display: flex;
         justify-content: space-between;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 7.5pt;
         color: #555555;
         border-top: 0.5pt solid #CCCCCC;
-        padding-top: 2mm;
-        z-index: 2;
+        padding-top: 4px;
+        margin-top: 14px;
     }
 
     .print-content-layer {
