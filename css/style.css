@@ -1348,16 +1348,19 @@ a:hover {
 @media print {
     @page {
         size: A4;
-        margin: 18mm 18mm 18mm 22mm;
+        margin: 20mm 18mm 20mm 22mm;
     }
 
-    body {
+    body,
+    body.dark-mode {
         margin: 0;
-        background-color: #FFFFFF;
-        color: #000000;
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
         font-family: "Times New Roman", Times, serif;
-        font-size: 12pt;
+        font-size: 11.5pt;
         line-height: 1.5;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .no-print {
@@ -1366,6 +1369,98 @@ a:hover {
 
     .print-only {
         display: block !important;
+        position: relative;
+    }
+
+    /* DIN 5008 Falz- & Lochmarken */
+    .print-fold-mark {
+        position: fixed;
+        left: -17mm;
+        height: 0;
+        border-top: 0.6pt solid #666666;
+        z-index: 5;
+    }
+
+    .print-fold-1 {
+        top: 85mm;
+        width: 4.5mm;
+    }
+
+    .print-hole-mark {
+        top: 128.5mm;
+        width: 6.5mm;
+        border-top-width: 0.9pt;
+    }
+
+    .print-fold-2 {
+        top: 190mm;
+        width: 4.5mm;
+    }
+
+    /* Dezentes Wasserzeichen */
+    .print-watermark {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.045;
+    }
+
+    .print-watermark-img {
+        width: 105mm;
+        height: 105mm;
+        object-fit: contain;
+        filter: grayscale(100%);
+    }
+
+    .print-watermark-text {
+        margin-top: 10mm;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 13pt;
+        font-weight: bold;
+        letter-spacing: 3px;
+        color: #000000;
+        transform: rotate(-18deg);
+    }
+
+    /* Wiederkehrende Kopf- & Fußzeile */
+    .print-running-header {
+        position: fixed;
+        top: -12mm;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 7.5pt;
+        color: #555555;
+        border-bottom: 0.5pt solid #CCCCCC;
+        padding-bottom: 2mm;
+        z-index: 2;
+    }
+
+    .print-running-footer {
+        position: fixed;
+        bottom: -12mm;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 7.5pt;
+        color: #555555;
+        border-top: 0.5pt solid #CCCCCC;
+        padding-top: 2mm;
+        z-index: 2;
+    }
+
+    .print-content-layer {
+        position: relative;
+        z-index: 1;
     }
 
     .print-header {
@@ -1373,8 +1468,8 @@ a:hover {
         justify-content: space-between;
         align-items: flex-start;
         border-bottom: 2px solid #000000;
-        padding-bottom: 12px;
-        margin-bottom: 20px;
+        padding-bottom: 10px;
+        margin-bottom: 16px;
     }
 
     .print-header-left {
@@ -1383,8 +1478,8 @@ a:hover {
     }
 
     .print-seal-img {
-        width: 85px;
-        height: 85px;
+        width: 82px;
+        height: 82px;
         object-fit: contain;
         display: block;
     }
@@ -1392,30 +1487,139 @@ a:hover {
     .print-meta {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 25px;
+        margin-bottom: 18px;
         font-size: 11pt;
     }
 
     .print-title {
-        font-size: 16pt;
+        font-size: 15.5pt;
         text-align: center;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         text-decoration: underline;
     }
 
     .print-body {
-        margin-bottom: 50px;
+        margin-bottom: 36px;
         text-align: justify;
     }
 
+    /* Behörden-Gummistempel */
+    .print-stamp {
+        display: inline-block;
+        border: 3px double #003366;
+        color: #003366;
+        padding: 5px 14px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 10.5pt;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        text-align: center;
+        transform: rotate(-4deg);
+        line-height: 1.25;
+        opacity: 0.88;
+    }
+
+    .print-stamp small {
+        display: block;
+        font-size: 7.5pt;
+        font-weight: normal;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+    }
+
+    .print-stamp-red {
+        border-color: #B30000;
+        color: #B30000;
+    }
+
+    .print-stamp-green {
+        border-color: #1B5E20;
+        color: #1B5E20;
+    }
+
+    .print-stamp-gray {
+        border-color: #555555;
+        color: #555555;
+    }
+
+    /* QR-Code & eAkte-Prüfbox auf dem Deckblatt */
+    .print-qr-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1px dashed #999999;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 8.5pt;
+        color: #333333;
+    }
+
+    .print-qr-img {
+        width: 68px;
+        height: 68px;
+        border: 1px solid #CCCCCC;
+        padding: 2px;
+        background: #FFFFFF;
+        flex-shrink: 0;
+    }
+
+    /* Unterschrift + Dienstsiegel */
     .print-signature {
-        margin-top: 60px;
+        margin-top: 44px;
         page-break-inside: avoid;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 20px;
     }
 
     .sig-line {
         font-size: 10.5pt;
+    }
+
+    .print-sig-hash {
+        margin-top: 6px;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 8pt;
+        color: #555555;
+    }
+
+    .print-sig-seal {
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .print-sig-seal-img {
+        width: 74px;
+        height: 74px;
+        object-fit: contain;
+        opacity: 0.8;
+        display: block;
+        margin: 0 auto 3px auto;
+    }
+
+    .print-sig-seal span {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 7.5pt;
+        color: #555555;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    /* Bild-Beweismittel als eigene Anlage */
+    .print-annex-section {
+        page-break-before: always;
+    }
+
+    .print-annex-item {
+        margin-bottom: 18px;
+        padding: 12px;
+        border: 1px solid #999999;
+        page-break-inside: avoid;
+        background: #FFFFFF;
     }
 }

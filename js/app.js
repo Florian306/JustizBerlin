@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </table>
             <p>Bitte bewahren Sie das Aktenzeichen <strong>${escapeHtml(az)}</strong> für Rückfragen unter „Vorgangs- &amp; Aktenauskunft“ auf.</p>
         `;
-        window.print();
+        triggerOfficialPrint(az);
     });
 
     // --- TAB 3: Vorgangs- & Aktenauskunft ---
@@ -1420,14 +1420,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 }).join('');
 
-            const bwmImages = bwmList
-                .filter(b => b.dataUrl && (b.type || '').startsWith('image/'))
-                .map(b => `
-                    <div style="margin-top: 16px; padding: 10px; border: 1px solid #999; page-break-inside: avoid;">
-                        <p style="margin: 0 0 8px 0;"><strong>Anlage ${escapeHtml(b.kennung)} (${escapeHtml(b.name)}):</strong></p>
-                        <img src="${b.dataUrl}" style="max-width: 100%; max-height: 260px; border: 1px solid #000;">
-                    </div>
-                `).join('');
+            const bwmImageItems = bwmList.filter(b => b.dataUrl && (b.type || '').startsWith('image/'));
+            const bwmAnnexHtml = bwmImageItems.length === 0 ? '' : `
+                <div class="print-annex-section">
+                    <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px; margin-top: 0;">Anlagen – Bild-Beweismittel (${bwmImageItems.length})</h3>
+                    ${bwmImageItems.map((b, idx) => `
+                        <div class="print-annex-item">
+                            <p style="margin: 0 0 8px 0; font-size: 10.5pt;">
+                                <strong>Anlage ${idx + 1} – ${escapeHtml(b.kennung)}</strong> · ${escapeHtml(b.name)}
+                                <span style="color:#555; font-size:9.5pt;">(Erfasst am ${escapeHtml(b.addedAt || akte.datum)})</span>
+                            </p>
+                            <img src="${b.dataUrl}" style="max-width: 100%; max-height: 360px; border: 1px solid #333; display: block; margin: 0 auto;">
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            const statusLower = (akte.status || '').toLowerCase();
+            let stampClass = 'print-stamp';
+            if (statusLower.includes('anklage') || statusLower.includes('haft')) stampClass += ' print-stamp-red';
+            else if (statusLower.includes('beschluss') || statusLower.includes('abgeschlossen')) stampClass += ' print-stamp-green';
+            else if (statusLower.includes('eingestellt')) stampClass += ' print-stamp-gray';
+
+            const eAkteId = generateEAkteId(akte.az, akte.datum);
+            const verifyUrl = `${window.location.origin}/#auskunft`;
+            const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=2&data=${encodeURIComponent(verifyUrl)}`;
 
             const nachtraegeHtml = nachtraegeList.length === 0
                 ? '<p style="color:#555; font-style:italic;">Keine weiteren Ermittlungsnachträge vorhanden.</p>'
@@ -1439,31 +1456,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 `).join('');
 
             bodyEl.innerHTML = `
-                <div style="page-break-after: always; border: 2px solid #000; padding: 28px; margin-top: 10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
-                        <span style="border: 2px solid #CC0000; color: #CC0000; padding: 4px 10px; font-weight: bold; font-size: 10pt; letter-spacing: 1px;">AMTLICHE AKTE · NUR FÜR DEN DIENSTGEBRAUCH</span>
-                        <span style="font-family: monospace; font-size: 12pt; font-weight: bold;">AZ: ${escapeHtml(akte.az)}</span>
+                <div style="page-break-after: always; border: 2px solid #000; padding: 24px 26px; margin-top: 6px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; gap: 12px;">
+                        <span style="border: 2px solid #CC0000; color: #CC0000; padding: 4px 10px; font-weight: bold; font-size: 9.5pt; letter-spacing: 1px;">AMTLICHE AKTE · NUR FÜR DEN DIENSTGEBRAUCH</span>
+                        <div class="${stampClass}">
+                            ${escapeHtml(akte.status || 'EINGEGANGEN')}
+                            <small>${escapeHtml(akte.datum)}</small>
+                        </div>
                     </div>
 
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 11pt;">
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2; width:36%;">Aktenzeichen</th><td style="padding:8px; border:1px solid #999;"><strong>${escapeHtml(akte.az)}</strong></td></tr>
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Vorgangsart</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.typ)}</td></tr>
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Eingangsdatum</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.datum)}</td></tr>
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Aktueller Status</th><td style="padding:8px; border:1px solid #999;"><strong>${escapeHtml(akte.status)}</strong></td></tr>
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Antragsteller / Dienststelle</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)} (${escapeHtml(akte.behoerde)})</td></tr>
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Betroffene Person</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.beteiligter)}</td></tr>
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Zuständiger Sachbearbeiter</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.bearbeiter || 'Nicht zugewiesen')}</td></tr>
-                        <tr><th style="text-align:left; padding:8px; border:1px solid #999; background:#F2F2F2;">Angewandte Paragraphen</th><td style="padding:8px; border:1px solid #999;">${escapeHtml(akte.paragraphen || 'Keine Angabe')}</td></tr>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 22px; font-size: 10.5pt;">
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2; width:36%;">Aktenzeichen</th><td style="padding:7px 8px; border:1px solid #999;"><strong>${escapeHtml(akte.az)}</strong></td></tr>
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2;">Vorgangsart</th><td style="padding:7px 8px; border:1px solid #999;">${escapeHtml(akte.typ)}</td></tr>
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2;">Eingangsdatum</th><td style="padding:7px 8px; border:1px solid #999;">${escapeHtml(akte.datum)}</td></tr>
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2;">Aktueller Status</th><td style="padding:7px 8px; border:1px solid #999;"><strong>${escapeHtml(akte.status)}</strong></td></tr>
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2;">Antragsteller / Dienststelle</th><td style="padding:7px 8px; border:1px solid #999;">${escapeHtml(akte.vorname)} ${escapeHtml(akte.nachname)} (${escapeHtml(akte.behoerde)})</td></tr>
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2;">Betroffene Person</th><td style="padding:7px 8px; border:1px solid #999;">${escapeHtml(akte.beteiligter)}</td></tr>
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2;">Zuständiger Sachbearbeiter</th><td style="padding:7px 8px; border:1px solid #999;">${escapeHtml(akte.bearbeiter || 'Nicht zugewiesen')}</td></tr>
+                        <tr><th style="text-align:left; padding:7px 8px; border:1px solid #999; background:#F2F2F2;">Angewandte Paragraphen</th><td style="padding:7px 8px; border:1px solid #999;">${escapeHtml(akte.paragraphen || 'Keine Angabe')}</td></tr>
                     </table>
 
-                    <div style="border-top: 2px solid #000; padding-top: 14px;">
-                        <p style="margin: 0 0 8px 0;"><strong>Aktenverzeichnis:</strong></p>
-                        <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                    <div style="border-top: 2px solid #000; padding-top: 12px;">
+                        <p style="margin: 0 0 6px 0;"><strong>Aktenverzeichnis:</strong></p>
+                        <ol style="margin: 0; padding-left: 20px; line-height: 1.7;">
                             <li>Sachverhalt &amp; Tatvorwurf</li>
                             <li>Beweismittel-Verzeichnis (${bwmList.length} ${bwmList.length === 1 ? 'Anlage' : 'Anlagen'})</li>
                             <li>Chronologie der Ermittlungsnachträge (${nachtraegeList.length} ${nachtraegeList.length === 1 ? 'Eintrag' : 'Einträge'})</li>
                             <li>Interner Vermerk / Verfügung</li>
+                            ${bwmImageItems.length > 0 ? `<li>Bild-Beweismittel (Anlagen ${bwmImageItems.length === 1 ? '1' : `1–${bwmImageItems.length}`})</li>` : ''}
                         </ol>
+                    </div>
+
+                    <div class="print-qr-box">
+                        <img src="${qrImgUrl}" alt="QR-Code Online-Auskunft" class="print-qr-img">
+                        <div>
+                            <strong>Elektronische Echtheitsprüfung &amp; Online-Aktenauskunft</strong><br>
+                            Vorgangsstatus online abrufbar unter <span>${escapeHtml(verifyUrl)}</span><br>
+                            <span style="font-family:monospace;">eAkte-Prüf-ID: ${escapeHtml(eAkteId)}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1482,13 +1512,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </thead>
                     <tbody>${bwmRows}</tbody>
                 </table>
-                ${bwmImages}
 
                 <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px;">3. Chronologie der Ermittlungsnachträge &amp; Aussagen</h3>
                 <div style="margin-bottom: 22px;">${nachtraegeHtml}</div>
 
                 <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px;">4. Interner Vermerk / Verfügung</h3>
                 <div style="border: 1px solid #999; padding: 12px; background: #FAFAFA; white-space: pre-wrap;">${escapeHtml(akte.vermerk || 'Kein Vermerk hinterlegt.')}</div>
+                ${bwmAnnexHtml}
             `;
         } else if (docType === 'Haftbefehl') {
             signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
@@ -1526,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
 
-        window.print();
+        triggerOfficialPrint(akte.az, akte.datum);
     });
 
     // --- Gesetzessammlung (Öffentlich & Intern) ---
@@ -2600,7 +2630,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (d.legal) html += `<p style="margin-top: 18px; font-size: 10.5pt; border-top: 1px solid #999; padding-top: 10px;"><strong>Rechtsmittelbelehrung / Hinweis:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(d.legal)}</span></p>`;
 
                     document.getElementById('print-doc-body').innerHTML = html;
-                    window.print();
+                    triggerOfficialPrint(document.getElementById('print-az')?.textContent || '', document.getElementById('print-datum')?.textContent || '');
                 });
             });
 
@@ -2738,8 +2768,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('print-doc-body').innerHTML = html;
         logActivity('Dokument erstellt', `${docType} (Az. ${az}) im Dokumenten-Generator gedruckt.`);
-        window.print();
+        triggerOfficialPrint(az, document.getElementById('print-datum')?.textContent || '');
     });
+
+    function generateEAkteId(az, datum) {
+        const seed = `${az || 'JB'}|${datum || ''}|SenJustV`;
+        let hash = 0x811c9dc5;
+        for (let i = 0; i < seed.length; i++) {
+            hash ^= seed.charCodeAt(i);
+            hash = Math.imul(hash, 0x01000193);
+        }
+        const hex = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0').slice(0, 6);
+        const cleanAz = String(az || 'DOK').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 10);
+        return `JB-${cleanAz}-${hex}`;
+    }
+
+    function triggerOfficialPrint(az, datum) {
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const ts = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())} Uhr`;
+        const eAkteId = generateEAkteId(az, datum || ts);
+
+        const runAz = document.getElementById('print-running-az');
+        const runMeta = document.getElementById('print-running-meta');
+        const sigHash = document.getElementById('print-sig-hash');
+        if (runAz) runAz.textContent = az ? `Geschäftszeichen: ${az}` : '';
+        if (runMeta) runMeta.textContent = `Ausgedruckt: ${ts} · eAkte-ID: ${eAkteId}`;
+        if (sigHash) sigHash.textContent = `Elektronische Prüfsumme: ${eAkteId} · Ausfertigung: ${ts}`;
+
+        const imgs = Array.from(document.querySelectorAll('#print-document img'));
+        const pending = imgs.filter(img => !img.complete);
+        if (pending.length === 0) {
+            window.print();
+            return;
+        }
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            window.print();
+        };
+        let remaining = pending.length;
+        pending.forEach(img => {
+            const onDone = () => { if (--remaining <= 0) finish(); };
+            img.addEventListener('load', onDone, { once: true });
+            img.addEventListener('error', onDone, { once: true });
+        });
+        setTimeout(finish, 900);
+    }
 
     function escapeHtml(str) {
         if (!str) return '';

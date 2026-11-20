@@ -1055,34 +1055,62 @@
 
     <!-- Druckbereich für amtliche Beschlüsse (nur bei @media print sichtbar) -->
     <section id="print-document" class="print-only" aria-hidden="true">
-        <div class="print-header">
-            <div class="print-header-left">
-                <strong>LAND BERLIN</strong><br>
-                Senatsverwaltung für Justiz und Verbraucherschutz<br>
-                Amtsgericht Tiergarten / Staatsanwaltschaft Berlin<br>
-                Turmstraße 91, 10559 Berlin
+        <!-- DIN 5008 Falz- & Lochmarken -->
+        <div class="print-fold-mark print-fold-1"></div>
+        <div class="print-fold-mark print-hole-mark"></div>
+        <div class="print-fold-mark print-fold-2"></div>
+
+        <!-- Dezentes Wasserzeichen auf jeder Seite -->
+        <div class="print-watermark">
+            <img src="assets/logo.jpg" alt="" class="print-watermark-img">
+            <div class="print-watermark-text">LAND BERLIN · NUR FÜR DEN DIENSTGEBRAUCH</div>
+        </div>
+
+        <!-- Wiederkehrende Kopf- & Fußzeile -->
+        <div class="print-running-header" id="print-running-header">
+            <span>Senatsverwaltung für Justiz und Verbraucherschutz · Land Berlin</span>
+            <span id="print-running-az"></span>
+        </div>
+        <div class="print-running-footer" id="print-running-footer">
+            <span>Turmstraße 91, 10559 Berlin · eAkte-System Justiz Berlin</span>
+            <span id="print-running-meta"></span>
+        </div>
+
+        <div class="print-content-layer">
+            <div class="print-header">
+                <div class="print-header-left">
+                    <strong>LAND BERLIN</strong><br>
+                    Senatsverwaltung für Justiz und Verbraucherschutz<br>
+                    Amtsgericht Tiergarten / Staatsanwaltschaft Berlin<br>
+                    Turmstraße 91, 10559 Berlin
+                </div>
+                <div class="print-header-right">
+                    <img src="assets/logo.jpg" alt="Dienstsiegel Land Berlin" class="print-seal-img">
+                </div>
             </div>
-            <div class="print-header-right">
-                <img src="assets/logo.jpg" alt="Dienstsiegel Land Berlin" class="print-seal-img">
+
+            <div class="print-meta">
+                <div><strong>Geschäftszeichen:</strong> <span id="print-az"></span></div>
+                <div><strong>Datum:</strong> <span id="print-datum"></span></div>
             </div>
-        </div>
 
-        <div class="print-meta">
-            <div><strong>Geschäftszeichen:</strong> <span id="print-az"></span></div>
-            <div><strong>Datum:</strong> <span id="print-datum"></span></div>
-        </div>
+            <h1 class="print-title" id="print-doc-title">BESCHLUSS</h1>
 
-        <h1 class="print-title" id="print-doc-title">BESCHLUSS</h1>
+            <div class="print-body" id="print-doc-body">
+                <!-- Dynamisch befüllt -->
+            </div>
 
-        <div class="print-body" id="print-doc-body">
-            <!-- Dynamisch befüllt -->
-        </div>
-
-        <div class="print-signature">
-            <div class="sig-line">
-                ________________________________________<br>
-                <span id="print-signer">Richter/in am Amtsgericht / Staatsanwalt/-anwältin</span><br>
-                <em>(Elektronisch ausgefertigt – gültig ohne Unterschrift gemäß § 37a VwVfG / § 32b StPO)</em>
+            <div class="print-signature">
+                <div class="sig-line">
+                    ________________________________________<br>
+                    <span id="print-signer">Richter/in am Amtsgericht / Staatsanwalt/-anwältin</span><br>
+                    <em>(Elektronisch ausgefertigt – gültig ohne Unterschrift gemäß § 37a VwVfG / § 32b StPO)</em>
+                    <div class="print-sig-hash" id="print-sig-hash"></div>
+                </div>
+                <div class="print-sig-seal">
+                    <img src="assets/logo.jpg" alt="Dienstsiegel" class="print-sig-seal-img">
+                    <span>Dienstsiegel</span>
+                </div>
             </div>
         </div>
     </section>
