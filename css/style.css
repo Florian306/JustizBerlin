@@ -1503,8 +1503,24 @@ a:hover {
     .print-meta {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         margin-bottom: 18px;
         font-size: 11pt;
+    }
+
+    .print-barcode {
+        text-align: center;
+        line-height: 1;
+    }
+
+    .print-handwritten-sig {
+        font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", cursive;
+        font-size: 21pt;
+        color: #0B2545;
+        line-height: 1;
+        margin-bottom: -10px;
+        padding-left: 8px;
+        transform: rotate(-2deg);
     }
 
     .print-title {

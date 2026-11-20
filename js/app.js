@@ -595,6 +595,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const auskunftForm = document.getElementById('auskunft-form');
     const auskunftErgebnis = document.getElementById('auskunft-ergebnis');
 
+    let pendingVerifyId = '';
+
     auskunftForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const azInput = document.getElementById('auskunft-az').value.trim().toLowerCase();
@@ -609,6 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
         auskunftErgebnis.classList.remove('hidden');
 
         if (!treffer) {
+            pendingVerifyId = '';
             auskunftErgebnis.innerHTML = `
                 <h3>Kein Vorgang gefunden</h3>
                 <p>Unter dem Aktenzeichen <strong>${escapeHtml(document.getElementById('auskunft-az').value)}</strong> in Verbindung mit dem angegebenen Nachnamen konnte kein Vorgang ermittelt werden. Bitte prüfen Sie Ihre Eingaben.</p>
@@ -617,6 +620,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         renderAuskunftDetail(treffer);
+        if (pendingVerifyId) {
+            const banner = document.createElement('div');
+            banner.style.cssText = 'background:#EAF4EA; border:1px solid #1B5E20; border-left:4px solid #1B5E20; color:#1B5E20; padding:10px 14px; margin-bottom:16px; border-radius:4px; font-size:13.5px;';
+            banner.innerHTML = `<strong>✓ Amtliches Dokument elektronisch verifiziert</strong> – Vorgang <code>${escapeHtml(treffer.az)}</code> ist im eAkte-System der Berliner Justiz registriert (Prüf-ID: <code>${escapeHtml(pendingVerifyId)}</code>).`;
+            auskunftErgebnis.prepend(banner);
+            pendingVerifyId = '';
+        }
     });
 
     function renderAuskunftDetail(treffer) {
@@ -881,8 +891,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(hashQuery);
             const qAz = params.get('az') || '';
             const qName = params.get('name') || '';
+            const qId = params.get('id') || '';
             if (qAz) document.getElementById('auskunft-az').value = qAz;
             if (qName) document.getElementById('auskunft-nachname').value = qName;
+            if (qId) pendingVerifyId = qId;
             if (qAz && qName) {
                 auskunftForm.dispatchEvent(new Event('submit', { cancelable: true }));
             }
@@ -1577,6 +1589,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
         triggerOfficialPrint(akte.az, akte.datum);
     });
+
+    const btnDocDiscord = document.getElementById('btn-doc-discord');
+    if (btnDocDiscord) {
+        btnDocDiscord.addEventListener('click', async () => {
+            if (!currentSelectedAz) return;
+            const akten = await AktenAPI.getAll();
+            const akte = akten.find(a => a.az === currentSelectedAz);
+            if (!akte) return;
+
+            const docType = document.getElementById('doc-type-select').value;
+            const target = document.getElementById('doc-target-input').value.trim() || akte.beteiligter;
+            const signer = document.getElementById('doc-signer-input').value.trim() || akte.bearbeiter || 'Justiz Berlin';
+            const extra = document.getElementById('doc-extra-input').value.trim();
+            const eAkteId = generateEAkteId(akte.az, akte.datum);
+            const params = new URLSearchParams({ az: akte.az, name: akte.nachname, id: eAkteId });
+            const verifyUrl = `${window.location.origin}/#auskunft?${params.toString()}`;
+
+            const msgEl = document.getElementById('doc-discord-msg');
+            btnDocDiscord.disabled = true;
+            try {
+                const res = await fetch('/api/beschluss-webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ docType, az: akte.az, target, extra, signer, verifyUrl })
+                });
+                if (res.ok) {
+                    logActivity('Beschluss an Discord', `${docType} (Az. ${akte.az}) per Webhook an Discord übermittelt.`);
+                    if (msgEl) {
+                        msgEl.textContent = '✓ An Discord übermittelt';
+                        msgEl.classList.remove('hidden');
+                        setTimeout(() => msgEl.classList.add('hidden'), 3000);
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.error || 'Discord-Versand fehlgeschlagen.');
+                }
+            } finally {
+                btnDocDiscord.disabled = false;
+            }
+        });
+    }
 
     // --- Gesetzessammlung (Öffentlich & Intern) ---
     const gesetzeFilterBook = document.getElementById('gesetze-filter-book');
@@ -3009,6 +3062,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams();
         if (az && az !== 'Ohne Az.') params.set('az', az);
         if (nachname) params.set('name', nachname);
+        params.set('id', eAkteId);
         const qs = params.toString();
         const verifyUrl = `${window.location.origin}/#auskunft${qs ? `?${qs}` : ''}`;
         const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=2&data=${encodeURIComponent(verifyUrl)}`;
@@ -3022,6 +3076,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+    }
+
+    function generateBarcodeSvg(text) {
+        const clean = String(text || 'JUSTIZ-BERLIN').trim();
+        let x = 2;
+        const bars = [];
+        for (let i = 0; i < clean.length; i++) {
+            const code = clean.charCodeAt(i);
+            const pattern = [
+                (code % 2) + 1,
+                ((code >> 1) % 2) + 1,
+                ((code >> 2) % 3) + 1,
+                ((code >> 4) % 2) + 1
+            ];
+            for (let j = 0; j < pattern.length; j++) {
+                const w = pattern[j];
+                if (j % 2 === 0) bars.push(`<rect x="${x}" y="0" width="${w}" height="24" fill="#000"/>`);
+                x += w;
+            }
+            x += 1;
+        }
+        const totalW = Math.max(x + 2, 80);
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="24" viewBox="0 0 ${totalW} 24" style="display:block; margin:0 auto;">${bars.join('')}</svg><div style="font-family:Consolas,monospace; font-size:7pt; letter-spacing:1px; margin-top:2px;">*${escapeHtml(clean)}*</div>`;
     }
 
     function generateEAkteId(az, datum) {
@@ -3045,9 +3122,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const runAz = document.getElementById('print-running-az');
         const runMeta = document.getElementById('print-running-meta');
         const sigHash = document.getElementById('print-sig-hash');
+        const barcodeEl = document.getElementById('print-barcode');
+        const handSigEl = document.getElementById('print-handwritten-sig');
+        const signerText = document.getElementById('print-signer')?.textContent || '';
+
         if (runAz) runAz.textContent = az ? `Geschäftszeichen: ${az}` : '';
         if (runMeta) runMeta.textContent = `Ausgedruckt: ${ts} · eAkte-ID: ${eAkteId}`;
         if (sigHash) sigHash.textContent = `Elektronische Prüfsumme: ${eAkteId} · Ausfertigung: ${ts}`;
+        if (barcodeEl) barcodeEl.innerHTML = az ? generateBarcodeSvg(az) : '';
+        if (handSigEl) {
+            const cleanSig = signerText.split('(')[0].split('–')[0].trim();
+            handSigEl.textContent = cleanSig.length <= 36 ? cleanSig : '';
+        }
 
         const imgs = Array.from(document.querySelectorAll('#print-document img'));
         const pending = imgs.filter(img => !img.complete);

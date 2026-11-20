@@ -634,7 +634,11 @@
                                 </div>
                             </div>
 
-                            <button type="button" id="btn-print-doc" class="btn-primary">Amtliches Dokument drucken / als PDF speichern</button>
+                            <div class="form-actions" style="margin-top: 12px; align-items: center;">
+                                <button type="button" id="btn-print-doc" class="btn-primary">Amtliches Dokument drucken / als PDF speichern</button>
+                                <button type="button" id="btn-doc-discord" class="btn-secondary">An Discord senden</button>
+                                <span id="doc-discord-msg" class="save-msg hidden"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1116,6 +1120,7 @@
 
                             <div class="print-meta">
                                 <div><strong>Geschäftszeichen:</strong> <span id="print-az"></span></div>
+                                <div id="print-barcode" class="print-barcode"></div>
                                 <div><strong>Datum:</strong> <span id="print-datum"></span></div>
                             </div>
 
@@ -1127,6 +1132,7 @@
 
                             <div class="print-signature">
                                 <div class="sig-line">
+                                    <div id="print-handwritten-sig" class="print-handwritten-sig"></div>
                                     ________________________________________<br>
                                     <span id="print-signer">Richter/in am Amtsgericht / Staatsanwalt/-anwältin</span><br>
                                     <em>(Elektronisch ausgefertigt – gültig ohne Unterschrift gemäß § 37a VwVfG / § 32b StPO)</em>
