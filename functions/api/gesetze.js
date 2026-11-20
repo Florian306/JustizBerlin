@@ -1,4 +1,5 @@
 import { verifySession } from './_session.js';
+import { sendBekanntmachungWebhook } from './_webhook.js';
 
 async function ensureGesetzeTables(db) {
     await db.prepare(`
@@ -63,6 +64,14 @@ export async function onRequestPost(context) {
         await context.env.DB.prepare(
             'INSERT INTO books (id, title, short, createdAt) VALUES (?, ?, ?, ?)'
         ).bind(id, body.title, body.short, today).run();
+
+        await sendBekanntmachungWebhook(context.env, {
+            title: `Gesetzbuch veröffentlicht: ${body.title}`,
+            description: `Das Gesetzbuch **${body.title}** (${body.short}) wurde neu in die Berliner Gesetzessammlung aufgenommen und ist ab sofort öffentlich einsehbar.`,
+            az: body.short,
+            datum: today
+        });
+
         return Response.json({ id, title: body.title, short: body.short, createdAt: today }, { status: 201 });
     }
 

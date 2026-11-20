@@ -1,4 +1,5 @@
 import { verifySession } from '../_session.js';
+import { sendBekanntmachungWebhook } from '../_webhook.js';
 
 export async function onRequestPatch(context) {
     const az = decodeURIComponent(context.params.az);
@@ -23,6 +24,15 @@ export async function onRequestPatch(context) {
     await context.env.DB.prepare(
         'UPDATE akten SET status = ?, vermerk = ?, beweismittel = ?, nachtraege = ?, bearbeiter = ?, paragraphen = ? WHERE az = ?'
     ).bind(status, vermerk || '', beweismittel || '[]', nachtraege || '[]', bearbeiter || '', paragraphen || '', az).run();
+
+    if (status !== current.status && (status === 'Beschluss erlassen' || status === 'Anklage erhoben')) {
+        await sendBekanntmachungWebhook(context.env, {
+            title: `${status} (${current.typ})`,
+            description: `Im Verfahren **${az}** wurde der Status auf **${status}** gesetzt.`,
+            az,
+            datum: current.datum
+        });
+    }
 
     return Response.json({ az, status, vermerk, beweismittel, nachtraege, bearbeiter, paragraphen });
 }
