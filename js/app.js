@@ -1664,32 +1664,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ansicht 1: Bücher-Übersicht (wenn kein Buch ausgewählt und keine Suche aktiv)
         if (!selectedPublicBookId && !search) {
-            const grid = document.createElement('div');
-            grid.className = 'service-cards-grid';
+            const totalLaws = data.laws.length;
+            const strip = document.createElement('div');
+            strip.className = 'law-stats-strip';
+            strip.innerHTML = `
+                <span><strong>${data.books.length}</strong> ${data.books.length === 1 ? 'Gesetzbuch' : 'Gesetzbücher'}</span>
+                <span><strong>${totalLaws}</strong> ${totalLaws === 1 ? 'Vorschrift' : 'Vorschriften'} insgesamt</span>
+                <span>Amtliche konsolidierte Fassung · Land Berlin</span>
+            `;
+            container.appendChild(strip);
 
-            data.books.forEach(book => {
-                const count = data.laws.filter(l => l.bookId === book.id).length;
+            const grid = document.createElement('div');
+            grid.className = 'law-books-grid';
+
+            const accentPalette = ['#B81D24', '#1E5AA8', '#2E7D32', '#9A6700', '#6A3D9A', '#00695C'];
+
+            data.books.forEach((book, idx) => {
+                const bookLaws = data.laws.filter(l => l.bookId === book.id);
+                const count = bookLaws.length;
+                const sections = new Set(bookLaws.map(l => (l.section || '').trim()).filter(Boolean));
+                const latestUpdate = bookLaws.map(l => l.updatedAt || '').filter(Boolean).sort().pop() || '';
+                const previewChips = bookLaws.slice(0, 3).map(l =>
+                    `<span class="law-book-chip">${escapeHtml(l.paragraph)} ${escapeHtml((l.title || '').slice(0, 22))}${(l.title || '').length > 22 ? '…' : ''}</span>`
+                ).join('');
+                const accent = accentPalette[idx % accentPalette.length];
+
                 const card = document.createElement('div');
-                card.className = 'service-card book-card';
+                card.className = 'law-book-card';
+                card.style.setProperty('--book-accent', accent);
+                card.dataset.bookId = book.id;
                 card.innerHTML = `
+                    <div class="law-book-watermark">§</div>
                     <div>
-                        <span class="hero-kicker">${escapeHtml(book.short)}</span>
-                        <h4>${escapeHtml(book.title)}</h4>
-                        <p>${count} ${count === 1 ? 'Vorschrift' : 'Vorschriften'} hinterlegt</p>
+                        <div class="law-book-top">
+                            <span class="law-book-badge">${escapeHtml(book.short)}</span>
+                            <span class="law-book-date">${latestUpdate ? `Stand: ${escapeHtml(latestUpdate)}` : 'Amtliche Fassung'}</span>
+                        </div>
+                        <h4 class="law-book-title">${escapeHtml(book.title)}</h4>
+                        <p class="law-book-meta">
+                            ${count} ${count === 1 ? 'Vorschrift' : 'Vorschriften'}${sections.size > 0 ? ` · ${sections.size} ${sections.size === 1 ? 'Abschnitt' : 'Abschnitte'}` : ''}
+                        </p>
+                        ${previewChips ? `<div class="law-book-chips">${previewChips}</div>` : ''}
                     </div>
-                    <button type="button" class="btn-secondary btn-small btn-open-book" data-book-id="${escapeHtml(book.id)}">Gesetzbuch öffnen</button>
+                    <div class="law-book-footer">
+                        <span class="law-book-cta">Gesetzbuch öffnen <span>→</span></span>
+                    </div>
                 `;
+                card.addEventListener('click', () => {
+                    selectedPublicBookId = book.id;
+                    renderGesetzePublic();
+                });
                 grid.appendChild(card);
             });
 
             container.appendChild(grid);
-
-            container.querySelectorAll('.btn-open-book').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectedPublicBookId = btn.dataset.bookId;
-                    renderGesetzePublic();
-                });
-            });
             return;
         }
 
