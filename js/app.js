@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderDocGenTab();
             } else if (btn.dataset.subtab === 'logs') {
                 renderLogsIntern();
+                renderBekanntmachungenAdmin();
             } else if (btn.dataset.subtab === 'roles') {
                 renderRolesIntern();
                 renderBansIntern();
@@ -2323,6 +2324,35 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logs-filter-search').addEventListener('input', renderLogsIntern);
     document.getElementById('btn-refresh-logs').addEventListener('click', renderLogsIntern);
 
+    async function renderBekanntmachungenAdmin() {
+        const el = document.getElementById('admin-bek-list');
+        if (!el) return;
+        try {
+            const res = await fetch('/api/bekanntmachungen');
+            if (!res.ok) return;
+            const list = await res.json();
+            if (list.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+            el.innerHTML = '<hr class="divider"><strong style="font-size:13px;">Veröffentlichte Bekanntmachungen:</strong>' +
+                list.map(b => `
+                    <div class="detail-header-row" style="padding:5px 0; border-bottom:1px solid var(--border-gray); font-size:13px;">
+                        <span><strong>${escapeHtml(b.datum)}</strong> – ${escapeHtml(b.title)} (${escapeHtml(b.az || 'SenJustV')})</span>
+                        <button type="button" class="btn-secondary btn-small btn-del-bek" data-id="${b.id}">Löschen</button>
+                    </div>
+                `).join('');
+            el.querySelectorAll('.btn-del-bek').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await fetch(`/api/bekanntmachungen?id=${encodeURIComponent(btn.dataset.id)}`, { method: 'DELETE' });
+                    logActivity('Bekanntmachung gelöscht', `Bekanntmachung #${btn.dataset.id} entfernt.`);
+                    renderBekanntmachungenAdmin();
+                    renderBekanntmachungen();
+                });
+            });
+        } catch {}
+    }
+
     document.getElementById('form-add-bekanntmachung').addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = document.getElementById('bek-title').value.trim();
@@ -2342,6 +2372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => msg.classList.add('hidden'), 3000);
             logActivity('Bekanntmachung veröffentlicht', `Amtliche Bekanntmachung "${title}" veröffentlicht.`);
             renderBekanntmachungen();
+            renderBekanntmachungenAdmin();
         }
     });
 

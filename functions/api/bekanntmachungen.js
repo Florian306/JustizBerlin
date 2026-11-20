@@ -52,3 +52,16 @@ export async function onRequestPost(context) {
 
     return Response.json({ id: res.meta.last_row_id, datum, title, text, az, author }, { status: 201 });
 }
+
+export async function onRequestDelete(context) {
+    const session = await verifySession(context);
+    if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
+    await ensureBekanntmachungenTable(context.env.DB);
+    const url = new URL(context.request.url);
+    const id = url.searchParams.get('id');
+    if (!id) return Response.json({ error: 'Missing id' }, { status: 400 });
+
+    await context.env.DB.prepare('DELETE FROM bekanntmachungen WHERE id = ?').bind(Number(id)).run();
+    return Response.json({ deleted: Number(id) });
+}
