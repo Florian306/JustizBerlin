@@ -864,7 +864,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const rawHash = window.location.hash.replace('#', '');
-        const hashParts = rawHash.split('/');
+        const [hashPath, hashQuery] = rawHash.split('?');
+        const hashParts = hashPath.split('/');
         const hashTab = hashParts[0];
         if (hashTab === 'gesetze') {
             if (hashParts[1]) selectedPublicBookId = decodeURIComponent(hashParts[1]);
@@ -875,6 +876,16 @@ document.addEventListener('DOMContentLoaded', () => {
             : sessionStorage.getItem('justiz_active_tab');
         if (savedTab && document.getElementById(`tab-${savedTab}`)) {
             switchTab(savedTab);
+        }
+        if (hashTab === 'auskunft' && hashQuery) {
+            const params = new URLSearchParams(hashQuery);
+            const qAz = params.get('az') || '';
+            const qName = params.get('name') || '';
+            if (qAz) document.getElementById('auskunft-az').value = qAz;
+            if (qName) document.getElementById('auskunft-nachname').value = qName;
+            if (qAz && qName) {
+                auskunftForm.dispatchEvent(new Event('submit', { cancelable: true }));
+            }
         }
     }
 
@@ -1436,15 +1447,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            const statusLower = (akte.status || '').toLowerCase();
-            let stampClass = 'print-stamp';
-            if (statusLower.includes('anklage') || statusLower.includes('haft')) stampClass += ' print-stamp-red';
-            else if (statusLower.includes('beschluss') || statusLower.includes('abgeschlossen')) stampClass += ' print-stamp-green';
-            else if (statusLower.includes('eingestellt')) stampClass += ' print-stamp-gray';
-
             const eAkteId = generateEAkteId(akte.az, akte.datum);
-            const verifyUrl = `${window.location.origin}/#auskunft`;
-            const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=2&data=${encodeURIComponent(verifyUrl)}`;
+            const qrBoxHtml = buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum);
+            const stampHtml = buildPrintStampHtml(akte.status || 'EINGEGANGEN', akte.datum);
 
             const nachtraegeHtml = nachtraegeList.length === 0
                 ? '<p style="color:#555; font-style:italic;">Keine weiteren Ermittlungsnachträge vorhanden.</p>'
@@ -1459,10 +1464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="page-break-after: always; border: 2px solid #000; padding: 24px 26px; margin-top: 6px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; gap: 12px;">
                         <span style="border: 2px solid #CC0000; color: #CC0000; padding: 4px 10px; font-weight: bold; font-size: 9.5pt; letter-spacing: 1px;">AMTLICHE AKTE · NUR FÜR DEN DIENSTGEBRAUCH</span>
-                        <div class="${stampClass}">
-                            ${escapeHtml(akte.status || 'EINGEGANGEN')}
-                            <small>${escapeHtml(akte.datum)}</small>
-                        </div>
+                        ${stampHtml}
                     </div>
 
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 22px; font-size: 10.5pt;">
@@ -1487,14 +1489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </ol>
                     </div>
 
-                    <div class="print-qr-box">
-                        <img src="${qrImgUrl}" alt="QR-Code Online-Auskunft" class="print-qr-img">
-                        <div>
-                            <strong>Elektronische Echtheitsprüfung &amp; Online-Aktenauskunft</strong><br>
-                            Vorgangsstatus online abrufbar unter <span>${escapeHtml(verifyUrl)}</span><br>
-                            <span style="font-family:monospace;">eAkte-Prüf-ID: ${escapeHtml(eAkteId)}</span>
-                        </div>
-                    </div>
+                    ${qrBoxHtml}
                 </div>
 
                 <h3 style="border-bottom: 2px solid #000; padding-bottom: 4px; margin-top: 0;">1. Sachverhalt &amp; Tatvorwurf</h3>
@@ -1523,36 +1518,61 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (docType === 'Haftbefehl') {
             signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
             bodyEl.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                    <span style="border: 2px solid #CC0000; color: #CC0000; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">EILBEDÜRFTIG · VOLLSTRECKUNGSAUFTRAG</span>
+                    ${buildPrintStampHtml('HAFTBEFEHL', akte.datum, 'red')}
+                </div>
                 <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(customTarget)}</strong> wird auf Antrag der Staatsanwaltschaft Berlin die Untersuchungshaft angeordnet.</p>
                 <p><strong>Gründe:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
                 <p>Es besteht dringender Tatverdacht sowie der Haftgrund: <strong>${escapeHtml(customExtra || 'Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)')}</strong>. Die Vollstreckung obliegt der Polizei Berlin.</p>
+                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
             `;
         } else if (docType === 'Durchsuchungsbeschluss') {
             signerEl.textContent = customSigner || 'Ermittlungsrichter/in am Amtsgericht Tiergarten';
             bodyEl.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                    <span style="border: 2px solid #CC0000; color: #CC0000; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">RICHTERLICHE ANORDNUNG · §§ 102, 105 StPO</span>
+                    ${buildPrintStampHtml('DURCHSUCHUNG', akte.datum, 'red')}
+                </div>
                 <p>In der Ermittlungssache betreffend <strong>${escapeHtml(customTarget)}</strong> wird gemäß §§ 102, 105 StPO die Durchsuchung folgender Objekte angeordnet: <strong>${escapeHtml(customExtra || 'Wohn- und Geschäftsräume sowie mitgeführte Fahrzeuge')}</strong>.</p>
                 <p><strong>Sachverhalt:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
                 <p>Zweck der Maßnahme ist das Auffinden von Beweismitteln. Die Beschlagnahme verfahrensrelevanter Gegenstände wird hiermit angeordnet.</p>
+                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
             `;
         } else if (docType === 'Strafbefehl') {
             signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
             bodyEl.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                    <span style="border: 1.5px solid #003366; color: #003366; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTSGERICHT TIERGARTEN · § 407 StPO</span>
+                    ${buildPrintStampHtml('STRAFBEFEHL', akte.datum, 'blue')}
+                </div>
                 <p>Auf Antrag der Staatsanwaltschaft Berlin wird gegen <strong>${escapeHtml(customTarget)}</strong> gemäß § 407 StPO folgende Rechtsfolge festgesetzt: <strong>${escapeHtml(customExtra || 'Geldstrafe')}</strong>.</p>
                 <p><strong>Tatvorwurf:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
                 <p>Gegen diesen Strafbefehl kann innerhalb von zwei Wochen nach Zustellung schriftlich oder zu Protokoll der Geschäftsstelle Einspruch eingelegt werden.</p>
+                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
             `;
         } else if (docType === 'Einstellungsverfügung') {
             signerEl.textContent = customSigner || akte.bearbeiter || 'Staatsanwalt/-anwältin – Staatsanwaltschaft Berlin';
             bodyEl.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                    <span style="border: 1.5px solid #555; color: #555; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">VERFAHRENSABSCHLUSS · § 170 Abs. 2 StPO</span>
+                    ${buildPrintStampHtml('EINGESTELLT', akte.datum, 'gray')}
+                </div>
                 <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(customTarget)}</strong> wegen <strong>${escapeHtml(customExtra || akte.paragraphen || 'des bekannten Tatvorwurfs')}</strong> wird das Verfahren gemäß § 170 Abs. 2 StPO eingestellt.</p>
                 <p><strong>Begründung:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
+                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
             `;
         } else {
             signerEl.textContent = customSigner || 'Präsident/in des Amtsgerichts Tiergarten (Schöffengeschäftsstelle)';
             bodyEl.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                    <span style="border: 1.5px solid #1B5E20; color: #1B5E20; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTLICHE BERUFUNG · § 45 GVG</span>
+                    ${buildPrintStampHtml('BERUFEN', akte.datum, 'green')}
+                </div>
                 <p>Sehr geehrte(r) <strong>${escapeHtml(customTarget)}</strong>,</p>
                 <p>auf Grundlage Ihrer Bewerbung / der Vorschlagsliste werden Sie hiermit gemäß § 45 GVG zum ehrenamtlichen Schöffendienst am Amtsgericht Tiergarten berufen.</p>
                 <p><strong>Termin / Hinweis:</strong> ${escapeHtml(customExtra || 'Die genaue Terminladung zu den Hauptverhandlungen erfolgt gesondert.')}</p>
+                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
             `;
         }
 
@@ -2760,16 +2780,57 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('print-doc-title').textContent = docType.toUpperCase();
         document.getElementById('print-signer').textContent = signer;
 
-        let html = `<p><strong>Betroffene Person / Adressat:</strong> ${escapeHtml(target)}</p>`;
+        const targetLastName = target.trim().split(/\s+/).slice(-1)[0] || '';
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                <span style="border: 1.5px solid #003366; color: #003366; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTLICHE AUSFERTIGUNG · JUSTIZ BERLIN</span>
+                ${buildPrintStampHtml(docType, datum)}
+            </div>
+            <p><strong>Betroffene Person / Adressat:</strong> ${escapeHtml(target)}</p>
+        `;
         if (laws) html += `<p><strong>Tatvorwurf / Angewandte Vorschriften:</strong> ${escapeHtml(laws)}</p>`;
         if (extra) html += `<p><strong>Anordnung / Maßnahme / Rechtsfolge:</strong> ${escapeHtml(extra)}</p>`;
         html += `<p style="margin-top: 16px;"><strong>Begründung / Beschlusstext:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(bodyText)}</span></p>`;
         if (legalText) html += `<p style="margin-top: 18px; font-size: 10.5pt; border-top: 1px solid #999; padding-top: 10px;"><strong>Rechtsmittelbelehrung / Hinweis:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(legalText)}</span></p>`;
+        html += buildPrintQrBoxHtml(az, targetLastName, datum);
 
         document.getElementById('print-doc-body').innerHTML = html;
         logActivity('Dokument erstellt', `${docType} (Az. ${az}) im Dokumenten-Generator gedruckt.`);
         triggerOfficialPrint(az, document.getElementById('print-datum')?.textContent || '');
     });
+
+    function buildPrintStampHtml(label, datum, variant) {
+        const lower = String(label || '').toLowerCase();
+        let cls = 'print-stamp';
+        if (variant === 'red' || (!variant && (lower.includes('anklage') || lower.includes('haft') || lower.includes('durchsuch')))) {
+            cls += ' print-stamp-red';
+        } else if (variant === 'green' || (!variant && (lower.includes('beschluss') || lower.includes('abgeschlossen') || lower.includes('beruf') || lower.includes('freigegeben')))) {
+            cls += ' print-stamp-green';
+        } else if (variant === 'gray' || (!variant && lower.includes('eingestellt'))) {
+            cls += ' print-stamp-gray';
+        }
+        return `<div class="${cls}">${escapeHtml(label || 'AMTLICH')}<small>${escapeHtml(datum || '')}</small></div>`;
+    }
+
+    function buildPrintQrBoxHtml(az, nachname, datum) {
+        const eAkteId = generateEAkteId(az, datum);
+        const params = new URLSearchParams();
+        if (az && az !== 'Ohne Az.') params.set('az', az);
+        if (nachname) params.set('name', nachname);
+        const qs = params.toString();
+        const verifyUrl = `${window.location.origin}/#auskunft${qs ? `?${qs}` : ''}`;
+        const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=2&data=${encodeURIComponent(verifyUrl)}`;
+        return `
+            <div class="print-qr-box">
+                <img src="${qrImgUrl}" alt="QR-Code Online-Auskunft" class="print-qr-img">
+                <div>
+                    <strong>Elektronische Echtheitsprüfung &amp; Online-Aktenauskunft</strong><br>
+                    QR-Code scannen für direkten Vorgangsabruf${az ? ` (Az. ${escapeHtml(az)})` : ''}<br>
+                    <span style="font-family:monospace;">eAkte-Prüf-ID: ${escapeHtml(eAkteId)}</span>
+                </div>
+            </div>
+        `;
+    }
 
     function generateEAkteId(az, datum) {
         const seed = `${az || 'JB'}|${datum || ''}|SenJustV`;
