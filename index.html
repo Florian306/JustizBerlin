@@ -608,6 +608,26 @@
                                         <input type="text" id="doc-extra-input" placeholder="z. B. Fluchtgefahr, 2.500 EUR Geldstrafe oder Anschrift">
                                     </div>
                                 </div>
+                                <div id="doc-hb-reasons" class="form-row hidden" style="background: var(--bg-light); border: 1px solid var(--border-gray); border-radius: 4px; padding: 12px 14px; margin-bottom: 14px;">
+                                    <label style="margin-bottom: 8px;">Haftgründe nach §§ 112, 112a StPO (Mehrfachauswahl):</label>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 6px 14px; font-size: 13.5px;">
+                                        <label style="font-weight: normal; display: flex; align-items: center; gap: 6px; margin: 0; cursor: pointer;">
+                                            <input type="checkbox" class="hb-reason-cb" value="Flucht (§ 112 Abs. 2 Nr. 1 StPO)"> Flucht (§ 112 Abs. 2 Nr. 1 StPO)
+                                        </label>
+                                        <label style="font-weight: normal; display: flex; align-items: center; gap: 6px; margin: 0; cursor: pointer;">
+                                            <input type="checkbox" class="hb-reason-cb" value="Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)" checked> Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)
+                                        </label>
+                                        <label style="font-weight: normal; display: flex; align-items: center; gap: 6px; margin: 0; cursor: pointer;">
+                                            <input type="checkbox" class="hb-reason-cb" value="Verdunkelungsgefahr (§ 112 Abs. 2 Nr. 3 StPO)"> Verdunkelungsgefahr (§ 112 Abs. 2 Nr. 3 StPO)
+                                        </label>
+                                        <label style="font-weight: normal; display: flex; align-items: center; gap: 6px; margin: 0; cursor: pointer;">
+                                            <input type="checkbox" class="hb-reason-cb" value="Schwere der Tat (§ 112 Abs. 3 StPO)"> Schwere der Tat (§ 112 Abs. 3 StPO)
+                                        </label>
+                                        <label style="font-weight: normal; display: flex; align-items: center; gap: 6px; margin: 0; cursor: pointer;">
+                                            <input type="checkbox" class="hb-reason-cb" value="Wiederholungsgefahr (§ 112a StPO)"> Wiederholungsgefahr (§ 112a StPO)
+                                        </label>
+                                    </div>
+                                </div>
                                 <div class="form-row">
                                     <label for="doc-body-input">Begründung / Beschlusstext (frei anpassbar):</label>
                                     <textarea id="doc-body-input" rows="5" placeholder="Begründung oder Tatvorwurf..."></textarea>

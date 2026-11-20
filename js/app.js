@@ -1325,6 +1325,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const lblExtra = document.getElementById('lbl-doc-extra');
         const bodyInp = document.getElementById('doc-body-input');
 
+        const hbBox = document.getElementById('doc-hb-reasons');
+        if (hbBox) hbBox.classList.toggle('hidden', docType !== 'Haftbefehl');
+
         if (docType === 'Ermittlungsakte') {
             customBox.classList.add('hidden');
             signerInp.value = akte.bearbeiter || 'Staatsanwaltschaft Berlin / Geschäftsstelle';
@@ -1517,16 +1520,19 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         } else if (docType === 'Haftbefehl') {
             signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
-            bodyEl.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                    <span style="border: 2px solid #CC0000; color: #CC0000; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">EILBEDÜRFTIG · VOLLSTRECKUNGSAUFTRAG</span>
-                    ${buildPrintStampHtml('HAFTBEFEHL', akte.datum, 'red')}
-                </div>
-                <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(customTarget)}</strong> wird auf Antrag der Staatsanwaltschaft Berlin die Untersuchungshaft angeordnet.</p>
-                <p><strong>Gründe:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
-                <p>Es besteht dringender Tatverdacht sowie der Haftgrund: <strong>${escapeHtml(customExtra || 'Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)')}</strong>. Die Vollstreckung obliegt der Polizei Berlin.</p>
-                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
-            `;
+            const checkedReasons = Array.from(document.querySelectorAll('.hb-reason-cb:checked')).map(cb => cb.value);
+            if (customExtra && !checkedReasons.includes(customExtra)) {
+                // Keep custom text if user modified input manually
+            }
+            bodyEl.innerHTML = buildHaftbefehlHtml({
+                az: akte.az,
+                datum: heute,
+                target: customTarget,
+                laws: akte.paragraphen || '',
+                reasons: checkedReasons.length > 0 ? checkedReasons : [customExtra || 'Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)'],
+                body: customBody,
+                nachname: akte.nachname
+            });
         } else if (docType === 'Durchsuchungsbeschluss') {
             signerEl.textContent = customSigner || 'Ermittlungsrichter/in am Amtsgericht Tiergarten';
             bodyEl.innerHTML = `
@@ -2798,6 +2804,66 @@ document.addEventListener('DOMContentLoaded', () => {
         logActivity('Dokument erstellt', `${docType} (Az. ${az}) im Dokumenten-Generator gedruckt.`);
         triggerOfficialPrint(az, document.getElementById('print-datum')?.textContent || '');
     });
+
+    document.querySelectorAll('.hb-reason-cb').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const selected = Array.from(document.querySelectorAll('.hb-reason-cb:checked')).map(el => el.value);
+            const extraInp = document.getElementById('doc-extra-input');
+            if (extraInp) extraInp.value = selected.join('; ');
+        });
+    });
+
+    function buildHaftbefehlHtml({ az, datum, target, laws, reasons, body, nachname }) {
+        const allReasons = [
+            'Flucht (§ 112 Abs. 2 Nr. 1 StPO)',
+            'Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)',
+            'Verdunkelungsgefahr (§ 112 Abs. 2 Nr. 3 StPO)',
+            'Schwere der Tat (§ 112 Abs. 3 StPO)',
+            'Wiederholungsgefahr (§ 112a StPO)'
+        ];
+        const activeSet = new Set(reasons || []);
+        const checklistHtml = allReasons.map(r => {
+            const isChecked = activeSet.has(r);
+            return `<div style="margin: 2px 0; ${isChecked ? 'font-weight: bold; color: #000;' : 'color: #666;'}">${isChecked ? '☑' : '☐'} ${escapeHtml(r)}</div>`;
+        }).join('');
+
+        return `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <span style="border: 2px solid #CC0000; color: #CC0000; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">EILBEDÜRFTIG · VOLLSTRECKUNGSAUFTRAG · § 114 StPO</span>
+                ${buildPrintStampHtml('HAFTBEFEHL', datum, 'red')}
+            </div>
+
+            <div style="border: 1.5px solid #000; background: #F7F7F7; padding: 10px 14px; margin-bottom: 14px; font-size: 10.5pt;">
+                <div style="font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #999; padding-bottom: 4px;">
+                    Amtsgericht Tiergarten – Ermittlungsrichter –
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt;">
+                    <tr><td style="width: 24%; padding: 2px 0; font-weight: bold;">Beschuldigte(r):</td><td style="padding: 2px 0;"><strong>${escapeHtml(target)}</strong></td></tr>
+                    <tr><td style="padding: 2px 0; font-weight: bold;">Tatvorwurf:</td><td style="padding: 2px 0;">${escapeHtml(laws || 'Verdacht einer Straftat gemäß Ermittlungsakte')}</td></tr>
+                </table>
+            </div>
+
+            <p style="margin: 0 0 10px 0;"><strong>I. Anordnung (Tenor)</strong><br>
+            Auf Antrag der Staatsanwaltschaft Berlin wird gegen den/die vorgenannte(n) Beschuldigte(n) gemäß §§ 112, 114 StPO die <strong>Untersuchungshaft</strong> angeordnet.</p>
+
+            <p style="margin: 0 0 4px 0;"><strong>II. Dringender Tatverdacht &amp; Gründe</strong></p>
+            <div style="border: 1px solid #999; background: #FAFAFA; padding: 9px 12px; margin-bottom: 12px; white-space: pre-wrap; font-size: 10.5pt;">${escapeHtml(body)}</div>
+
+            <p style="margin: 0 0 4px 0;"><strong>III. Haftgründe (§§ 112, 112a StPO)</strong></p>
+            <div style="border: 1px solid #999; padding: 8px 12px; margin-bottom: 12px; font-size: 10pt; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px;">
+                ${checklistHtml}
+            </div>
+
+            <p style="margin: 0 0 8px 0; font-size: 10pt;"><strong>IV. Vollstreckungsauftrag &amp; Rechtsbehelfsbelehrung (§§ 114b, 115 StPO)</strong><br>
+            Die Vollstreckung dieses Haftbefehls obliegt der Polizei Berlin. Der/die Beschuldigte ist unverzüglich, spätestens am Tage nach der Ergreifung, dem zuständigen Gericht vorzuführen. Gegen diesen Haftbefehl ist die Beschwerde (§ 304 StPO) sowie jederzeit der Antrag auf gerichtliche Haftprüfung (§ 117 StPO) zulässig.</p>
+
+            <div style="border: 1px dashed #666; padding: 7px 10px; margin-top: 10px; font-family: Arial, Helvetica, sans-serif; font-size: 8.5pt; color: #333;">
+                <strong>Vollzugsvermerk (Polizei Berlin):</strong> Festgenommen am: ________________ um: ________ Uhr · Dienststelle / Beamter: ______________________________
+            </div>
+
+            ${buildPrintQrBoxHtml(az, nachname, datum)}
+        `;
+    }
 
     function buildPrintStampHtml(label, datum, variant) {
         const lower = String(label || '').toLowerCase();
