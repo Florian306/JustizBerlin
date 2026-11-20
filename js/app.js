@@ -1521,65 +1521,58 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (docType === 'Haftbefehl') {
             signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
             const checkedReasons = Array.from(document.querySelectorAll('.hb-reason-cb:checked')).map(cb => cb.value);
-            if (customExtra && !checkedReasons.includes(customExtra)) {
-                // Keep custom text if user modified input manually
-            }
-            bodyEl.innerHTML = buildHaftbefehlHtml({
+            bodyEl.innerHTML = buildOfficialDocHtml('Haftbefehl', {
                 az: akte.az,
                 datum: heute,
                 target: customTarget,
                 laws: akte.paragraphen || '',
+                extra: customExtra,
                 reasons: checkedReasons.length > 0 ? checkedReasons : [customExtra || 'Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)'],
                 body: customBody,
                 nachname: akte.nachname
             });
         } else if (docType === 'Durchsuchungsbeschluss') {
             signerEl.textContent = customSigner || 'Ermittlungsrichter/in am Amtsgericht Tiergarten';
-            bodyEl.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                    <span style="border: 2px solid #CC0000; color: #CC0000; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">RICHTERLICHE ANORDNUNG · §§ 102, 105 StPO</span>
-                    ${buildPrintStampHtml('DURCHSUCHUNG', akte.datum, 'red')}
-                </div>
-                <p>In der Ermittlungssache betreffend <strong>${escapeHtml(customTarget)}</strong> wird gemäß §§ 102, 105 StPO die Durchsuchung folgender Objekte angeordnet: <strong>${escapeHtml(customExtra || 'Wohn- und Geschäftsräume sowie mitgeführte Fahrzeuge')}</strong>.</p>
-                <p><strong>Sachverhalt:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
-                <p>Zweck der Maßnahme ist das Auffinden von Beweismitteln. Die Beschlagnahme verfahrensrelevanter Gegenstände wird hiermit angeordnet.</p>
-                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
-            `;
+            bodyEl.innerHTML = buildOfficialDocHtml('Durchsuchungsbeschluss', {
+                az: akte.az,
+                datum: heute,
+                target: customTarget,
+                laws: akte.paragraphen || '',
+                extra: customExtra,
+                body: customBody,
+                nachname: akte.nachname
+            });
         } else if (docType === 'Strafbefehl') {
             signerEl.textContent = customSigner || 'Richter/in am Amtsgericht Tiergarten';
-            bodyEl.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                    <span style="border: 1.5px solid #003366; color: #003366; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTSGERICHT TIERGARTEN · § 407 StPO</span>
-                    ${buildPrintStampHtml('STRAFBEFEHL', akte.datum, 'blue')}
-                </div>
-                <p>Auf Antrag der Staatsanwaltschaft Berlin wird gegen <strong>${escapeHtml(customTarget)}</strong> gemäß § 407 StPO folgende Rechtsfolge festgesetzt: <strong>${escapeHtml(customExtra || 'Geldstrafe')}</strong>.</p>
-                <p><strong>Tatvorwurf:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
-                <p>Gegen diesen Strafbefehl kann innerhalb von zwei Wochen nach Zustellung schriftlich oder zu Protokoll der Geschäftsstelle Einspruch eingelegt werden.</p>
-                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
-            `;
+            bodyEl.innerHTML = buildOfficialDocHtml('Strafbefehl', {
+                az: akte.az,
+                datum: heute,
+                target: customTarget,
+                laws: akte.paragraphen || '',
+                extra: customExtra,
+                body: customBody,
+                nachname: akte.nachname
+            });
         } else if (docType === 'Einstellungsverfügung') {
             signerEl.textContent = customSigner || akte.bearbeiter || 'Staatsanwalt/-anwältin – Staatsanwaltschaft Berlin';
-            bodyEl.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                    <span style="border: 1.5px solid #555; color: #555; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">VERFAHRENSABSCHLUSS · § 170 Abs. 2 StPO</span>
-                    ${buildPrintStampHtml('EINGESTELLT', akte.datum, 'gray')}
-                </div>
-                <p>In dem Ermittlungsverfahren gegen <strong>${escapeHtml(customTarget)}</strong> wegen <strong>${escapeHtml(customExtra || akte.paragraphen || 'des bekannten Tatvorwurfs')}</strong> wird das Verfahren gemäß § 170 Abs. 2 StPO eingestellt.</p>
-                <p><strong>Begründung:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(customBody)}</span></p>
-                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
-            `;
+            bodyEl.innerHTML = buildOfficialDocHtml('Einstellungsverfügung', {
+                az: akte.az,
+                datum: heute,
+                target: customTarget,
+                laws: customExtra || akte.paragraphen || '',
+                body: customBody,
+                nachname: akte.nachname
+            });
         } else {
             signerEl.textContent = customSigner || 'Präsident/in des Amtsgerichts Tiergarten (Schöffengeschäftsstelle)';
-            bodyEl.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                    <span style="border: 1.5px solid #1B5E20; color: #1B5E20; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTLICHE BERUFUNG · § 45 GVG</span>
-                    ${buildPrintStampHtml('BERUFEN', akte.datum, 'green')}
-                </div>
-                <p>Sehr geehrte(r) <strong>${escapeHtml(customTarget)}</strong>,</p>
-                <p>auf Grundlage Ihrer Bewerbung / der Vorschlagsliste werden Sie hiermit gemäß § 45 GVG zum ehrenamtlichen Schöffendienst am Amtsgericht Tiergarten berufen.</p>
-                <p><strong>Termin / Hinweis:</strong> ${escapeHtml(customExtra || 'Die genaue Terminladung zu den Hauptverhandlungen erfolgt gesondert.')}</p>
-                ${buildPrintQrBoxHtml(akte.az, akte.nachname, akte.datum)}
-            `;
+            bodyEl.innerHTML = buildOfficialDocHtml('Schöffen-Ladung', {
+                az: akte.az,
+                datum: heute,
+                target: customTarget,
+                extra: customExtra,
+                body: customBody,
+                nachname: akte.nachname
+            });
         }
 
         triggerOfficialPrint(akte.az, akte.datum);
@@ -2787,18 +2780,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('print-signer').textContent = signer;
 
         const targetLastName = target.trim().split(/\s+/).slice(-1)[0] || '';
-        let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                <span style="border: 1.5px solid #003366; color: #003366; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTLICHE AUSFERTIGUNG · JUSTIZ BERLIN</span>
-                ${buildPrintStampHtml(docType, datum)}
-            </div>
-            <p><strong>Betroffene Person / Adressat:</strong> ${escapeHtml(target)}</p>
-        `;
-        if (laws) html += `<p><strong>Tatvorwurf / Angewandte Vorschriften:</strong> ${escapeHtml(laws)}</p>`;
-        if (extra) html += `<p><strong>Anordnung / Maßnahme / Rechtsfolge:</strong> ${escapeHtml(extra)}</p>`;
-        html += `<p style="margin-top: 16px;"><strong>Begründung / Beschlusstext:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(bodyText)}</span></p>`;
-        if (legalText) html += `<p style="margin-top: 18px; font-size: 10.5pt; border-top: 1px solid #999; padding-top: 10px;"><strong>Rechtsmittelbelehrung / Hinweis:</strong><br><span style="white-space:pre-wrap;">${escapeHtml(legalText)}</span></p>`;
-        html += buildPrintQrBoxHtml(az, targetLastName, datum);
+        const html = buildOfficialDocHtml(docType, {
+            az,
+            datum,
+            target,
+            laws,
+            extra,
+            reasons: extra ? extra.split(';').map(s => s.trim()).filter(Boolean) : ['Fluchtgefahr (§ 112 Abs. 2 Nr. 2 StPO)'],
+            body: bodyText,
+            legal: legalText,
+            nachname: targetLastName
+        });
 
         document.getElementById('print-doc-body').innerHTML = html;
         logActivity('Dokument erstellt', `${docType} (Az. ${az}) im Dokumenten-Generator gedruckt.`);
@@ -2812,6 +2804,140 @@ document.addEventListener('DOMContentLoaded', () => {
             if (extraInp) extraInp.value = selected.join('; ');
         });
     });
+
+    function buildOfficialDocHtml(docType, data) {
+        const { az, datum, target, laws, extra, reasons, body, legal, nachname } = data;
+        if (docType === 'Haftbefehl') {
+            return buildHaftbefehlHtml({ az, datum, target, laws, reasons, body, nachname });
+        }
+
+        if (docType === 'Durchsuchungsbeschluss') {
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <span style="border: 2px solid #CC0000; color: #CC0000; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">RICHTERLICHE ANORDNUNG · §§ 102, 105 StPO</span>
+                    ${buildPrintStampHtml('DURCHSUCHUNG', datum, 'red')}
+                </div>
+                <div style="border: 1.5px solid #000; background: #F7F7F7; padding: 10px 14px; margin-bottom: 14px; font-size: 10.5pt;">
+                    <div style="font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #999; padding-bottom: 4px;">
+                        Amtsgericht Tiergarten – Ermittlungsrichter –
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt;">
+                        <tr><td style="width: 28%; padding: 2px 0; font-weight: bold;">Betroffene Person:</td><td style="padding: 2px 0;"><strong>${escapeHtml(target)}</strong></td></tr>
+                        <tr><td style="padding: 2px 0; font-weight: bold;">Tatvorwurf:</td><td style="padding: 2px 0;">${escapeHtml(laws || 'Verdacht einer Straftat gemäß Ermittlungsakte')}</td></tr>
+                        <tr><td style="padding: 2px 0; font-weight: bold;">Durchsuchungsobjekt:</td><td style="padding: 2px 0;"><strong>${escapeHtml(extra || 'Wohn- und Geschäftsräume sowie mitgeführte Fahrzeuge')}</strong></td></tr>
+                    </table>
+                </div>
+                <p style="margin: 0 0 10px 0;"><strong>I. Beschluss (Anordnung)</strong><br>
+                Auf Antrag der Staatsanwaltschaft Berlin wird gemäß §§ 102, 105 StPO die <strong>Durchsuchung</strong> der oben bezeichneten Räumlichkeiten, Fahrzeuge und der Person angeordnet. Zugleich wird die Beschlagnahme verfahrensrelevanter Beweismittel (§ 94 StPO) angeordnet.</p>
+                <p style="margin: 0 0 4px 0;"><strong>II. Sachverhalt &amp; Gründe</strong></p>
+                <div style="border: 1px solid #999; background: #FAFAFA; padding: 9px 12px; margin-bottom: 12px; white-space: pre-wrap; font-size: 10.5pt;">${escapeHtml(body)}</div>
+                <p style="margin: 0 0 8px 0; font-size: 10pt;"><strong>III. Vollstreckung &amp; Rechtsbehelfsbelehrung</strong><br>
+                ${escapeHtml(legal || 'Die Durchführung obliegt der Polizei Berlin. Gegen diesen Beschluss ist das Rechtsmittel der Beschwerde (§ 304 StPO) beim Amtsgericht Tiergarten zulässig.')}</p>
+                <div style="border: 1px dashed #666; padding: 7px 10px; margin-top: 10px; font-family: Arial, Helvetica, sans-serif; font-size: 8.5pt; color: #333;">
+                    <strong>Durchsuchungsvermerk (Polizei Berlin):</strong> Durchgeführt am: ____________ von _____ bis _____ Uhr · Sicherstellungen: ☐ Ja ☐ Nein · Beamter: _____________________
+                </div>
+                ${buildPrintQrBoxHtml(az, nachname, datum)}
+            `;
+        }
+
+        if (docType === 'Strafbefehl') {
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <span style="border: 1.5px solid #003366; color: #003366; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTSGERICHT TIERGARTEN · STRAFBEFEHLSVERFAHREN · § 407 StPO</span>
+                    ${buildPrintStampHtml('STRAFBEFEHL', datum, 'blue')}
+                </div>
+                <div style="border: 1.5px solid #000; background: #F7F7F7; padding: 10px 14px; margin-bottom: 14px; font-size: 10.5pt;">
+                    <div style="font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #999; padding-bottom: 4px;">
+                        Amtsgericht Tiergarten – Strafrichter –
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt;">
+                        <tr><td style="width: 28%; padding: 2px 0; font-weight: bold;">Angeschuldigte(r):</td><td style="padding: 2px 0;"><strong>${escapeHtml(target)}</strong></td></tr>
+                        <tr><td style="padding: 2px 0; font-weight: bold;">Angewandte Vorschriften:</td><td style="padding: 2px 0;">${escapeHtml(laws || 'Gemäß Antrag der Staatsanwaltschaft Berlin')}</td></tr>
+                    </table>
+                </div>
+                <p style="margin: 0 0 4px 0;"><strong>I. Festgesetzte Rechtsfolge (Tenor)</strong></p>
+                <div style="border: 1.5px solid #003366; background: #F2F6FA; padding: 9px 12px; margin-bottom: 12px; font-size: 10.5pt;">
+                    Auf Antrag der Staatsanwaltschaft Berlin wird gegen Sie gemäß § 407 StPO folgende Rechtsfolge festgesetzt:<br>
+                    <strong>${escapeHtml(extra || 'Geldstrafe gemäß gesetzlicher Bestimmung')}</strong>
+                </div>
+                <p style="margin: 0 0 4px 0;"><strong>II. Zur Last gelegter Sachverhalt</strong></p>
+                <div style="border: 1px solid #999; background: #FAFAFA; padding: 9px 12px; margin-bottom: 12px; white-space: pre-wrap; font-size: 10.5pt;">${escapeHtml(body)}</div>
+                <p style="margin: 0 0 8px 0; font-size: 10pt;"><strong>III. Kosten &amp; Rechtsbehelfsbelehrung</strong><br>
+                ${escapeHtml(legal || 'Sie tragen die Kosten des Verfahrens (§ 465 StPO). Gegen diesen Strafbefehl können Sie innerhalb von zwei Wochen nach Zustellung schriftlich oder zu Protokoll der Geschäftsstelle Einspruch einlegen. Wird kein rechtzeitiger Einspruch erhoben, steht der Strafbefehl einem rechtskräftigen Urteil gleich.')}</p>
+                ${buildPrintQrBoxHtml(az, nachname, datum)}
+            `;
+        }
+
+        if (docType === 'Einstellungsverfügung') {
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <span style="border: 1.5px solid #555; color: #555; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">STAATSANWALTSCHAFT BERLIN · VERFAHRENSABSCHLUSS</span>
+                    ${buildPrintStampHtml('EINGESTELLT', datum, 'gray')}
+                </div>
+                <div style="border: 1.5px solid #000; background: #F7F7F7; padding: 10px 14px; margin-bottom: 14px; font-size: 10.5pt;">
+                    <div style="font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #999; padding-bottom: 4px;">
+                        Staatsanwaltschaft Berlin – Dezernat für Ermittlungsverfahren –
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt;">
+                        <tr><td style="width: 28%; padding: 2px 0; font-weight: bold;">Ermittlungsverfahren gegen:</td><td style="padding: 2px 0;"><strong>${escapeHtml(target)}</strong></td></tr>
+                        <tr><td style="padding: 2px 0; font-weight: bold;">Wegen:</td><td style="padding: 2px 0;">${escapeHtml(laws || 'Des bekannten Tatvorwurfs')}</td></tr>
+                    </table>
+                </div>
+                <p style="margin: 0 0 10px 0;"><strong>I. Verfügung</strong><br>
+                Das vorbezeichnete Ermittlungsverfahren wird gemäß <strong>§ 170 Abs. 2 StPO</strong> eingestellt.</p>
+                <p style="margin: 0 0 4px 0;"><strong>II. Gründe</strong></p>
+                <div style="border: 1px solid #999; background: #FAFAFA; padding: 9px 12px; margin-bottom: 12px; white-space: pre-wrap; font-size: 10.5pt;">${escapeHtml(body)}</div>
+                <p style="margin: 0 0 8px 0; font-size: 10pt;"><strong>III. Rechtsbehelfsbelehrung</strong><br>
+                ${escapeHtml(legal || 'Gegen diesen Bescheid steht dem Verletzten, der zugleich Antragsteller ist, binnen zwei Wochen nach Bekanntmachung die Beschwerde an den Generalstaatsanwalt in Berlin zu (§ 172 Abs. 1 StPO).')}</p>
+                ${buildPrintQrBoxHtml(az, nachname, datum)}
+            `;
+        }
+
+        if (docType === 'Schöffen-Ladung') {
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <span style="border: 1.5px solid #1B5E20; color: #1B5E20; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTLICHE BERUFUNG · EHRENAMTLICHER RICHTERDIENST · § 45 GVG</span>
+                    ${buildPrintStampHtml('BERUFEN', datum, 'green')}
+                </div>
+                <div style="border: 1.5px solid #000; background: #F7F7F7; padding: 10px 14px; margin-bottom: 14px; font-size: 10.5pt;">
+                    <div style="font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #999; padding-bottom: 4px;">
+                        Der Präsident des Amtsgerichts Tiergarten – Schöffengeschäftsstelle –
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt;">
+                        <tr><td style="width: 28%; padding: 2px 0; font-weight: bold;">Berufene Person:</td><td style="padding: 2px 0;"><strong>${escapeHtml(target)}</strong></td></tr>
+                    </table>
+                </div>
+                <p style="margin: 0 0 10px 0;"><strong>I. Berufung zum Schöffendienst</strong><br>
+                Sehr geehrte(r) <strong>${escapeHtml(target)}</strong>, auf Grundlage Ihrer Bewerbung / der Vorschlagsliste werden Sie hiermit gemäß § 45 GVG zum ehrenamtlichen Schöffendienst am Amtsgericht Tiergarten berufen.</p>
+                <p style="margin: 0 0 4px 0;"><strong>II. Termin &amp; Hinweise</strong></p>
+                <div style="border: 1px solid #999; background: #FAFAFA; padding: 9px 12px; margin-bottom: 12px; white-space: pre-wrap; font-size: 10.5pt;">${escapeHtml(extra || body || 'Die genaue Terminladung zu den Hauptverhandlungen erfolgt gesondert.')}</div>
+                <p style="margin: 0 0 8px 0; font-size: 10pt;"><strong>III. Rechtliche Hinweise</strong><br>
+                ${escapeHtml(legal || 'Das Schöffenamt ist ein Ehrenamt. Schöffen unterliegen der richterlichen Unabhängigkeit sowie der gesetzlichen Verschwiegenheitspflicht über den Hergang der Beratung und Abstimmung (§ 43 DRiG).')}</p>
+                ${buildPrintQrBoxHtml(az, nachname, datum)}
+            `;
+        }
+
+        return `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <span style="border: 1.5px solid #003366; color: #003366; padding: 3px 9px; font-weight: bold; font-size: 9pt; letter-spacing: 1px;">AMTLICHE AUSFERTIGUNG · JUSTIZ BERLIN</span>
+                ${buildPrintStampHtml(docType, datum)}
+            </div>
+            <div style="border: 1.5px solid #000; background: #F7F7F7; padding: 10px 14px; margin-bottom: 14px; font-size: 10.5pt;">
+                <div style="font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; border-bottom: 1px solid #999; padding-bottom: 4px;">
+                    Senatsverwaltung für Justiz und Verbraucherschutz – Land Berlin
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt;">
+                    <tr><td style="width: 28%; padding: 2px 0; font-weight: bold;">Betroffene Person:</td><td style="padding: 2px 0;"><strong>${escapeHtml(target)}</strong></td></tr>
+                    ${laws ? `<tr><td style="padding: 2px 0; font-weight: bold;">Rechtsgrundlage:</td><td style="padding: 2px 0;">${escapeHtml(laws)}</td></tr>` : ''}
+                </table>
+            </div>
+            ${extra ? `<p style="margin: 0 0 10px 0;"><strong>I. Anordnung / Maßnahme</strong><br>${escapeHtml(extra)}</p>` : ''}
+            <p style="margin: 0 0 4px 0;"><strong>${extra ? 'II.' : 'I.'} Begründung / Beschlusstext</strong></p>
+            <div style="border: 1px solid #999; background: #FAFAFA; padding: 9px 12px; margin-bottom: 12px; white-space: pre-wrap; font-size: 10.5pt;">${escapeHtml(body)}</div>
+            ${legal ? `<p style="margin: 0 0 8px 0; font-size: 10pt;"><strong>Rechtsmittelbelehrung / Hinweis</strong><br><span style="white-space:pre-wrap;">${escapeHtml(legal)}</span></p>` : ''}
+            ${buildPrintQrBoxHtml(az, nachname, datum)}
+        `;
+    }
 
     function buildHaftbefehlHtml({ az, datum, target, laws, reasons, body, nachname }) {
         const allReasons = [
