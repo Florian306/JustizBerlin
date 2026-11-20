@@ -158,9 +158,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderBekanntmachungen() {
         const tbody = document.getElementById('bekanntmachungen-tbody');
-        const [akten, gesetze] = await Promise.all([AktenAPI.getAll(), GesetzeAPI.getAll()]);
+        const [akten, gesetze, manualBek] = await Promise.all([
+            AktenAPI.getAll(),
+            GesetzeAPI.getAll(),
+            fetch('/api/bekanntmachungen').then(r => r.ok ? r.json() : []).catch(() => [])
+        ]);
 
         const items = [];
+
+        // Freie amtliche Bekanntmachungen
+        (manualBek || []).forEach(b => {
+            items.push({
+                datum: b.datum,
+                betreff: `<strong>${escapeHtml(b.title)}</strong>`,
+                az: b.az || 'SenJustV',
+                detailTitle: `${b.title} (${b.az || 'SenJustV'})`,
+                detailText: b.text
+            });
+        });
 
         // Echte veröffentlichte Gesetzbücher
         gesetze.books.filter(b => b.createdAt).forEach(b => {
@@ -2307,6 +2322,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('logs-filter-search').addEventListener('input', renderLogsIntern);
     document.getElementById('btn-refresh-logs').addEventListener('click', renderLogsIntern);
+
+    document.getElementById('form-add-bekanntmachung').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('bek-title').value.trim();
+        const az = document.getElementById('bek-az').value.trim();
+        const text = document.getElementById('bek-text').value.trim();
+        if (!title || !text) return;
+
+        const res = await fetch('/api/bekanntmachungen', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, az, text })
+        });
+        if (res.ok) {
+            e.target.reset();
+            const msg = document.getElementById('bek-save-msg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+            logActivity('Bekanntmachung veröffentlicht', `Amtliche Bekanntmachung "${title}" veröffentlicht.`);
+            renderBekanntmachungen();
+        }
+    });
 
     async function renderRolesIntern() {
         const tbody = document.getElementById('intern-roles-tbody');

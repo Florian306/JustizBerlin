@@ -884,6 +884,28 @@
 
                 <!-- Aktivitäts-Log -->
                 <div id="subtab-logs" class="subtab-panel">
+                    <details class="toc-section mb-20" style="background: var(--bg-white); padding: 12px 16px; margin-bottom: 20px;">
+                        <summary style="font-size: 15px; padding: 4px 0;">+ Neue Amtliche Bekanntmachung veröffentlichen (Startseite &amp; Discord)</summary>
+                        <form id="form-add-bekanntmachung" class="official-form mt-10" style="margin-bottom: 0;">
+                            <div class="form-grid-2">
+                                <div class="form-row">
+                                    <label for="bek-title">Betreff / Überschrift <span class="req">*</span></label>
+                                    <input type="text" id="bek-title" required placeholder="z. B. Schöffenwahl 2026 eröffnet">
+                                </div>
+                                <div class="form-row">
+                                    <label for="bek-az">Aktenzeichen / Kürzel (optional)</label>
+                                    <input type="text" id="bek-az" placeholder="z. B. SenJustV I A 1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <label for="bek-text">Text der Bekanntmachung <span class="req">*</span></label>
+                                <textarea id="bek-text" rows="3" required placeholder="Wortlaut der amtlichen Bekanntmachung..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary btn-small">Auf Startseite &amp; in Discord veröffentlichen</button>
+                            <span id="bek-save-msg" class="save-msg hidden">Veröffentlicht.</span>
+                        </form>
+                    </details>
+
                     <h3 class="section-heading">Aktivitäts- &amp; Audit-Log</h3>
                     <div class="filter-bar">
                         <div class="filter-group">

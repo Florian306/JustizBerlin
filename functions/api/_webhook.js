@@ -24,3 +24,24 @@ export async function sendBekanntmachungWebhook(env, { title, description, az, d
         });
     } catch {}
 }
+
+export async function sendEingangWebhook(env, akte) {
+    const webhookUrl = env.DISCORD_EINGANG_WEBHOOK;
+    if (!webhookUrl) return;
+
+    try {
+        await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'Justiz-Poststelle – Neuer Eingang',
+                embeds: [{
+                    title: `📥 Neuer Vorgang eingegangen: ${akte.az}`,
+                    description: `**Vorgangsart:** ${akte.typ}\n**Antragsteller:** ${akte.vorname} ${akte.nachname}${akte.kontakt ? ` (${akte.kontakt})` : ''}\n**Betroffene Person:** ${akte.beteiligter || 'Keine Angabe'}\n\n👉 **Im Dienstportal öffnen:** https://justizberlin.pages.dev/#intern`,
+                    color: 0x003366,
+                    footer: { text: `Eingegangen am ${akte.datum} · Senatsverwaltung für Justiz Berlin` }
+                }]
+            })
+        });
+    } catch {}
+}

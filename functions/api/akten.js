@@ -1,3 +1,5 @@
+import { sendEingangWebhook } from './_webhook.js';
+
 async function ensureAktenTable(db) {
     await db.prepare(`
         CREATE TABLE IF NOT EXISTS akten (
@@ -58,6 +60,8 @@ export async function onRequestPost(context) {
         bwmJson,
         body.kontakt || ''
     ).run();
+
+    await sendEingangWebhook(context.env, body);
 
     return Response.json(body, { status: 201 });
 }
